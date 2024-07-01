@@ -2,6 +2,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_base/app/services/controller/base_controller.dart';
 import 'package:flutter_base/app/services/controller/config_controller.dart';
 // import 'package:flutter_base/app/services/controller/config_controller.dart';
 import 'package:flutter_base/config/dark_theme.dart';
@@ -91,7 +92,7 @@ class MyApp extends StatelessWidget {
       darkTheme: darkTheme,
       initialBinding: BaseBinding(apiService: apiService),
       // initialRoute: AppPages.INITIAL,
-      initialRoute: Routes.POS,
+      initialRoute: Routes.AUTH,
       getPages: AppPages.routes,
     );
   }

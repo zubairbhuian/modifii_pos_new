@@ -4,7 +4,7 @@ class URLS {
   static String baseURL = 'https://yogo-pos-server.vercel.app/api/v1';
 
   //** end popint **
-  static String login = '$baseURL/server/login';
+  static String login = '$baseURL/auth/login';
   static String categories = '$baseURL/categories';
   static String products = '$baseURL/products';
   static String placeOrder = '$baseURL/table/order/place';
