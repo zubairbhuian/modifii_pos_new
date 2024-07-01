@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_base/app/modules/pos/controllers/pos_controller.dart';
 import 'package:flutter_base/app/modules/pos/models/category_model.dart';
+import 'package:flutter_base/app/modules/subCategory/models/sub_category_model.dart';
 import 'package:flutter_base/app/utils/my_func.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 
 class CategoryBody extends GetView<PosController> {
   const CategoryBody({super.key});
@@ -18,14 +20,14 @@ class CategoryBody extends GetView<PosController> {
   Widget _body(ThemeData theme, BuildContext context) {
     return SingleChildScrollView(
       child: Obx(() {
-        List<CategoryModel> veg = controller.categoryList
-            .where((value) => value.type == 'veg')
+        List<SubCategoryModel> veg = controller.categoryList
+            .where((value) => value.type == 'VEG')
             .toList();
-        List<CategoryModel> nonVeg = controller.categoryList
-            .where((value) => value.type == 'non_veg')
+        List<SubCategoryModel> nonVeg = controller.categoryList
+            .where((value) => value.type == 'NON_VEG')
             .toList();
-        List<CategoryModel> drinks = controller.categoryList
-            .where((value) => value.type == 'drinks')
+        List<SubCategoryModel> drinks = controller.categoryList
+            .where((value) => value.type == 'DRINKS')
             .toList();
         return Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,7 +43,7 @@ class CategoryBody extends GetView<PosController> {
     );
   }
 
-  Widget _categoryBtn(ThemeData theme, List<CategoryModel> data) => Expanded(
+  Widget _categoryBtn(ThemeData theme, List<SubCategoryModel> data) => Expanded(
         child: ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -52,7 +54,7 @@ class CategoryBody extends GetView<PosController> {
             },
             color: MyFunc.productColor(data[index].type),
             style: theme.textTheme.titleLarge?.copyWith(color: Colors.white),
-            text: data[index].name,
+            text: data[index].title,
           ).marginOnly(bottom: 12),
         ).marginOnly(bottom: 20),
       );

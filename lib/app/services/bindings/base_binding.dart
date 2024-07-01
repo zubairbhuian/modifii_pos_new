@@ -11,9 +11,8 @@ class BaseBinding extends Bindings {
 
   @override
   void dependencies() {
-    // Get.put(BaseController(apiService: apiService));
-    Get.put(ConfigController());
-    Get.put(PosController());
-    Get.put(BaseController(apiService: apiService));
+    Get.put(BaseController(apiService: apiService), permanent: true);
+    Get.put(ConfigController(), permanent: true);
+    Get.put(PosController(), permanent: true);
   }
 }

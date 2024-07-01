@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter_base/app/routes/app_pages.dart';
+import 'package:flutter_base/app/services/controller/base_controller.dart';
 import 'package:flutter_base/app/utils/logger.dart';
 import 'package:flutter_base/app/utils/urls.dart';
 import 'package:flutter_base/app/widgets/popup_dialogs.dart';
@@ -43,15 +44,15 @@ class AuthController extends GetxController {
   RxString password = "".obs;
   RxInt passwordLength = 6.obs;
   List<String> numberList = [
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
     "7",
     "8",
     "9",
+    "4",
+    "5",
+    "6",
+    "1",
+    "2",
+    "3",
     "*",
     "0",
     "*",
@@ -60,19 +61,17 @@ class AuthController extends GetxController {
   // **** Login *****
 
   void login() async {
-    Map<String, dynamic> data = {"auth_pin": password.value};
-    try {
-      kLogger.i('auth: $data');
-      PopupDialog.showLoadingDialog();
-      var res = await Dio().post(URLS.login, data: data);
+    Map<String, dynamic> data = {"auth_pin": int.parse(password.value)};
+    PopupDialog.showLoadingDialog();
+    if (password.value.isNotEmpty) {
+      var res =
+          await BaseController.to.apiService.makePostRequest(URLS.login, data);
+      // var res = await Dio().post(URLS.login, data: data);
       if (res.statusCode == 200 || res.statusCode == 201) {
         Get.offAllNamed(Routes.POS);
       } else {
         PopupDialog.showErrorMessage("password is not valid");
       }
-      kLogger.e(res.data);
-    } catch (e) {
-      kLogger.e('Error from %%%% login %%%% => $e');
       PopupDialog.closeLoadingDialog();
     }
   }
