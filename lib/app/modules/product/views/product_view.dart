@@ -37,7 +37,7 @@ class ProductView extends GetView<ProductController> {
                           child: const AddProductDialog(),
                         );
                       },
-                      text: "Add Sub-category",
+                      text: "Add Product",
                       textColor: Colors.white,
                     ),
                   ),
@@ -79,7 +79,7 @@ class ProductView extends GetView<ProductController> {
                             TableRow(
                               // table decoration
                               decoration:
-                                  BoxDecoration(color: theme.disabledColor),
+                                  BoxDecoration(color: theme.dividerColor),
                               children: <Widget>[
                                 Text(
                                   'SL',

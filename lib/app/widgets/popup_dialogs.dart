@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_base/app/widgets/my_custom_text.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
@@ -80,6 +81,7 @@ class PopupDialog {
       builder: (BuildContext context) {
         return Center(
           child: SizedBox(
+            height: MediaQuery.sizeOf(context).height * 0.8,
             width: width ?? MediaQuery.sizeOf(context).width * 0.5,
             child: Material(
               elevation: 2,
@@ -105,16 +107,20 @@ class PopupDialog {
                         splashFactory: NoSplash.splashFactory,
                         child: Icon(
                           Icons.close,
-                          color: Theme.of(context).focusColor,
+                          color: Theme.of(context).colorScheme.background,
                           size: 18,
                         ),
                       ),
                     ),
                   ),
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(left: 20, right: 26, bottom: 20),
-                    child: child,
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            left: 20, right: 26, bottom: 20),
+                        child: child,
+                      ),
+                    ),
                   ),
                 ],
               ),

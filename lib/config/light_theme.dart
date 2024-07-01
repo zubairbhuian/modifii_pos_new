@@ -13,7 +13,7 @@ ThemeData lightTheme = ThemeData(
   dividerColor: Colors.grey.shade300,
   dialogBackgroundColor: const Color(0xffF9FAFD),
   hintColor: const Color.fromARGB(255, 128, 129, 133),
-  focusColor: Colors.grey.shade600,
+  focusColor: Colors.grey.shade200,
   highlightColor: const Color(0x000000ff),
   indicatorColor: const Color(0x000000ff),
   shadowColor: const Color(0x000000ff),

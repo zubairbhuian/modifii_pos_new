@@ -13,7 +13,7 @@ ThemeData darkTheme = ThemeData(
   dividerColor: const Color(0xff5B636B),
   dialogBackgroundColor: const Color(0xffF9FAFD),
   hintColor: const Color(0xffA0A3A9),
-  focusColor: Colors.grey.shade200,
+  focusColor: Colors.grey.shade700,
   highlightColor: const Color(0x000000ff),
   indicatorColor: const Color(0x000000ff),
   shadowColor: const Color(0x000000ff),
