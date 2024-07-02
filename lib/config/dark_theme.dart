@@ -132,4 +132,19 @@ ThemeData darkTheme = ThemeData(
           color: Color(0xffEDF2F7)),
     ),
   ),
+  scrollbarTheme: ScrollbarThemeData(
+    thumbColor: MaterialStateProperty.all(Colors.grey.shade800),
+    trackColor: MaterialStateProperty.all(Colors.grey.shade500),
+    crossAxisMargin: -12,
+  ),
+  dividerTheme: DividerThemeData(
+    color: Colors.grey.shade300,
+    thickness: 2,
+    space: 10,
+  ),
+  radioTheme: const RadioThemeData(
+    fillColor: MaterialStatePropertyAll(
+      Color(0xfff65b1c),
+    ),
+  ),
 );

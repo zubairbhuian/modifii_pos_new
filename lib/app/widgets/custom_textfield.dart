@@ -155,7 +155,7 @@ class CustomTextField extends StatelessWidget {
           ),
           // ********** inputFormatters ********
           inputFormatters:
-              inputFormatters ?? [LengthLimitingTextInputFormatter(40)],
+              inputFormatters ?? [LengthLimitingTextInputFormatter(256)],
         ),
         // ********** marginBottom ********
         SizedBox(
@@ -175,7 +175,9 @@ class CustomDropdownTextField extends StatelessWidget {
     this.icon,
     this.enabledBorderColor,
     this.borderColor,
-    this.hintStyle, this.value,required this.items,
+    this.hintStyle,
+    this.value,
+    required this.items,
   });
 
   final String? label;
@@ -204,7 +206,7 @@ class CustomDropdownTextField extends StatelessWidget {
                     ?.copyWith(color: const Color(0xFFC0C0C0)),
               ),
           icon: icon,
-          value:value ,
+          value: value,
           dropdownColor: theme.scaffoldBackgroundColor,
           focusColor: theme.scaffoldBackgroundColor,
           decoration: InputDecoration(

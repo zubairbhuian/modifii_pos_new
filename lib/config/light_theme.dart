@@ -140,4 +140,7 @@ ThemeData lightTheme = ThemeData(
     thickness: 2,
     space: 10,
   ),
+  radioTheme: const RadioThemeData(
+    fillColor: MaterialStatePropertyAll(Color(0xfff65b1c)),
+  ),
 );
