@@ -7,6 +7,8 @@ import 'package:flutter_base/app/modules/pos/controllers/tables_controller.dart'
 import 'package:flutter_base/app/modules/pos/models/category_model.dart';
 import 'package:flutter_base/app/modules/pos/models/order_place_model.dart';
 import 'package:flutter_base/app/modules/pos/models/product_model.dart';
+import 'package:flutter_base/app/modules/subCategory/models/sub_category_model.dart';
+import 'package:flutter_base/app/services/controller/base_controller.dart';
 import 'package:flutter_base/app/utils/logger.dart';
 import 'package:flutter_base/app/utils/urls.dart';
 import 'package:get/get.dart';
@@ -34,71 +36,85 @@ class PosController extends GetxController {
   RxBool isShowOrders = true.obs;
   int? categoryId;
 
-  RxList<CategoryModel> categoryList = <CategoryModel>[].obs;
+  // RxList<CategoryModel> categoryList = <CategoryModel>[].obs;
   RxInt selectedCategoryIndex = (-1).obs;
   void updateSelectedCategoryIndex(int value) {
     selectedCategoryIndex.value = value;
   }
 
-  RxList<ProductModel> productList = <ProductModel>[].obs;
+  // RxList<ProductModel> productList = <ProductModel>[].obs;
   RxList<ProductModel> mainProductList = <ProductModel>[].obs;
   RxBool isProductPage = false.obs;
 
+  // get sub category
+  var categoryList = <SubCategoryModel>[].obs;
   RxBool isLoadingCategory = false.obs;
-  getCategory({String? type, int? offset, int? limit}) async {
-    isLoadingCategory.value = true;
-    Map<String, dynamic>? queryParameters = {
-      "type": type,
-      "offset": offset,
-      "limit": limit
-    };
+  getCategoryList() async {
+    //     Map<String, dynamic> data = {
+    //   "title": titleController.text,
+    //   "type": selectedCategory // VEG, NON_VEG, DRINKS
+    // };
     try {
-      var res =
-          await Dio().get(URLS.categories, queryParameters: queryParameters);
+      var res = await BaseController.to.apiService.dio.get(URLS.categories);
+
       if (res.statusCode == 200) {
         categoryList.assignAll((res.data["data"] as List)
-            .map((e) => CategoryModel.fromJson(e))
+            .map((e) => SubCategoryModel.fromJson(e))
             .toList());
-      }
-      isLoadingCategory.value = false;
 
-      // kLogger.e(categoryList.length);
+        kLogger.e(categoryList.length);
+      }
     } catch (e) {
-      kLogger.e('Error from %%%% get categori %%%% => $e');
+      kLogger.e('Error from %%%% get category %%%% => $e');
     }
   }
 
   //** Get all product **
   RxBool isLoadingProduct = false.obs;
-  getProduct({String? type, int? offset, int? limit, int? categoryIds}) async {
-    isLoadingProduct.value = true;
-    productList.clear();
-    categoryId = categoryIds;
-    Map<String, dynamic>? queryParameters = {
-      "product_type": type,
-      "offset": offset,
-      "limit": limit ?? 800,
-      "category_ids": categoryIds
-    };
-    try {
-      var res =
-          await Dio().get(URLS.products, queryParameters: queryParameters);
-      if (res.statusCode == 200) {
-        productList.assignAll((res.data["products"] as List)
-            .map((e) => ProductModel.fromJson(e))
-            .toList());
-        mainProductList.assignAll((res.data["products"] as List)
-            .map((e) => ProductModel.fromJson(e))
-            .toList());
+  // getProduct({String? type, int? offset, int? limit, int? categoryIds}) async {
+  //   isLoadingProduct.value = true;
+  //   productList.clear();
+  //   categoryId = categoryIds;
+  //   Map<String, dynamic>? queryParameters = {
+  //     "product_type": type,
+  //     "offset": offset,
+  //     "limit": limit ?? 800,
+  //     "category_ids": categoryIds
+  //   };
+  //   try {
+  //     var res =
+  //         await Dio().get(URLS.products, queryParameters: queryParameters);
+  //     if (res.statusCode == 200) {
+  //       productList.assignAll((res.data["products"] as List)
+  //           .map((e) => ProductModel.fromJson(e))
+  //           .toList());
+  //       mainProductList.assignAll((res.data["products"] as List)
+  //           .map((e) => ProductModel.fromJson(e))
+  //           .toList());
 
-        /// Save fetched posts to Hive for future use
-        // await MyHive.saveAllProducts(productList);
+  //       /// Save fetched posts to Hive for future use
+  //       // await MyHive.saveAllProducts(productList);
 
-        isLoadingProduct.value = false;
-      }
-      // kLogger.e(productList);
-    } catch (e) {
-      kLogger.e('Error from %%%% get categori %%%% => $e');
+  //       isLoadingProduct.value = false;
+  //     }
+  //     // kLogger.e(productList);
+  //   } catch (e) {
+  //     kLogger.e('Error from %%%% get categori %%%% => $e');
+  //   }
+  // }
+
+  var productList = <ProductModel>[].obs;
+  getProductList() async {
+    //     Map<String, dynamic> data = {
+    //   "title": titleController.text,
+    //   "type": selectedCategory // VEG, NON_VEG, DRINKS
+    // };
+    var res = await BaseController.to.apiService.dio.get(URLS.products);
+
+    if (res.statusCode == 200) {
+      productList.assignAll((res.data["data"] as List)
+          .map((e) => ProductModel.fromJson(e))
+          .toList());
     }
   }
 
@@ -427,8 +443,8 @@ class PosController extends GetxController {
 
   @override
   void onInit() {
-    // getCategory();
-    // getProduct();
+    getCategoryList();
+    getProductList();
     super.onInit();
   }
 

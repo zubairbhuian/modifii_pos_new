@@ -3,9 +3,9 @@ import 'package:flutter_base/app/utils/static_colors.dart';
 
 class MyFunc {
   static Color productColor(String text) {
-    if (text == "veg") {
+    if (text == "VEG") {
       return StaticColors.greenColor;
-    } else if (text == "non_veg") {
+    } else if (text == "NON_VEG") {
       return const Color(0xffFD571A);
     } else {
       return StaticColors.purpleColor;
