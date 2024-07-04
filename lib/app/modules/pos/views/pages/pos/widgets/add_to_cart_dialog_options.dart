@@ -26,7 +26,7 @@ class AddToCartDialogOptions extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               MyCustomText(
-                item.name ?? '',
+                item.name,
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
               ),
@@ -63,19 +63,18 @@ class AddToCartDialogOptions extends StatelessWidget {
                   // height: 100,
                   child: Row(
                     children: List.generate(
-                      variation.values.length,
+                      variation.options.length,
                       (index) => _popupPrimaryBtn(
                         onPressed: () {
                           c.setSelectedProductVariationValue(index);
                           // c.orderTotalPrice =
                           //     num.parse(variation.values[index].optionPrice);
-                          price = c.orderTotalPrice =
-                              num.parse(variation.values[index].optionPrice);
+                          price = c.orderTotalPrice =variation.options[index].price;
                           c.orderQuantity = 1;
                           c.update();
                         },
-                        label: variation.values[index].label,
-                        price: variation.values[index].optionPrice,
+                        label: variation.options[index].name,
+                        price: variation.options[index].price.toStringAsFixed(2),
                         isSelected: c.selectedProductVariationValue == index
                             ? true
                             : false,
@@ -168,10 +167,12 @@ class AddToCartDialogOptions extends StatelessWidget {
                     id: item.id.toString(),
                     name: item.name,
                     description: item.description,
-                    type: item.productType,
+                    // type: item.productType,
+                    type: "",
                     price: price,
                     quantity: c.orderQuantity,
-                    isLiquor: int.parse(item.isLiquor.toString()),
+                    // isLiquor: int.parse(item.isLiquor.toString()),
+                    isLiquor: 1,
                     togo: '',
                     dontMake: '',
                     rush: '',
