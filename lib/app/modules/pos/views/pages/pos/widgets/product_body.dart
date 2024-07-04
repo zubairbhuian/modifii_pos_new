@@ -28,9 +28,9 @@ class ProductBody extends GetView<PosController> {
           var item = controller.productList[index];
           return PrimaryBtn(
             onPressed: () {
-              controller.orderTotalPrice = item.price!.toDouble();
+              controller.orderTotalPrice = item.price.toDouble();
               controller.resetModifierSelections();
-              controller.checkHasVariations(item.variations ?? []);
+              controller.checkHasVariations(item.variations);
               if (controller.hasVariations) {
                 PopupDialog.customDialog(
                     child: AddToCartDialogOptions(item: item));
@@ -39,10 +39,11 @@ class ProductBody extends GetView<PosController> {
                   id: item.id.toString(),
                   name: item.name,
                   description: item.description,
-                  type: item.productType,
-                  price: item.price ?? 0,
+                  type: "",
+                  price: item.price ,
                   quantity: PosController.to.orderQuantity,
-                  isLiquor: int.parse(item.isLiquor.toString()),
+                  // isLiquor: int.parse(item.isLiquor.toString()),
+                  isLiquor: 1,
                   togo: '',
                   dontMake: '',
                   rush: '',

@@ -12,6 +12,7 @@ import 'package:flutter_base/app/services/controller/base_controller.dart';
 import 'package:flutter_base/app/utils/logger.dart';
 import 'package:flutter_base/app/utils/urls.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 import '../../../widgets/popup_dialogs.dart';
 
 class PosController extends GetxController {
@@ -43,7 +44,7 @@ class PosController extends GetxController {
   }
 
   // RxList<ProductModel> productList = <ProductModel>[].obs;
-  RxList<ProductModel> mainProductList = <ProductModel>[].obs;
+  // RxList<ProductModel> mainProductList = <ProductModel>[].obs;
   RxBool isProductPage = false.obs;
 
   // get sub category
@@ -103,7 +104,8 @@ class PosController extends GetxController {
   //   }
   // }
 
-  var productList = <ProductModel>[].obs;
+  RxList<ProductModel> productList = <ProductModel>[].obs;
+  RxList<ProductModel> mainProductList = <ProductModel>[].obs;
   getProductList() async {
     //     Map<String, dynamic> data = {
     //   "title": titleController.text,
@@ -112,20 +114,25 @@ class PosController extends GetxController {
     var res = await BaseController.to.apiService.dio.get(URLS.products);
 
     if (res.statusCode == 200) {
-      productList.assignAll((res.data["data"] as List)
+      mainProductList.assignAll((res.data["data"] as List)
           .map((e) => ProductModel.fromJson(e))
           .toList());
+      productList = mainProductList;
     }
   }
 
   //** find product categoryId**
-  findProductsByCategoryId(String categoryId) {
-    productList.assignAll(mainProductList
-        .where((product) => product.categoryIds!
-            .expand((category) => [category.id])
-            .contains(categoryId))
-        .toList());
+void findProductsByCategoryId(String categoryId) {
+  List<ProductModel> filteredProducts = mainProductList
+      .where((product) => product.categoryId != null && product.categoryId.contains(categoryId))
+      .toList();
+
+  if (filteredProducts.isEmpty) {
+    productList.assignAll([]);
+  } else {
+    productList.assignAll(filteredProducts);
   }
+}
 
   TextEditingController kitchenNoteTEC = TextEditingController();
   void addKitchenNote() {

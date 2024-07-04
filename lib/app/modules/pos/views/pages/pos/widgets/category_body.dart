@@ -50,7 +50,7 @@ class CategoryBody extends GetView<PosController> {
           itemCount: data.length,
           itemBuilder: (context, index) => PrimaryBtn(
             onPressed: () {
-              controller.findProductsByCategoryId(data[index].id.toString());
+              controller.findProductsByCategoryId(data[index].id);
             },
             color: MyFunc.productColor(data[index].type),
             style: theme.textTheme.titleLarge?.copyWith(color: Colors.white),

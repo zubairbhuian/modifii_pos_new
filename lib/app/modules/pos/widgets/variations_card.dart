@@ -3,7 +3,7 @@ import 'package:flutter_base/app/modules/pos/models/product_model.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
 
 class VariationsCard extends StatefulWidget {
-  final List<Value> data;
+  final List<Variation> data;
   const VariationsCard({super.key, required this.data});
 
   @override
@@ -27,7 +27,7 @@ class _VariationsCardState extends State<VariationsCard> {
                 });
                 // c.setSelectedOrderModifiersIndex(index);
               },
-              text: widget.data[index].label,
+              text: widget.data[index].name,
               isOutline: true,
               color: activeIndex == index
                   ? Theme.of(context).primaryColorLight
