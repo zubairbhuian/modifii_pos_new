@@ -12,6 +12,7 @@ abstract class Routes {
   static const PRODUCT = _Paths.PRODUCT;
   static const CLOCK_IN = _Paths.CLOCK_IN;
   static const AUTH = _Paths.AUTH;
+  static const SIGN_IN = _Paths.SIGN_IN;
 }
 
 abstract class _Paths {
@@ -22,5 +23,6 @@ abstract class _Paths {
   static const SUB_CATEGORY = '/sub-category';
   static const CLOCK_IN = '/clock-in';
   static const PRODUCT = '/product';
-   static const AUTH = '/auth';
+  static const AUTH = '/auth';
+  static const SIGN_IN = '/sign-in';
 }

@@ -92,7 +92,7 @@ class MyApp extends StatelessWidget {
       darkTheme: darkTheme,
       initialBinding: BaseBinding(apiService: apiService),
       // initialRoute: AppPages.INITIAL,
-      initialRoute: Routes.AUTH,
+      initialRoute: Routes.SIGN_IN,
       getPages: AppPages.routes,
     );
   }

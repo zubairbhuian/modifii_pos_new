@@ -61,7 +61,7 @@ class PrimaryBtn extends StatelessWidget {
                 backgroundColor: color ?? theme.primaryColor,
                 foregroundColor: Colors.white,
                 padding: padding ??
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(borderRadius ?? 0),
                 ),

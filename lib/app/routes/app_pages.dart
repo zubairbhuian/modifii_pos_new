@@ -1,5 +1,6 @@
 import 'package:flutter_base/app/modules/auth/bindings/auth_binding.dart';
 import 'package:flutter_base/app/modules/auth/views/auth_view.dart';
+import 'package:flutter_base/app/modules/auth/views/signIn/signin_view.dart';
 import 'package:flutter_base/app/modules/clockIn/bindings/clock_in_binding.dart';
 import 'package:flutter_base/app/modules/clockIn/views/clock_in_view.dart';
 import 'package:get/get.dart';
@@ -58,6 +59,11 @@ class AppPages {
     GetPage(
       name: _Paths.AUTH,
       page: () => const AuthView(),
+      binding: AuthBinding(),
+    ),
+    GetPage(
+      name: _Paths.SIGN_IN,
+      page: () => const SigninView(),
       binding: AuthBinding(),
     ),
   ];
