@@ -9,7 +9,20 @@ import '../views/pages/table_order/widgets/printers_list_dialog.dart';
 class OrdersController extends GetxController {
   static OrdersController get to => Get.find();
 
-  RxList<OrderData> ordersList = <OrderData>[].obs;
+  RxList<OrderData> ordersList = <OrderData>[
+    OrderData(
+      tableId: 16,
+      serverName: 'Akhunjee',
+      authorizationCode: '0988765',
+      id: 161616,
+      deliveryDate: '16-06-2024',
+      deliveryTime: '10:10 AM',
+      orderType: 'Dine In',
+      orderStatus: 'Confirmed',
+      orderAmount: 420,
+      paymentStatus: 'Taka dey nai',
+    )
+  ].obs;
 
   bool isLoadingOrders = false;
   getOrders() async {
