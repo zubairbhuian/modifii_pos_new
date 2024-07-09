@@ -1,9 +1,12 @@
+import 'package:flutter_base/app/modules/clockIn/controllers/clock_in_controller.dart';
 import 'package:flutter_base/app/modules/pos/controllers/pos_controller.dart';
 import 'package:flutter_base/app/modules/pos/controllers/tables_controller.dart';
 import 'package:flutter_base/app/services/controller/config_controller.dart';
 import 'package:flutter_base/app/utils/static_colors.dart';
+import 'package:flutter_base/app/widgets/custom_alert_dialog.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_base/app/widgets/my_custom_text.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -84,6 +87,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   //** Buttons **
   Widget _topBar(ThemeData theme, BuildContext context) {
     ConfigController configController = ConfigController.to;
+    ClockInController clockInController = ClockInController.to;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -93,24 +97,23 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           Row(
             children: [
               if (isLeading)
+                // CustomInkWell(
+                //   onTap: () => Get.back(),
+                //   child: const Icon(
+                //     FontAwesomeIcons.arrowLeft,
+                //     size: 28,
+                //   ),
+                // ).marginOnly(right: 20),
                 CustomInkWell(
-                  onTap: () => Get.back(),
+                  onTap: Scaffold.of(context).openDrawer,
                   child: const Icon(
-                    FontAwesomeIcons.arrowLeft,
+                    FontAwesomeIcons.burger,
                     size: 28,
                   ),
                 ).marginOnly(right: 20),
-              // if (isPrimary == true)
-              // CustomInkWell(
-              //   onTap: Scaffold.of(context).openDrawer,
-              //   child: const Icon(
-              //     FontAwesomeIcons.burger,
-              //     size: 28,
-              //   ),
-              // ).marginOnly(right: 20),
               if (hasHomeButton)
                 CustomInkWell(
-                  onTap: Scaffold.of(context).openDrawer,
+                  onTap: () {},
                   child: SvgPicture.asset(
                     width: 200,
                     'assets/images/splash/yogo_logo.svg',
@@ -139,109 +142,110 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ),
               const SizedBox(width: 18),
-              // Visibility(
-              //   visible: clockInController.timer?.isActive ?? false,
-              //   child: Row(
-              //     children: [
-              //       Obx(
-              //         () => SizedBox(
-              //           height: 80,
-              //           child: ListView.separated(
-              //             shrinkWrap: true,
-              //             scrollDirection: Axis.horizontal,
-              //             itemCount:
-              //                 clockInController.showClockInTimer().length,
-              //             itemBuilder: (context, index) {
-              //               return SizedBox(
-              //                 height: 28,
-              //                 width: 32,
-              //                 child: Center(
-              //                   child: MyCustomText(
-              //                     clockInController.showClockInTimer()[index],
-              //                     fontSize: 20,
-              //                     fontWeight: FontWeight.w600,
-              //                   ),
-              //                 ),
-              //               );
-              //             },
-              //             separatorBuilder: (_, indes) {
-              //               return const Center(
-              //                 child: MyCustomText(
-              //                   ':',
-              //                   fontSize: 20,
-              //                   fontWeight: FontWeight.w600,
-              //                 ),
-              //               );
-              //             },
-              //           ),
-              //         ),
-              //       ),
-              //       const SizedBox(width: 12),
-              //       PrimaryBtn(
-              //         onPressed: () {
-              //           customAlertDialog(
-              //             context: context,
-              //             child: Column(
-              //               mainAxisSize: MainAxisSize.min,
-              //               crossAxisAlignment: CrossAxisAlignment.center,
-              //               children: [
-              //                 const MyCustomText(
-              //                   'Do you want to clock out?',
-              //                   fontSize: 28,
-              //                   fontWeight: FontWeight.w700,
-              //                 ),
-              //                 const SizedBox(height: 28),
-              //                 Row(
-              //                   mainAxisSize: MainAxisSize.min,
-              //                   children: [
-              //                     PrimaryBtn(
-              //                       onPressed:(){},
-              //                       text: 'Yes',
-              //                       textColor: Colors.white,
-              //                     ),
-              //                     const SizedBox(width: 24),
-              //                     PrimaryBtn(
-              //                       onPressed: Get.back,
-              //                       text: 'Cancel',
-              //                       color: StaticColors.blackLightColor,
-              //                       textColor: Colors.white,
-              //                     ),
-              //                   ],
-              //                 )
-              //               ],
-              //             ),
-              //           );
-              //         },
-              //         text: 'Clockout',
-              //         textColor: Colors.white,
-              //         color: StaticColors.redColor,
-              //       ),
-              //     ],
-              //   ),
-              // ),
-              // const SizedBox(width: 18),
-
-              // Visibility(
-              //   visible: hasLogoutBtn,
-              //   child: PrimaryBtn(
-              //     onPressed: () {
-              //       // ClockInController.to.clockOut();
-              //       Get.offAllNamed(AppPages.INITIAL);
-              //     },
-              //     text: 'Logout',
-              //     textColor: Colors.white,
-              //     color: StaticColors.redColor,
-              //   ),
-              // ),
-              PrimaryBtn(
-                onPressed: () => Get.offAllNamed(AppPages.INITIAL),
-                width: 80,
-                text: 'Logout',
-                textColor: Colors.white,
-                color: Colors.redAccent,
+              Visibility(
+                visible: clockInController.timer?.isActive ?? false,
+                child: Row(
+                  children: [
+                    Obx(
+                      () => SizedBox(
+                        height: 80,
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemCount:
+                              clockInController.showClockInTimer().length,
+                          itemBuilder: (context, index) {
+                            return SizedBox(
+                              height: 28,
+                              width: 32,
+                              child: Center(
+                                child: MyCustomText(
+                                  clockInController.showClockInTimer()[index],
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            );
+                          },
+                          separatorBuilder: (_, indes) {
+                            return const Center(
+                              child: MyCustomText(
+                                ':',
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    PrimaryBtn(
+                      onPressed: () {
+                        customAlertDialog(
+                          context: context,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const MyCustomText(
+                                'Do you want to clock out?',
+                                fontSize: 28,
+                                fontWeight: FontWeight.w700,
+                              ),
+                              const SizedBox(height: 28),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  PrimaryBtn(
+                                    onPressed: clockInController.clockOut,
+                                    text: 'Yes',
+                                    textColor: Colors.white,
+                                  ),
+                                  const SizedBox(width: 24),
+                                  PrimaryBtn(
+                                    onPressed: Get.back,
+                                    text: 'Cancel',
+                                    color: StaticColors.blackLightColor,
+                                    textColor: Colors.white,
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        );
+                      },
+                      text: 'Clockout',
+                      textColor: Colors.white,
+                      color: StaticColors.redColor,
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 18),
+
+              Visibility(
+                visible: hasLogoutBtn,
+                child: PrimaryBtn(
+                  onPressed: () {
+                    ClockInController.to.clockOut();
+                    Get.offAllNamed(AppPages.INITIAL);
+                  },
+                  text: 'Logout',
+                  textColor: Colors.white,
+                  color: StaticColors.redColor,
+                ),
+              ),
+              // PrimaryBtn(
+              //   onPressed: () => Get.offAllNamed(AppPages.INITIAL),
+              //   width: 80,
+              //   text: 'Logout',
+              //   textColor: Colors.white,
+              //   color: Colors.redAccent,
+              // ),
             ],
           ),
+
           // InkWell(
           //   onTap: () {},
           //   splashFactory: NoSplash.splashFactory,
@@ -258,8 +262,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   //** buttons **
   Widget _buttons(ThemeData theme) {
     const double btnSize = 130;
-    const double txtMaxSize = 40;
-    const double txtMinSize = 25;
+    const double txtMaxSize = 35;
+    const double txtMinSize = 22;
     return Expanded(
       child: ColoredBox(
         color: theme.scaffoldBackgroundColor,
@@ -339,6 +343,73 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               textMaxSize: txtMaxSize,
               textMinSize: txtMinSize,
             ),
+            const SizedBox(width: 10),
+            PrimaryBtn(
+              width: btnSize,
+              height: btnSize,
+              onPressed: () {
+                PosController.to.onchangePage(3);
+              },
+              padding: EdgeInsets.zero,
+              color: StaticColors.blueColor,
+              textColor: Colors.white,
+              text: 'TAKEOUT',
+              textMaxSize: txtMaxSize,
+              textMinSize: txtMinSize,
+            ),
+            const SizedBox(width: 10),
+            const Spacer(),
+            PrimaryBtn(
+              width: btnSize,
+              height: btnSize,
+              onPressed: () {},
+              color: StaticColors.blueColor,
+              textColor: Colors.white,
+              text: 'Dine-in\nSummery',
+              textMaxSize: txtMaxSize,
+              textMinSize: txtMinSize,
+            ),
+            const SizedBox(width: 10),
+            PrimaryBtn(
+              width: btnSize,
+              height: btnSize,
+              onPressed: () {
+                // controller.getCategory(type: 'drinks');
+              },
+              isdisabled: true,
+              color: StaticColors.blueColor,
+              textColor: Colors.white,
+              text: 'Dine-in \nCash Out',
+              textMaxSize: txtMaxSize,
+              textMinSize: txtMinSize,
+            ),
+            const SizedBox(width: 10),
+            PrimaryBtn(
+              width: btnSize,
+              height: btnSize,
+              onPressed: () {
+                // controller.getCategory(type: 'drinks');
+              },
+              color: StaticColors.greenColor,
+              textColor: Colors.white,
+              text: 'Take out \nSummery',
+              textMaxSize: txtMaxSize,
+              textMinSize: txtMinSize,
+            ),
+            const SizedBox(width: 10),
+            PrimaryBtn(
+              width: btnSize,
+              height: btnSize,
+              onPressed: () {
+                // controller.getCategory(type: 'drinks');
+              },
+              color: StaticColors.greenColor,
+              textColor: Colors.white,
+              text: 'Take out \nCash Out',
+              textMaxSize: txtMaxSize,
+              textMinSize: txtMinSize,
+            ),
+            const SizedBox(width: 16),
           ],
         ),
       ),

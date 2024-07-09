@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_base/app/modules/pos/controllers/pos_controller.dart';
 import 'package:flutter_base/app/modules/pos/views/pages/pos/widgets/custom_order_dialog_options.dart';
 import 'package:flutter_base/app/modules/pos/views/pages/pos/widgets/discount_dialog_options.dart';
 import 'package:flutter_base/app/utils/static_colors.dart';
 import 'package:flutter_base/app/widgets/popup_dialogs.dart';
+import 'package:get/get.dart';
 import '../../../../../../widgets/custom_btn.dart';
 import '../../../../../../widgets/custom_textfield.dart';
 
-class SearchAndCustomItemRow extends StatelessWidget {
+class SearchAndCustomItemRow extends GetView<PosController> {
   const SearchAndCustomItemRow({super.key});
 
   @override
@@ -41,8 +43,12 @@ class SearchAndCustomItemRow extends StatelessWidget {
         Expanded(
           flex: 2,
           child: CustomTextField(
+            controller: controller.searchController,
             hintText: 'Search item',
             prefixIcon: Icon(Icons.search, color: Colors.grey.shade400),
+            onChange: (value) {
+              // controller.findProductsByName(value);
+            },
           ),
         ),
         const SizedBox(width: 36.0),

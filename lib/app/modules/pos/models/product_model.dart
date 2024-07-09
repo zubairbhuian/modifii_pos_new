@@ -183,125 +183,162 @@
 //   }
 // }
 class ProductModel {
-    ProductModel({
-        required this.id,
-        required this.name,
-        required this.description,
-        required this.price,
-        required this.status,
-        required this.categoryId,
-        required this.branchId,
-        required this.category,
-        required this.variations,
-    });
+  ProductModel({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.price,
+    required this.status,
+    required this.subCategory,
+    required this.branchId,
+    required this.variations,
+  });
 
-    final String id;
-    final String name;
-    final dynamic description;
-    final num price;
-    final String status;
-    final String categoryId;
-    final String branchId;
-    final Category? category;
-    final List<Variation> variations;
+  final int id;
+  final String name;
+  final String description;
+  final num price;
+  final String status;
+  final SubCategory subCategory;
+  final dynamic branchId;
+  final List<Variation> variations;
 
-    factory ProductModel.fromJson(Map<String, dynamic> json){ 
-        return ProductModel(
-            id: json["id"] ?? "",
-            name: json["name"] ?? "",
-            description: json["description"],
-            price: json["price"] ?? 0,
-            status: json["status"] ?? "",
-            categoryId: json["categoryId"] ?? "",
-            branchId: json["branchId"] ?? "",
-            category: json["category"] == null ? null : Category.fromJson(json["category"]),
-            variations: json["variations"] == null ? [] : List<Variation>.from(json["variations"]!.map((x) => Variation.fromJson(x))),
-        );
-    }
+  factory ProductModel.fromJson(Map<String, dynamic> json) {
+    return ProductModel(
+      id: json["id"] ?? 0,
+      name: json["name"] ?? "",
+      description: json["description"] ?? "",
+      price: json["price"] ?? 0,
+      status: json["status"] ?? "",
+      subCategory: SubCategory.fromJson(json["subCategory"]),
+      branchId: json["branchId"],
+      variations: json["variations"] == null
+          ? []
+          : List<Variation>.from(
+              json["variations"]!.map((x) => Variation.fromJson(x))),
+    );
+  }
 
-    @override
-    String toString(){
-        return "$id, $name, $description, $price, $status, $categoryId, $branchId, $category, $variations, ";
-    }
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "description": description,
+        "price": price,
+        "status": status,
+        "subCategory": subCategory.toJson(),
+        "branchId": branchId,
+        "variations": variations.map((x) => x.toJson()).toList(),
+      };
 }
 
-class Category {
-    Category({
-        required this.type,
-    });
+class SubCategory {
+  SubCategory({
+    required this.id,
+    required this.title,
+    required this.deleted,
+    required this.status,
+    required this.mainCategoryId,
+    required this.createdAt,
+    required this.updatedAt,
+  });
 
-    final String type;
+  final String id;
+  final String title;
+  final bool deleted;
+  final String status;
+  final String mainCategoryId;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
-    factory Category.fromJson(Map<String, dynamic> json){ 
-        return Category(
-            type: json["type"] ?? "",
-        );
-    }
+  factory SubCategory.fromJson(Map<String, dynamic> json) {
+    return SubCategory(
+      id: json["id"] ?? "",
+      title: json["title"] ?? "",
+      deleted: json["deleted"] ?? false,
+      status: json["status"] ?? "",
+      mainCategoryId: json["mainCategoryId"] ?? "",
+      createdAt: DateTime.tryParse(json["createdAt"] ?? ""),
+      updatedAt: DateTime.tryParse(json["updatedAt"] ?? ""),
+    );
+  }
 
-    @override
-    String toString(){
-        return "$type, ";
-    }
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "title": title,
+        "deleted": deleted,
+        "status": status,
+        "mainCategoryId": mainCategoryId,
+        "createdAt": createdAt?.toIso8601String(),
+        "updatedAt": updatedAt?.toIso8601String(),
+      };
 }
 
 class Variation {
-    Variation({
-        required this.id,
-        required this.name,
-        required this.selcetionType,
-        required this.max,
-        required this.min,
-        required this.required,
-        required this.options,
-    });
+  Variation({
+    required this.id,
+    required this.name,
+    required this.selcetionType,
+    required this.max,
+    required this.min,
+    required this.required,
+    required this.options,
+  });
 
-    final String id;
-    final String name;
-    final String selcetionType;
-    final int max;
-    final int min;
-    final bool required;
-    final List<Option> options;
+  final String id;
+  final String name;
+  final String selcetionType;
+  final num max;
+  final num min;
+  final bool required;
+  final List<Option> options;
 
-    factory Variation.fromJson(Map<String, dynamic> json){ 
-        return Variation(
-            id: json["id"] ?? "",
-            name: json["name"] ?? "",
-            selcetionType: json["selcetionType"] ?? "",
-            max: json["max"] ?? 0,
-            min: json["min"] ?? 0,
-            required: json["required"] ?? false,
-            options: json["options"] == null ? [] : List<Option>.from(json["options"]!.map((x) => Option.fromJson(x))),
-        );
-    }
+  factory Variation.fromJson(Map<String, dynamic> json) {
+    return Variation(
+      id: json["id"] ?? "",
+      name: json["name"] ?? "",
+      selcetionType: json["selcetionType"] ?? "",
+      max: json["max"] ?? 0,
+      min: json["min"] ?? 0,
+      required: json["required"] ?? false,
+      options: json["options"] == null
+          ? []
+          : List<Option>.from(json["options"]!.map((x) => Option.fromJson(x))),
+    );
+  }
 
-    @override
-    String toString(){
-        return "$id, $name, $selcetionType, $max, $min, $required, $options, ";
-    }
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "selcetionType": selcetionType,
+        "max": max,
+        "min": min,
+        "required": required,
+        "options": options.map((x) => x.toJson()).toList(),
+      };
 }
 
 class Option {
-    Option({
-        required this.id,
-        required this.name,
-        required this.price,
-    });
+  Option({
+    required this.id,
+    required this.name,
+    required this.price,
+  });
 
-    final String id;
-    final String name;
-    final num price;
+  final String id;
+  final String name;
+  final num price;
 
-    factory Option.fromJson(Map<String, dynamic> json){ 
-        return Option(
-            id: json["id"] ?? "",
-            name: json["name"] ?? "",
-            price: json["price"] ?? 0,
-        );
-    }
+  factory Option.fromJson(Map<String, dynamic> json) {
+    return Option(
+      id: json["id"] ?? "",
+      name: json["name"] ?? "",
+      price: json["price"] ?? 0,
+    );
+  }
 
-    @override
-    String toString(){
-        return "$id, $name, $price, ";
-    }
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "price": price,
+      };
 }

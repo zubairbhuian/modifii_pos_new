@@ -6,6 +6,7 @@ import 'package:flutter_base/app/modules/pos/widgets/cart_item.dart';
 import 'package:flutter_base/app/modules/pos/views/pages/pos/widgets/category_body.dart';
 import 'package:flutter_base/app/modules/pos/views/pages/pos/widgets/product_body.dart';
 import 'package:flutter_base/app/utils/static_colors.dart';
+import 'package:flutter_base/app/widgets/app_indecator.dart';
 import 'package:flutter_base/app/widgets/custom_alert_dialog.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -37,8 +38,8 @@ class PosPage extends GetView<PosController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // item 1 (Category)
-                    const Expanded(flex: 2, child: CategoryBody()),
-                    const SizedBox(width: 24),
+                    const Flexible(flex: 2, child: CategoryBody()),
+                    const SizedBox(width: 16),
                     // item 2 (Product)
                     Expanded(
                       flex: 3,
@@ -49,7 +50,7 @@ class PosPage extends GetView<PosController> {
                             flex: 4,
                             child: Obx(
                               () => controller.isLoadingProduct.value
-                                  ? const CustomLoading()
+                                  ? const AppIndecator()
                                   : const ProductBody(),
                             ),
                           ),

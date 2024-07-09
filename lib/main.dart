@@ -83,8 +83,6 @@ class MyApp extends StatelessWidget {
     Get.put(ConfigController());
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      // defaultTransition: Transition.cupertino,
-      // transitionDuration: const Duration(milliseconds: 0),
       title: 'flutter base',
       themeMode:
           ConfigController.to.isLightTheme ? ThemeMode.light : ThemeMode.dark,
@@ -92,7 +90,7 @@ class MyApp extends StatelessWidget {
       darkTheme: darkTheme,
       initialBinding: BaseBinding(apiService: apiService),
       // initialRoute: AppPages.INITIAL,
-      initialRoute: Routes.SIGN_IN,
+      initialRoute: Routes.POS,
       getPages: AppPages.routes,
     );
   }

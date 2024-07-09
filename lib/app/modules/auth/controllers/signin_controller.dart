@@ -28,7 +28,7 @@ class SignInController extends GetxController {
         await BaseController.to.apiService.makePostRequest(URLS.login, data);
     PopupDialog.closeLoadingDialog();
     if (res.statusCode == 200 || res.statusCode == 201) {
-      Get.offAllNamed(Routes.POS);
+      Get.offAllNamed(Routes.CLOCK_IN);
     } else {
       // if (res.statusCode == 404 || res.statusCode == 406)
       PopupDialog.showErrorMessage(res.data["message"]);

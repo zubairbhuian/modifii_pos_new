@@ -14,6 +14,7 @@ import 'package:flutter_base/app/utils/urls.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import '../../../widgets/popup_dialogs.dart';
+import '../models/main_category_model.dart';
 
 class PosController extends GetxController {
   static PosController get to => Get.find();
@@ -43,24 +44,22 @@ class PosController extends GetxController {
     selectedCategoryIndex.value = value;
   }
 
-  // RxList<ProductModel> productList = <ProductModel>[].obs;
-  // RxList<ProductModel> mainProductList = <ProductModel>[].obs;
   RxBool isProductPage = false.obs;
 
-  // get sub category
-  var categoryList = <SubCategoryModel>[].obs;
+  // get main and sub category
+  var categoryList = <MainCategoryModel>[].obs;
   RxBool isLoadingCategory = false.obs;
-  getCategoryList() async {
+  Future getCategoryList() async {
     //     Map<String, dynamic> data = {
     //   "title": titleController.text,
     //   "type": selectedCategory // VEG, NON_VEG, DRINKS
     // };
     try {
-      var res = await BaseController.to.apiService.dio.get(URLS.categories);
+      var res = await BaseController.to.apiService.dio.get(URLS.mainCategories);
 
       if (res.statusCode == 200) {
         categoryList.assignAll((res.data["data"] as List)
-            .map((e) => SubCategoryModel.fromJson(e))
+            .map((e) => MainCategoryModel.fromJson(e))
             .toList());
 
         kLogger.e(categoryList.length);
@@ -72,41 +71,9 @@ class PosController extends GetxController {
 
   //** Get all product **
   RxBool isLoadingProduct = false.obs;
-  // getProduct({String? type, int? offset, int? limit, int? categoryIds}) async {
-  //   isLoadingProduct.value = true;
-  //   productList.clear();
-  //   categoryId = categoryIds;
-  //   Map<String, dynamic>? queryParameters = {
-  //     "product_type": type,
-  //     "offset": offset,
-  //     "limit": limit ?? 800,
-  //     "category_ids": categoryIds
-  //   };
-  //   try {
-  //     var res =
-  //         await Dio().get(URLS.products, queryParameters: queryParameters);
-  //     if (res.statusCode == 200) {
-  //       productList.assignAll((res.data["products"] as List)
-  //           .map((e) => ProductModel.fromJson(e))
-  //           .toList());
-  //       mainProductList.assignAll((res.data["products"] as List)
-  //           .map((e) => ProductModel.fromJson(e))
-  //           .toList());
-
-  //       /// Save fetched posts to Hive for future use
-  //       // await MyHive.saveAllProducts(productList);
-
-  //       isLoadingProduct.value = false;
-  //     }
-  //     // kLogger.e(productList);
-  //   } catch (e) {
-  //     kLogger.e('Error from %%%% get categori %%%% => $e');
-  //   }
-  // }
-
-  RxList<ProductModel> productList = <ProductModel>[].obs;
-  RxList<ProductModel> mainProductList = <ProductModel>[].obs;
-  getProductList() async {
+  List<ProductModel> productList = [];
+  List<ProductModel> mainProductList = [];
+  Future getProductList() async {
     //     Map<String, dynamic> data = {
     //   "title": titleController.text,
     //   "type": selectedCategory // VEG, NON_VEG, DRINKS
@@ -117,22 +84,76 @@ class PosController extends GetxController {
       mainProductList.assignAll((res.data["data"] as List)
           .map((e) => ProductModel.fromJson(e))
           .toList());
-      productList = mainProductList;
+
+      productList = [...mainProductList];
+      update();
+      Logger().i(mainProductList.length);
+      Logger().i(productList.length);
     }
   }
 
-  //** find product categoryId**
-void findProductsByCategoryId(String categoryId) {
-  List<ProductModel> filteredProducts = mainProductList
-      .where((product) => product.categoryId != null && product.categoryId.contains(categoryId))
-      .toList();
+  //** find product by name**
+  final searchController = TextEditingController();
+  // void findProductsByName(String name) async {
+  //   // productList = [...mainProductList];
+  //   Logger().e("M=> ${mainProductList.length}");
+  //   Logger().e("S=> ${productList.length}");
+  //   List<ProductModel> filteredProducts = [];
+  //   if (name.isNotEmpty) {
+  //     // productList = mainProductList;
+  //     filteredProducts = mainProductList
+  //         .where((product) =>
+  //             product.name.toLowerCase().contains(name.toLowerCase()))
+  //         .toList();
+  //   }
 
-  if (filteredProducts.isEmpty) {
-    productList.assignAll([]);
-  } else {
-    productList.assignAll(filteredProducts);
+  //   Logger().d(name);
+  //   if (filteredProducts.isEmpty) {
+  //     productList = [...mainProductList];
+  //   } else {
+  //     productList.assignAll(filteredProducts);
+  //   }
+  //   update();
+  // }
+
+  void findProductsByName(String name) async {
+    // Log the lengths of the lists
+    Logger().e("M=> ${mainProductList.length}");
+    Logger().e("S=> ${productList.length}");
+
+    // If the search name is empty, show the full main product list
+    if (name.isEmpty) {
+      productList.assignAll(mainProductList);
+    } else {
+      // Filter the products by name
+      List<ProductModel> filteredProducts = mainProductList
+          .where((product) =>
+              product.name.toLowerCase().contains(name.toLowerCase()))
+          .toList();
+
+      Logger().d(name);
+
+      // Assign the filtered products to the productList observable
+      productList.assignAll(filteredProducts);
+    }
+
+    // Update the UI
+    update();
   }
-}
+
+  //** find product categoryId**
+  void findProductsByCategoryId(String categoryId) {
+    List<ProductModel> filteredProducts = mainProductList
+        .where((product) => product.subCategory.id.contains(categoryId))
+        .toList();
+    if (filteredProducts.isEmpty) {
+      productList = [];
+    } else {
+      productList.assignAll(filteredProducts);
+    }
+    searchController.clear();
+    update();
+  }
 
   TextEditingController kitchenNoteTEC = TextEditingController();
   void addKitchenNote() {
@@ -142,25 +163,7 @@ void findProductsByCategoryId(String categoryId) {
     kitchenNoteTEC.clear();
   }
 
-  TextEditingController itemSearchTEC = TextEditingController();
-  void searchItemList(String? value) {
-    if (value != null || value != '') {
-      productList.value = mainProductList.where((item) {
-        return item.name.toLowerCase().contains(value ?? '');
-      }).toList();
-    }
-    update();
-  }
-
-  void clearSearchItem() {
-    itemSearchTEC.clear();
-    productList.value = mainProductList.where((item) {
-      return item.name.toLowerCase().contains('');
-    }).toList();
-    update();
-  }
-
-  // List<String> orderTypes = ['TO GO', "DON'T MAKE", 'RUSH'];
+  // ++++++ Add Extra info for order  +++++++
   bool isTogoSelected = false;
   bool isDontMakeSelected = false;
   bool isRushSelected = false;
@@ -335,7 +338,7 @@ void findProductsByCategoryId(String categoryId) {
     TablesController.to.clearSelections();
     cartList.clear();
     getTotalPrice();
-    clearSearchItem();
+    // clearSearchItem();
     update();
   }
 
@@ -450,9 +453,20 @@ void findProductsByCategoryId(String categoryId) {
 
   @override
   void onInit() {
-    getCategoryList();
-    getProductList();
+    searchController
+        .addListener(() => findProductsByName(searchController.text));
+
     super.onInit();
+  }
+
+  @override
+  void onReady() async {
+    PopupDialog.showLoadingDialog();
+    await getCategoryList();
+    await getProductList();
+    PopupDialog.closeLoadingDialog();
+    // TODO: implement onReady
+    super.onReady();
   }
 
   @override

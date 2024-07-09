@@ -190,16 +190,14 @@ class OrderDetails extends GetView<TablesController> {
                           },
                           text: data,
                           padding: const EdgeInsets.symmetric(horizontal: 12),
-                          side: BorderSide(
-                            color: controller.paymentMathodActiveIndex.value ==
-                                    index
-                                ? theme.primaryColor
-                                : theme.disabledColor,
-                          ),
                           style: TextStyle(
                               fontWeight: FontWeight.w700,
                               color: theme.primaryColorDark),
-                          borderColor: theme.hintColor,
+                          borderColor:
+                              controller.paymentMathodActiveIndex.value == index
+                                  ? theme.primaryColor
+                                  : theme.disabledColor,
+                                   isOutline: true,
                         );
                       });
                     },

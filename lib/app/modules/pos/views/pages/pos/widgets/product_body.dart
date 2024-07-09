@@ -14,12 +14,8 @@ class ProductBody extends GetView<PosController> {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    return _body(theme, context);
-  }
-
-  //** Body **
-  Widget _body(ThemeData theme, BuildContext context) {
-    return SingleChildScrollView(child: Obx(() {
+    return SingleChildScrollView(
+        child: GetBuilder<PosController>(builder: (controller) {
       return StaggeredGrid.count(
         crossAxisCount: context.isPortrait ? 2 : 3,
         mainAxisSpacing: 12,
@@ -40,7 +36,7 @@ class ProductBody extends GetView<PosController> {
                   name: item.name,
                   description: item.description,
                   type: "",
-                  price: item.price ,
+                  price: item.price,
                   quantity: PosController.to.orderQuantity,
                   // isLiquor: int.parse(item.isLiquor.toString()),
                   isLiquor: 1,
@@ -59,7 +55,8 @@ class ProductBody extends GetView<PosController> {
             },
             isOutline: true,
             height: 78,
-            text: item.name!.toUpperCase(),
+            text: controller.productList[index].name.toUpperCase(),
+            color: theme.scaffoldBackgroundColor,
           );
         }),
       );

@@ -6,6 +6,7 @@ class URLS {
   //** end popint **
   static String login = '$baseURL/auth/login';
   static String categories = '$baseURL/categories';
+  static String mainCategories = '$baseURL/main-categories';
   static String products = '$baseURL/products';
   static String placeOrder = '$baseURL/table/order/place';
 

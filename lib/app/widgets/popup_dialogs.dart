@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_base/app/services/controller/config_controller.dart';
 import 'package:flutter_base/app/widgets/my_custom_text.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
@@ -47,12 +48,12 @@ class PopupDialog {
             Center(
               child: SizedBox(
                 // dialog width
-                width: 80,
-                height: 80,
+                width: 120,
+                height: 120,
                 child: Material(
                   elevation: 2,
                   // dialog color
-                  shadowColor: Colors.black12,
+                  shadowColor: Colors.transparent,
                   // backgraund color
                   color: Colors.transparent,
                   // border radius
@@ -60,9 +61,9 @@ class PopupDialog {
                   // main body
                   /// DoubleBounce
                   /// SpinningLines
-                  child: SpinKitSpinningLines(
+                  child: SpinKitRing(
                     color: theme.primaryColor,
-                    size: 43, // You can customize the size
+                    size: 53, // You can customize the size
                   ),
                 ),
               ),
@@ -73,38 +74,40 @@ class PopupDialog {
     );
   }
 
-  static customDialog({required Widget child, double? width}) {
+  static customDialog({required Widget child, double? width, double? height}) {
     return showDialog<void>(
       // Context
       context: Get.context!,
       // barrierDismissible: false,
       builder: (BuildContext context) {
+        ThemeData theme = Theme.of(context);
         return Center(
           child: SizedBox(
-            height: MediaQuery.sizeOf(context).height * 0.8,
+            height: height ?? MediaQuery.sizeOf(context).height * 0.8,
             width: width ?? MediaQuery.sizeOf(context).width * 0.5,
             child: Material(
-              elevation: 2,
+              elevation: 3,
               // dialog color
-              shadowColor: Colors.black12,
+              shadowColor: ConfigController.to.isLightTheme
+                  ? Colors.black12
+                  : Colors.white,
               // backgraund color
-              color: Theme.of(context).scaffoldBackgroundColor,
+              color: theme.cardColor,
               // border radius
               borderRadius: BorderRadius.circular(6),
 
-              // main body
-              /// DoubleBounce
               /// SpinningLines
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Align(
                     alignment: Alignment.centerRight,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 4, right: 4),
-                      child: InkWell(
-                        onTap: Get.back,
-                        splashFactory: NoSplash.splashFactory,
+                    child: InkWell(
+                      onTap: Get.back,
+                      splashFactory: NoSplash.splashFactory,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            left: 8, right: 8, top: 8, bottom: 2),
                         child: Icon(
                           Icons.close,
                           color: Theme.of(context).colorScheme.background,

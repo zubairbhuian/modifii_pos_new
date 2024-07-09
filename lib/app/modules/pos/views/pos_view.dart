@@ -6,6 +6,7 @@ import 'package:flutter_base/app/widgets/appbar.dart';
 import 'package:get/get.dart';
 import '../controllers/pos_controller.dart';
 import 'pages/pos/pos_page.dart';
+import 'pages/takeout/takeout_page.dart';
 
 class PosView extends GetView<PosController> {
   const PosView({super.key});
@@ -28,6 +29,7 @@ class PosView extends GetView<PosController> {
             PosPage(),
             TableOrderPage(),
             TablesPage(),
+            TakeOutPage(),
           ],
         ),
       ),
