@@ -1,0 +1,146 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_base/app/widgets/custom_btn.dart';
+import 'package:flutter_base/app/widgets/custom_inkwell.dart';
+import '../../../../../widgets/my_custom_text.dart';
+
+class CartItem extends StatelessWidget {
+  const CartItem({
+    super.key,
+    required this.title,
+    required this.serveFirst,
+    required this.togo,
+    required this.dontMake,
+    required this.rush,
+    required this.heat,
+    required this.note,
+    required this.amount,
+    required this.quantity,
+    this.onRemove,
+    this.onDecrement,
+    this.onIncrement,
+  });
+
+  final String title;
+  final String serveFirst;
+  final String togo;
+  final String dontMake;
+  final String rush;
+  final String heat;
+  final String note;
+  final num amount;
+  final num quantity;
+  final VoidCallback? onRemove;
+  final VoidCallback? onDecrement;
+  final VoidCallback? onIncrement;
+
+  @override
+  Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    MyCustomText(
+                      title,
+                      fontWeight: FontWeight.bold,
+                      maxLines: 2,
+                    ),
+                    const SizedBox(height: 4),
+                    _modifiers(serveFirst),
+                    _modifiers(togo),
+                    _modifiers(dontMake),
+                    _modifiers(rush),
+                    _modifiers('Heat: $heat'),
+                  ],
+                ),
+              ),
+
+              const SizedBox(width: 4),
+              // btns
+              Row(
+                children: [
+                  PrimaryBtnWithChild(
+                    onPressed: onDecrement!,
+                    width: 32,
+                    height: 32,
+                    padding: const EdgeInsets.all(4),
+                    child: const Center(child: Icon(Icons.remove)),
+                  ),
+                  Container(
+                    width: 40,
+                    height: 28,
+                    decoration: BoxDecoration(
+                        border: Border.all(color: theme.hintColor)),
+                    child: Center(
+                      child: MyCustomText(
+                        quantity.toString(),
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  PrimaryBtnWithChild(
+                    onPressed: onIncrement!,
+                    width: 32,
+                    height: 32,
+                    padding: const EdgeInsets.all(4),
+                    child: const Center(child: Icon(Icons.add)),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 4),
+              // amount
+              SizedBox(
+                // width: 70,
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    "\$${amount.toStringAsFixed(2)}",
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 4.0),
+              CustomInkWell(
+                onTap: onRemove,
+                child: Icon(
+                  Icons.delete,
+                  color: theme.colorScheme.error,
+                  size: 22,
+                ),
+              ),
+            ],
+          ),
+          _modifiers('note: $note', maxLines: 5, isItalic: true),
+        ],
+      ),
+    );
+  }
+
+  Visibility _modifiers(String value,
+      {int maxLines = 2, bool isItalic = false}) {
+    return Visibility(
+      visible: value.contains(':') ? value.length > 6 : value != '',
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 8),
+        child: MyCustomText(
+          value.trim(),
+          fontSize: 14,
+          maxLines: maxLines,
+          fontStyle: isItalic ? FontStyle.italic : FontStyle.normal,
+        ),
+      ),
+    );
+  }
+}

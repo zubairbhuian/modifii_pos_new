@@ -41,20 +41,24 @@ class MyFunc {
     return MaterialColor(color.value, swatch);
   }
 
-  static Color getTableColorWithStatus(int? status) {
+  static Color getTableColorWithStatus(String? status) {
     switch (status) {
-      case 1:
+      case "AVAILABLE":
         return const Color(0xff118A01); // Available
-      case 2:
+      case "WALK_IN":
         return const Color(0xffF8931D); // Booked
-      case 3:
-        return const Color.fromARGB(255, 255, 106, 52); // UServing
-      case 4:
+      case "COOKING":
+        return const Color.fromARGB(255, 255, 106, 52); // COOKING
+      case "SERVING":
+        return const Color.fromARGB(255, 255, 106, 52); // Serving
+      case "ONLINE_BOOKING":
         return const Color(0xff006AFF); // Online Booking
-      case 5:
+      case "COMBINED_TABLES":
         return const Color(0xff6864D2); // Combined
+      case "HOLD_TABLES":
+        return const Color(0xffEA295E); // Combined
       default:
-        return const Color(0xffEA295E); // Hold
+        return const Color.fromARGB(255, 75, 22, 36); // Hold
     }
   }
 

@@ -1,23 +1,31 @@
 import 'package:dio/dio.dart';
+import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_base/app/modules/pos/controllers/orders_controller.dart';
 import 'package:flutter_base/app/modules/pos/controllers/tables_controller.dart';
-import 'package:flutter_base/app/modules/pos/models/category_model.dart';
-import 'package:flutter_base/app/modules/pos/models/order_place_model.dart';
-import 'package:flutter_base/app/modules/pos/models/product_model.dart';
-import 'package:flutter_base/app/modules/subCategory/models/sub_category_model.dart';
+import 'package:flutter_base/app/modules/pos/order/models/order_model.dart';
+import 'package:flutter_base/app/modules/pos/order/models/order_place_model.dart';
+import 'package:flutter_base/app/modules/pos/order/models/product_model.dart';
+import 'package:flutter_base/app/modules/pos/order/models/variation_model.dart';
 import 'package:flutter_base/app/services/controller/base_controller.dart';
 import 'package:flutter_base/app/utils/logger.dart';
 import 'package:flutter_base/app/utils/urls.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import '../../../widgets/popup_dialogs.dart';
-import '../models/main_category_model.dart';
+import '../order/models/main_category_model.dart';
 
 class PosController extends GetxController {
   static PosController get to => Get.find();
+  // for table number
+  TextEditingController tableController = TextEditingController();
+  TextEditingController guestController = TextEditingController();
+  void updateTableName(String newName) {
+    tableController = TextEditingController(text: newName);
+    update();
+  }
 
   //** change page **
   PageController pageController = PageController();
@@ -69,16 +77,19 @@ class PosController extends GetxController {
     }
   }
 
+  //** find product by name**
+  final searchController = TextEditingController();
   //** Get all product **
-  RxBool isLoadingProduct = false.obs;
+  bool isLoadingProduct = false;
   List<ProductModel> productList = [];
   List<ProductModel> mainProductList = [];
+
   Future getProductList() async {
     //     Map<String, dynamic> data = {
     //   "title": titleController.text,
     //   "type": selectedCategory // VEG, NON_VEG, DRINKS
     // };
-    var res = await BaseController.to.apiService.dio.get(URLS.products);
+    var res = await BaseController.to.apiService.makeGetRequest(URLS.products);
 
     if (res.statusCode == 200) {
       mainProductList.assignAll((res.data["data"] as List)
@@ -92,34 +103,10 @@ class PosController extends GetxController {
     }
   }
 
-  //** find product by name**
-  final searchController = TextEditingController();
-  // void findProductsByName(String name) async {
-  //   // productList = [...mainProductList];
-  //   Logger().e("M=> ${mainProductList.length}");
-  //   Logger().e("S=> ${productList.length}");
-  //   List<ProductModel> filteredProducts = [];
-  //   if (name.isNotEmpty) {
-  //     // productList = mainProductList;
-  //     filteredProducts = mainProductList
-  //         .where((product) =>
-  //             product.name.toLowerCase().contains(name.toLowerCase()))
-  //         .toList();
-  //   }
-
-  //   Logger().d(name);
-  //   if (filteredProducts.isEmpty) {
-  //     productList = [...mainProductList];
-  //   } else {
-  //     productList.assignAll(filteredProducts);
-  //   }
-  //   update();
-  // }
-
   void findProductsByName(String name) async {
     // Log the lengths of the lists
-    Logger().e("M=> ${mainProductList.length}");
-    Logger().e("S=> ${productList.length}");
+    // Logger().e("M=> ${mainProductList.length}");
+    // Logger().e("S=> ${productList.length}");
 
     // If the search name is empty, show the full main product list
     if (name.isEmpty) {
@@ -267,7 +254,7 @@ class PosController extends GetxController {
   }
 
   bool hasVariations = false;
-  void checkHasVariations(List<Variation> variations) {
+  void checkHasVariations(List<VariationModel> variations) {
     if (variations.isEmpty) {
       hasVariations = false;
     } else {
@@ -276,7 +263,7 @@ class PosController extends GetxController {
     }
   }
 
-  List<Variation> productVariations = [];
+  List<VariationModel> productVariations = [];
   int? selectedProductVariationValue;
   void setSelectedProductVariationValue(int index) {
     selectedProductVariationValue = index;
@@ -301,27 +288,29 @@ class PosController extends GetxController {
   // **======+=======**
   //** Order Process **
 
-  List<Cart> cartList = <Cart>[];
-  final ScrollController cartListScrollController = ScrollController();
-  void cartListScrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      cartListScrollController.animateTo(
-        cartListScrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    });
+// zubair ==== + +++++++
+// zubair ==== + +++++++
+  OrderModel myOrder = OrderModel();
+
+  onPlaseOrder() {
+    update();
+    
+    /// for test
+    // Logger().e("gratuityAmount => ${myOrder.gratuityAmount}");
+    // Logger().e("gstAmount => ${myOrder.gstAmount}");
+    // Logger().e("pstAmount => ${myOrder.pstAmount}");
+    Logger().e("length => ${myOrder.carts.length}");
+    // Logger().e("numberOfPeople => ${myOrder.numberOfPeople}");
+    // Logger().e("orderAmount => ${myOrder.orderAmount}");
+    // Logger().e("paymentMethod => ${myOrder.paymentMethod}");
+    // Logger().e("gratuityAmount => ${myOrder.gratuityAmount}");
+    // Logger().e("gratuityAmount => ${myOrder.tableId}");
   }
 
   //** Add cart item  **
-  onAddCartItem(Cart item) {
-    cartList.add(item);
-    // for (var cart in cartList) {
-    //   kLogger.i(cart);
-    // }
-    getTotalPrice();
-    kitchenNoteTEC.clear();
-
+  onAddCartItem(CartModel item) {
+    myOrder.carts.add(item);
+    calculateTotalPrice();
     //scroll listview to end
     WidgetsBinding.instance.addPostFrameCallback((_) {
       cartListScrollController.animateTo(
@@ -334,11 +323,69 @@ class PosController extends GetxController {
     update();
   }
 
+  //** Remove cart item with index **
+  onRemoveCartItemWithIndex(int index) {
+    // Check if the index is within bounds
+    if (index >= 0 && index < myOrder.carts.length) {
+      myOrder.carts.removeAt(index);
+    }
+    calculateTotalPrice();
+    update();
+  }
+
+  //** Quantity Update **
+  void quantityUpdateWithCartListIndex(int index, {required bool isIncriment}) {
+    if (myOrder.carts[index].quantity < 10 && isIncriment) {
+      myOrder.carts[index].quantity = myOrder.carts[index].quantity + 1;
+    } else if (myOrder.carts[index].quantity > 1 && !isIncriment) {
+      myOrder.carts[index].quantity = myOrder.carts[index].quantity - 1;
+    }
+    calculateTotalPrice();
+    update();
+  }
+
+  calculateTotalPrice() {
+    // for subtotal
+    num totalPrice = 0;
+    for (var item in myOrder.carts) {
+      num discountedPrice = item.price - item.discountAmount;
+      totalPrice += discountedPrice * item.quantity;
+    }
+    myOrder.subTotal = totalPrice;
+    // for gratuityAmount
+    if (guestController.text.isNotEmpty) {
+      if (int.parse(guestController.text) >= 6) {
+        myOrder.gratuityAmount = myOrder.gratuityAmount * .18;
+      }
+    }
+    //for gst
+    myOrder.gstAmount = myOrder.subTotal * .05;
+    //for pst
+    myOrder.pstAmount = 0; //myOrder.subTotal * .1;
+    // for Total
+    myOrder.orderAmount = myOrder.subTotal +
+        myOrder.gstAmount +
+        myOrder.pstAmount +
+        myOrder.gratuityAmount;
+  }
+
+// zubair ==== + +++++++
+// zubair ==== + +++++++
+
+  List<Cart> cartList = <Cart>[];
+  final ScrollController cartListScrollController = ScrollController();
+  void cartListScrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      cartListScrollController.animateTo(
+        cartListScrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    });
+  }
+
   void clearCartList() {
-    TablesController.to.clearSelections();
-    cartList.clear();
-    getTotalPrice();
-    // clearSearchItem();
+    myOrder = OrderModel();
     update();
   }
 
@@ -360,11 +407,11 @@ class PosController extends GetxController {
     }
     cartGSTAmount.value = cartSubTotalPrice * 0.05;
     cartPSTAmount.value = cartSubTotalLiquorPrice * 0.10;
-    if (TablesController.to.selectedGuestNumbers != null) {
-      if (int.parse(TablesController.to.selectedGuestNumbers!) >= 6) {
-        cartGratuityAmount.value = cartSubTotalPrice * 0.18;
-      }
-    }
+    // if (TablesController.to.selectedGuestNumbers != null) {
+    //   if (int.parse(TablesController.to.selectedGuestNumbers!) >= 6) {
+    //     cartGratuityAmount.value = cartSubTotalPrice * 0.18;
+    //   }
+    // }
 
     cartTotalAmount.value = cartSubTotalPrice.value +
         cartGSTAmount.value +
@@ -372,84 +419,63 @@ class PosController extends GetxController {
         cartGratuityAmount.value;
   }
 
-  //** Remove cart item with index **
-  onRemoveCartItemWithIndex(int index) {
-    // Check if the index is within bounds
-    if (index >= 0 && index < cartList.length) {
-      cartList.removeAt(index);
-    }
-    getTotalPrice();
-    update();
-  }
+// //place order
+//   void postPlaceOrder() async {
+//     if (cartList.isEmpty) {
+//       PopupDialog.showErrorMessage("Please add item!");
+//       return;
+//     }
+//     if (!TablesController.to.isTableOrBarSelected()) {
+//       PopupDialog.showErrorMessage("Please select Table or Bar!");
+//       return;
+//     }
+//     if (TablesController.to.selectedGuestNumbers == null) {
+//       PopupDialog.showErrorMessage("Please select Number of Guests!");
+//       return;
+//     }
 
-  //** Quantity Update **
-  void quantityUpdateWithCartListIndex(int index, {required bool isIncriment}) {
-    if (cartList[index].quantity < 10 && isIncriment) {
-      cartList[index].quantity = cartList[index].quantity + 1;
-    } else if (cartList[index].quantity > 1 && !isIncriment) {
-      cartList[index].quantity = cartList[index].quantity - 1;
-    }
-    getTotalPrice();
-    update();
-  }
+//     List<Map<String, dynamic>> cartItems = [];
 
-//place order
-  void postPlaceOrder() async {
-    if (cartList.isEmpty) {
-      PopupDialog.showErrorMessage("Please add item!");
-      return;
-    }
-    if (!TablesController.to.isTableOrBarSelected()) {
-      PopupDialog.showErrorMessage("Please select Table or Bar!");
-      return;
-    }
-    if (TablesController.to.selectedGuestNumbers == null) {
-      PopupDialog.showErrorMessage("Please select Number of Guests!");
-      return;
-    }
-
-    List<Map<String, dynamic>> cartItems = [];
-
-    for (var cart in cartList) {
-      cartItems.add(cart.toJson());
-    }
-    Map<String, dynamic> data = {
-      "cart": cartItems,
-      "table_id":
-          num.parse(TablesController.to.selectedTable?.id.toString() ?? ''),
-      "bar_id": num.parse(TablesController.to.selectedBar?.id.toString() ?? ''),
-      "server_id": 1,
-      "branch_id": 1,
-      "number_of_people": TablesController.to.selectedGuestNumbers,
-      "payment_status": "unpaid",
-      "payment_method": "pay_after_eating",
-      "order_amount": cartTotalAmount.toStringAsFixed(2),
-      "gratuity_amount": 0,
-      "gst_amount": cartGSTAmount.toStringAsFixed(2),
-      "pst_amount": cartPSTAmount.toStringAsFixed(2),
-      "order_note": kitchenNoteTEC.text,
-    };
-    try {
-      kLogger.i(data);
-      PopupDialog.showLoadingDialog();
-      var res = await Dio().post(
-        URLS.placeOrder,
-        data: data,
-      );
-      if (res.statusCode == 200 || res.statusCode == 201) {
-        PopupDialog.showSuccessDialog("Order placed successfully!");
-        TablesController.to.getTables();
-        OrdersController.to.getOrders();
-      } else if (res.statusCode == 403) {
-        PopupDialog.showErrorMessage("Failed to place order!");
-      }
-      kLogger.i("response: ${res.data}");
-      PopupDialog.closeLoadingDialog();
-    } catch (e) {
-      kLogger.e('Error from %%%% login %%%% => $e');
-      PopupDialog.closeLoadingDialog();
-    }
-  }
+//     for (var cart in cartList) {
+//       cartItems.add(cart.toJson());
+//     }
+//     Map<String, dynamic> data = {
+//       "cart": cartItems,
+//       "table_id":
+//           num.parse(TablesController.to.selectedTable?.id.toString() ?? ''),
+//       "bar_id": num.parse(TablesController.to.selectedBar?.id.toString() ?? ''),
+//       "server_id": 1,
+//       "branch_id": 1,
+//       "number_of_people": TablesController.to.selectedGuestNumbers,
+//       "payment_status": "unpaid",
+//       "payment_method": "pay_after_eating",
+//       "order_amount": cartTotalAmount.toStringAsFixed(2),
+//       "gratuity_amount": 0,
+//       "gst_amount": cartGSTAmount.toStringAsFixed(2),
+//       "pst_amount": cartPSTAmount.toStringAsFixed(2),
+//       "order_note": kitchenNoteTEC.text,
+//     };
+//     try {
+//       kLogger.i(data);
+//       PopupDialog.showLoadingDialog();
+//       var res = await Dio().post(
+//         URLS.placeOrder,
+//         data: data,
+//       );
+//       if (res.statusCode == 200 || res.statusCode == 201) {
+//         PopupDialog.showSuccessDialog("Order placed successfully!");
+//         TablesController.to.getTables();
+//         OrdersController.to.getOrders();
+//       } else if (res.statusCode == 403) {
+//         PopupDialog.showErrorMessage("Failed to place order!");
+//       }
+//       kLogger.i("response: ${res.data}");
+//       PopupDialog.closeLoadingDialog();
+//     } catch (e) {
+//       kLogger.e('Error from %%%% login %%%% => $e');
+//       PopupDialog.closeLoadingDialog();
+//     }
+//   }
 
   @override
   void onInit() {

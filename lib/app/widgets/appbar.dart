@@ -320,7 +320,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               width: btnSize,
               height: btnSize,
               onPressed: () {
-                TablesController.to.updateIsShowOrderDetails(false);
+                // TablesController.to.updateIsShowOrderDetails(false);
                 PosController.to.onchangePage(1);
               },
               color: StaticColors.yellowColor,

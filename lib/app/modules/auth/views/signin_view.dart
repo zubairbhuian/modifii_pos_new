@@ -131,6 +131,7 @@ class SigninView extends GetView<SignInController> {
                                 },
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 19),
+                                  
                               ),
                             ],
                           ),

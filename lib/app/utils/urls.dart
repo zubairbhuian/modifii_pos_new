@@ -10,7 +10,8 @@ class URLS {
   static String products = '$baseURL/products';
   static String placeOrder = '$baseURL/table/order/place';
 
-  static String tableList = '$baseURL/table/dine-in-area';
+  static String tableCategory = '$baseURL/table-categories';
+  static String tableHold = '$baseURL/tables';
   static String barList = '$baseURL/bars/list';
   static String allBarList = '$baseURL/bars/area';
   static String hallList = '$baseURL/table/hall-area';

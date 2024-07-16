@@ -219,6 +219,7 @@ class PrimaryBtnWithChild extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final BorderSide? side;
   final bool isOutline;
+  final AlignmentGeometry? alignment;
 
   const PrimaryBtnWithChild({
     super.key,
@@ -235,6 +236,7 @@ class PrimaryBtnWithChild extends StatelessWidget {
     this.padding,
     this.side,
     this.isOutline = false,
+    this.alignment,
   });
 
   void playTapSound() {
@@ -245,8 +247,8 @@ class PrimaryBtnWithChild extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     return SizedBox(
-      height: height ?? 48,
-      width: width ?? 120,
+      height: height,
+      width: width,
       child: ElevatedButton(
         onPressed: () {
           playTapSound();
@@ -255,6 +257,7 @@ class PrimaryBtnWithChild extends StatelessWidget {
         style: !isOutline
             ? ElevatedButton.styleFrom(
                 elevation: elevation ?? 1,
+                alignment: alignment,
                 // textStyle: style ?? theme.textTheme.labelLarge,
                 // disabledBackgroundColor: kDisabledColor,
                 // disabledForegroundColor: kDisabledTextColor,

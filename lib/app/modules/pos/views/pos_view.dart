@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_base/app/modules/pos/views/pages/table_order/table_order_page.dart';
-import 'package:flutter_base/app/modules/pos/views/pages/tables/tables_page.dart';
+import 'package:flutter_base/app/modules/pos/order/views/order_view.dart';
+import 'package:flutter_base/app/modules/pos/takeout/views/takeout_view.dart';
+import 'package:flutter_base/app/modules/pos/dine-in-orders/views/dine_in_order_view.dart';
+import 'package:flutter_base/app/modules/pos/dine-in/views/dine_in_view.dart';
 import 'package:flutter_base/app/widgets/app_drawer.dart';
 import 'package:flutter_base/app/widgets/appbar.dart';
 import 'package:get/get.dart';
 import '../controllers/pos_controller.dart';
-import 'pages/pos/pos_page.dart';
-import 'pages/takeout/takeout_page.dart';
 
 class PosView extends GetView<PosController> {
   const PosView({super.key});
@@ -26,10 +26,10 @@ class PosView extends GetView<PosController> {
           onPageChanged: (value) {},
           children: const [
             // TableOrderPage(),
-            PosPage(),
-            TableOrderPage(),
-            TablesPage(),
-            TakeOutPage(),
+            OrderView(),
+            DineInOrderView(),
+            DineInView(),
+            TakeOutView(),
           ],
         ),
       ),
