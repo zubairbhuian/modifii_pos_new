@@ -1,5 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter_base/app/utils/logger.dart';
+import 'package:flutter_base/app/routes/app_pages.dart';
 import 'package:get/get.dart';
 
 import '../base/api_service.dart';
@@ -16,19 +16,15 @@ class BaseController extends GetxController {
 
   set isFirstTime(bool isFirstTime) => Preferences.isFirstTime = isFirstTime;
 
-  bool get isLoggedIn => Preferences.token.isNotEmpty;
+  bool get isLoggedIn => Preferences.accessToken.isNotEmpty;
 
-  set token(String token) => Preferences.token = token;
+  set token(String token) => Preferences.accessToken = token;
 
   void logout() {
     Preferences.clear();
-    // Get.offAllNamed(Routes.SIGN_IN);
   }
-    void playTapSound() {
+
+  void playTapSound() {
     AudioPlayer().play(AssetSource('audio/tap_sound_1.mp3'));
   }
-
-
-
-  
 }

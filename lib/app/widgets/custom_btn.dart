@@ -17,8 +17,8 @@ class PrimaryBtn extends StatelessWidget {
   final String text;
   final TextStyle? style;
   final EdgeInsetsGeometry? padding;
-  final BorderSide? side;
   final bool isOutline;
+  final bool isdisabled;
   final double textMaxSize;
   final double textMinSize;
 
@@ -35,8 +35,8 @@ class PrimaryBtn extends StatelessWidget {
     this.width,
     this.elevation,
     this.padding,
-    this.side,
     this.isOutline = false,
+    this.isdisabled = false,
     this.textMaxSize = 18,
     this.textMinSize = 14,
   });
@@ -49,56 +49,90 @@ class PrimaryBtn extends StatelessWidget {
       width: width,
       child: ElevatedButton(
         onPressed: () {
-          BaseController.to.playTapSound();
-          onPressed();
+          if (!isdisabled) {
+            BaseController.to.playTapSound();
+            onPressed();
+          }
         },
-        style: !isOutline
-            ? ElevatedButton.styleFrom(
-                elevation: elevation ?? 1,
-                // textStyle: style ?? theme.textTheme.labelLarge,
-                // disabledBackgroundColor: kDisabledColor,
-                // disabledForegroundColor: kDisabledTextColor,
-                backgroundColor: color ?? theme.primaryColor,
-                foregroundColor: Colors.white,
-                padding: padding ??
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(borderRadius ?? 0),
-                ),
-                // ****** Border color *******
-                side: side
-                // const BorderSide(
-                //   color: kPrimaryColor,
-                //   width: 0,
-                // ),
-                )
-            : ElevatedButton.styleFrom(
-                elevation: 0,
-                // textStyle: style ?? theme.textTheme.labelLarge,
-                // disabledBackgroundColor: kDisabledColor,
-                // disabledForegroundColor: kDisabledTextColor,
-                backgroundColor: color ?? theme.scaffoldBackgroundColor,
-                foregroundColor: color ?? StaticColors.greenLightColor,
-                // splashFactory: NoSplash.splashFactory,
-                padding: padding ??
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(borderRadius ?? 0),
-                ),
-                // ****** Border color *******
-                side: side ??
-                    BorderSide(
-                      color: borderColor ?? theme.colorScheme.background,
-                      width: 1.5,
-                    ),
-              ),
+        style: ButtonStyle(
+          elevation: MaterialStateProperty.resolveWith<double>(
+              (Set<MaterialState> states) {
+            if (states.contains(MaterialState.hovered)) {
+              return isdisabled ? 0 : 5.0; // Elevation when hovered
+            }
+            return 0.0; // Normal elevation
+          }),
+          surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+          backgroundColor: MaterialStateProperty.resolveWith<Color?>((states) {
+            // if (states.contains(MaterialState.)) {
+            //   return theme.disabledColor.withOpacity(.6);
+            // }
+            return isdisabled
+                ? theme.disabledColor.withOpacity(.4)
+                : color ?? theme.primaryColor;
+          }),
+          padding: MaterialStateProperty.all(
+            padding ?? const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+          ),
+          shape: MaterialStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(borderRadius ?? 0),
+            ),
+          ),
+          side: MaterialStateProperty.resolveWith<BorderSide?>((states) {
+            if (isOutline == true) {
+              return BorderSide(
+                color: borderColor ?? theme.colorScheme.background,
+                width: 1.5,
+              );
+            }
+            return null;
+          }),
+          splashFactory: InkRipple.splashFactory,
+          overlayColor: MaterialStateProperty.all(
+              Colors.transparent), // Remove hover color
+          mouseCursor: MaterialStateProperty.resolveWith<MouseCursor>(
+              (Set<MaterialState> states) {
+            if (states.contains(MaterialState.hovered)) {
+              return isdisabled
+                  ? SystemMouseCursors.noDrop
+                  : SystemMouseCursors.click; // Change cursor when hovered
+            }
+            return SystemMouseCursors.basic; // Default cursor
+          }), // Remove hover color
+        ),
+        // style: ElevatedButton.styleFrom(
+        //   elevation: 0,
+        //   // textStyle: style ?? theme.textTheme.labelLarge,
+        //   // disabledBackgroundColor: kDisabledColor,
+        //   // disabledForegroundColor: kDisabledTextColor,
+        //   surfaceTintColor: Colors.transparent,
+        //   backgroundColor: isdisabled
+        //       ? theme.disabledColor.withOpacity(.6)
+        //       : color ?? theme.scaffoldBackgroundColor,
+        //   // splashFactory: NoSplash.splashFactory,
+        //   padding: padding ??
+        //       const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+        //   shape: RoundedRectangleBorder(
+        //     borderRadius: BorderRadius.circular(borderRadius ?? 0),
+        //   ),
+        //   // ****** Border color *******
+        //   side: isOutline == true
+        //       ? BorderSide(
+        //           color: borderColor ?? theme.colorScheme.background,
+        //           width: 1.5,
+        //         )
+        //       : null,
+        // ),
         child: AutoSizeText(
           text,
           maxLines: 2, maxFontSize: textMaxSize, minFontSize: textMinSize,
           textAlign: TextAlign.center,
           style: style ??
               TextStyle(
-                color: textColor ?? theme.colorScheme.background,
+                color: isdisabled
+                    ? theme.disabledColor
+                    : textColor ?? theme.colorScheme.background,
               ),
           // overflow: TextOverflow.ellipsis,
         ),
@@ -185,6 +219,7 @@ class PrimaryBtnWithChild extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final BorderSide? side;
   final bool isOutline;
+  final AlignmentGeometry? alignment;
 
   const PrimaryBtnWithChild({
     super.key,
@@ -201,6 +236,7 @@ class PrimaryBtnWithChild extends StatelessWidget {
     this.padding,
     this.side,
     this.isOutline = false,
+    this.alignment,
   });
 
   void playTapSound() {
@@ -211,8 +247,8 @@ class PrimaryBtnWithChild extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     return SizedBox(
-      height: height ?? 48,
-      width: width ?? 120,
+      height: height,
+      width: width,
       child: ElevatedButton(
         onPressed: () {
           playTapSound();
@@ -221,6 +257,7 @@ class PrimaryBtnWithChild extends StatelessWidget {
         style: !isOutline
             ? ElevatedButton.styleFrom(
                 elevation: elevation ?? 1,
+                alignment: alignment,
                 // textStyle: style ?? theme.textTheme.labelLarge,
                 // disabledBackgroundColor: kDisabledColor,
                 // disabledForegroundColor: kDisabledTextColor,

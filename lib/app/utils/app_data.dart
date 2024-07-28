@@ -6,4 +6,5 @@ class AppData {
     CategoryTypeModel(title: "Non veg", value: "NON_VEG"),
     CategoryTypeModel(title: "Drinks", value: "DRINKS")
   ];
+
 }

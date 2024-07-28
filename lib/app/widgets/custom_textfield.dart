@@ -1,5 +1,6 @@
 //https://pub.dev/packages/dropdown_button2
 
+import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_base/app/widgets/my_custom_text.dart';
@@ -23,6 +24,7 @@ class CustomTextField extends StatelessWidget {
   final String? Function(String?)? validator;
   final Function(String)? onChange;
   final EdgeInsetsGeometry? padding;
+  final FocusNode? focusNode;
   final Color? cursorColor;
   final TextAlign? textAlign;
   final double? fontSize;
@@ -67,7 +69,7 @@ class CustomTextField extends StatelessWidget {
     this.errorStyle,
     this.marginBottom,
     this.hintStyle,
-    this.isFilled = false,
+    this.isFilled = false, this.focusNode,
   });
 
   @override
@@ -87,6 +89,8 @@ class CustomTextField extends StatelessWidget {
           controller: controller,
           // ********** validator ********
           validator: validator,
+          // ********** focusNode ********
+          focusNode: focusNode,
           // ********** onChanged ********
           onChanged: onChange,
           // ********** obscureText ********
@@ -130,21 +134,25 @@ class CustomTextField extends StatelessWidget {
             suffixIcon: suffixIcon,
             // ********** border ********
             border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(4),
                 borderSide: BorderSide(color: theme.hintColor)),
             // ********** focusedBorder ********
             focusColor: theme.primaryColor,
             focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(0),
+                borderRadius: BorderRadius.circular(4),
                 borderSide: BorderSide(color: theme.hintColor)),
             // ********** enabledBorder ********
             enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(0),
+                borderRadius: BorderRadius.circular(4),
                 borderSide: BorderSide(color: theme.hintColor)),
             // ********** errorBorder ********
             errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(0),
-                borderSide: BorderSide(color: theme.hintColor)),
+                borderRadius: BorderRadius.circular(4),
+                borderSide: const BorderSide(color: Colors.red)),
+            // ********** errorBorder ********
+            focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(4),
+                borderSide: const BorderSide(color: Colors.red)),
             // ********** hintText ********
             hintText: hintText,
             hintStyle: hintStyle ??
@@ -153,6 +161,7 @@ class CustomTextField extends StatelessWidget {
             label: label,
             labelStyle: labelStyle ?? theme.textTheme.labelLarge,
           ),
+
           // ********** inputFormatters ********
           inputFormatters:
               inputFormatters ?? [LengthLimitingTextInputFormatter(256)],
@@ -335,3 +344,97 @@ class CustomDropdownTextField extends StatelessWidget {
 //     );
 //   }
 // }
+
+class CustomSearchTextField extends StatelessWidget {
+  final dynamic controller;
+  final FocusNode? textFieldFocusNode;
+  final FocusNode? searchFocusNode;
+  final bool? clearOption;
+  final bool? searchShowCursor;
+  final int? dropDownItemCount;
+  final bool? enableSearch;
+  final TextInputType? searchKeyboardType;
+  final List<DropDownValueModel> dropDownList;
+  final Function(dynamic)? onChanged;
+  final String? hintText;
+  final bool? searchAutofocus;
+  final bool? isFilled;
+  final double? radius;
+  const CustomSearchTextField(
+      {super.key,
+      this.controller,
+      this.textFieldFocusNode,
+      this.searchFocusNode,
+      this.clearOption,
+      this.searchShowCursor,
+      this.dropDownItemCount,
+      this.enableSearch,
+      this.searchKeyboardType,
+      required this.dropDownList,
+      this.onChanged,
+      this.hintText,
+      this.searchAutofocus,
+      this.isFilled,
+      this.radius});
+
+  @override
+  Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+    return DropDownTextField(
+      controller: controller,
+      clearOption: clearOption ?? true,
+      textFieldFocusNode: textFieldFocusNode,
+      searchFocusNode: searchFocusNode,
+      searchAutofocus: searchAutofocus ?? false,
+      dropDownItemCount: dropDownItemCount ?? 6,
+      searchShowCursor: searchShowCursor,
+      enableSearch: enableSearch ?? false,
+      searchKeyboardType: searchKeyboardType,
+      dropDownList: dropDownList,
+      onChanged: (val) {},
+      textFieldDecoration: InputDecoration(
+        filled: isFilled,
+        fillColor: theme.scaffoldBackgroundColor,
+        // // ********** errorText ********
+        // errorText: errorText,
+        // errorStyle: errorStyle ??
+        //     theme.textTheme.bodyLarge?.copyWith(color: Colors.red),
+        // errorMaxLines: 5,
+        // ********** padding ********
+
+        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        // // ********** prefixIcon ********
+        // prefixIcon: prefixIcon,
+        // // ********** suffixIcon ********
+        // suffixIcon: suffixIcon,
+        // ********** border ********
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(radius ?? 4),
+            borderSide: BorderSide(color: theme.hintColor)),
+        // ********** focusedBorder ********
+        focusColor: theme.primaryColor,
+        focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(radius ?? 4),
+            borderSide: BorderSide(color: theme.hintColor)),
+        // ********** enabledBorder ********
+        enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(radius ?? 4),
+            borderSide: BorderSide(color: theme.hintColor)),
+        // ********** errorBorder ********
+        errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(radius ?? 4),
+            borderSide: const BorderSide(color: Colors.red)),
+        // ********** errorBorder ********
+        focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(radius ?? 4),
+            borderSide: const BorderSide(color: Colors.red)),
+        // ********** hintText ********
+        hintText: hintText,
+
+        // ********** label ********
+
+        labelStyle: theme.textTheme.labelLarge,
+      ),
+    );
+  }
+}

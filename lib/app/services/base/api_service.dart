@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_base/app/services/base/base_model.dart';
 
-
 class ApiService {
   final Dio dio;
 
@@ -22,10 +21,17 @@ class ApiService {
         response = await dio.post(
           url,
           data: data,
-          options: Options(contentType: contentType, receiveDataWhenStatusError: true),
+          options: Options(
+              contentType: contentType, receiveDataWhenStatusError: true),
         );
       } else if (method == HttpMethod.put) {
         response = await dio.put(
+          url,
+          data: data,
+          options: Options(contentType: contentType),
+        );
+      } else if (method == HttpMethod.patch) {
+        response = await dio.patch(
           url,
           data: data,
           options: Options(contentType: contentType),
@@ -85,13 +91,19 @@ class ApiService {
     );
   }
 
-  Future<BaseModel> makeGetRequest(String url,{Map<String, dynamic>? queryParameters}) async {
-    return _makeRequest(url,queryParameters , HttpMethod.get);
+  Future<BaseModel> makeGetRequest(String url,
+      {Map<String, dynamic>? queryParameters}) async {
+    return _makeRequest(url, queryParameters, HttpMethod.get);
   }
 
   Future<BaseModel> makePutRequest(
       String url, Map<String, dynamic> data) async {
     return _makeRequest(url, data, HttpMethod.put);
+  }
+
+  Future<BaseModel> makePatchRequest(
+      String url, Map<String, dynamic> data) async {
+    return _makeRequest(url, data, HttpMethod.patch);
   }
 
   Future<BaseModel> makeDeleteRequest(String url,
@@ -104,5 +116,6 @@ enum HttpMethod {
   get,
   post,
   put,
+  patch,
   delete,
 }

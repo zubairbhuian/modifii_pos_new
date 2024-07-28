@@ -7,12 +7,15 @@ import 'preferences.dart';
 class DioInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    options.headers['BranchToken'] =
+        'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJicmFuY2hJZCI6IjY2YTM5ODg0NWY0NDFlNGE5NjUwOWZkNSIsImJyYW5jaEVtYWlsIjoibmFiaWxCcmFuY2gxQGdtYWlsLmNvbSIsInJlc3RhdXJhbnRJZCI6IjY2YTM5ODc3NWY0NDFlNGE5NjUwOWZkNCIsImlhdCI6MTcyMTk5ODAzMCwiZXhwIjoxNzI5Nzc0MDMwfQ.JIIEu5dDaith-nZzQEc_tQ-3Aqawjd4OsTSAvJtJGWw';
+
     /// add token to header if user is logged in
-    // final token = Preferences.token;
-    // if (token.isNotEmpty) {
-    //   // options.headers['access-token'] =token;
-    //   // options.headers['Authorization'] = 'Bearer $token';
-    // }
+    final token = Preferences.accessToken;
+    if (token.isNotEmpty) {
+      // options.headers['access-token'] =token;
+      options.headers['Authorization'] = 'Bearer $token';
+    }
 
     /// set options
     options.validateStatus = (_) => true;
@@ -40,7 +43,7 @@ class DioInterceptor extends Interceptor {
     if (response.statusCode == 200) {
       final token = response.data['token'];
       if (token != null && token is String) {
-        Preferences.token = token;
+        Preferences.accessToken = token;
       }
     }
     if (kDebugMode) {

@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_base/app/routes/app_pages.dart';
+import 'package:flutter_base/app/services/base/preferences.dart';
 import 'package:flutter_base/app/services/controller/base_controller.dart';
 import 'package:flutter_base/app/utils/logger.dart';
 import 'package:flutter_base/app/utils/urls.dart';
@@ -61,16 +63,16 @@ class AuthController extends GetxController {
   // **** Login *****
 
   void login() async {
-    Map<String, dynamic> data = {"auth_pin": int.parse(password.value)};
+    Map<String, dynamic> data = {"loginPin": int.parse(password.value)};
     PopupDialog.showLoadingDialog();
     if (password.value.isNotEmpty) {
-      var res =
-          await BaseController.to.apiService.makePostRequest(URLS.login, data);
-      // var res = await Dio().post(URLS.login, data: data);
+      var res = await BaseController.to.apiService
+          .makePostRequest(URLS.employeeLogin, data);
       if (res.statusCode == 200 || res.statusCode == 201) {
-        Get.offAllNamed(Routes.POS);
+        Get.offAllNamed(Routes.CLOCK_IN);
+        Preferences.accessToken = res.data["data"]["accessToken"];
       } else {
-        PopupDialog.showErrorMessage("password is not valid");
+        PopupDialog.showErrorMessage(res.data["message"]);
       }
       PopupDialog.closeLoadingDialog();
     }

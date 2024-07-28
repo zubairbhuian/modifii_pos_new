@@ -13,6 +13,6 @@ class BaseBinding extends Bindings {
   void dependencies() {
     Get.put(BaseController(apiService: apiService), permanent: true);
     Get.put(ConfigController(), permanent: true);
-    Get.put(PosController(), permanent: true);
+    // Get.put(PosController(), permanent: true);
   }
 }

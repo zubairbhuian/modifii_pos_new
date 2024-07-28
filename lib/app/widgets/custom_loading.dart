@@ -8,7 +8,7 @@ class CustomLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SpinKitSpinningLines(
+    return SpinKitPulsingGrid(
       color: Theme.of(context).primaryColor,
       size: 48,
     );

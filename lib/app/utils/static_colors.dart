@@ -21,4 +21,5 @@ class OrderColors {
   static const Color onlineBooking = Color(0xff006AFF);
   static const Color combined = Color(0xff6864D2);
   static const Color hold = Color(0xffEA295E);
+  
 }

@@ -1,22 +1,41 @@
-import 'package:dio/dio.dart';
+// ignore_for_file: constant_identifier_names
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_base/app/modules/pos/controllers/orders_controller.dart';
-import 'package:flutter_base/app/modules/pos/controllers/tables_controller.dart';
-import 'package:flutter_base/app/modules/pos/models/category_model.dart';
-import 'package:flutter_base/app/modules/pos/models/order_place_model.dart';
-import 'package:flutter_base/app/modules/pos/models/product_model.dart';
-import 'package:flutter_base/app/modules/subCategory/models/sub_category_model.dart';
+import 'package:flutter_base/app/modules/pos/dine-in/models/table_model.dart';
+import 'package:flutter_base/app/modules/pos/order/models/order_model.dart';
+import 'package:flutter_base/app/modules/pos/order/models/order_place_model.dart';
+import 'package:flutter_base/app/modules/pos/order/models/product_model.dart';
+import 'package:flutter_base/app/modules/pos/order/models/variation_model.dart';
 import 'package:flutter_base/app/services/controller/base_controller.dart';
 import 'package:flutter_base/app/utils/logger.dart';
 import 'package:flutter_base/app/utils/urls.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import '../../../widgets/popup_dialogs.dart';
+import '../order/models/main_category_model.dart';
 
 class PosController extends GetxController {
   static PosController get to => Get.find();
+  // for table number
+  TextEditingController tableController = TextEditingController();
+  TextEditingController guestController = TextEditingController();
+  // for Focus
+  final FocusNode tableFocusNode = FocusNode();
+  final FocusNode guestFocusNode = FocusNode();
+
+  void changeFocusToGuest() {
+    tableFocusNode.unfocus();
+    FocusScope.of(Get.context!).requestFocus(guestFocusNode);
+  }
+
+  void updateTableName(TableModel table) {
+    tableController = TextEditingController(text: table.tableName);
+    myOrder.tableId = table.id;
+    changeFocusToGuest();
+    update();
+  }
 
   //** change page **
   PageController pageController = PageController();
@@ -43,24 +62,21 @@ class PosController extends GetxController {
     selectedCategoryIndex.value = value;
   }
 
-  // RxList<ProductModel> productList = <ProductModel>[].obs;
-  // RxList<ProductModel> mainProductList = <ProductModel>[].obs;
   RxBool isProductPage = false.obs;
 
-  // get sub category
-  var categoryList = <SubCategoryModel>[].obs;
+  // get main and sub category
+  var categoryList = <MainCategoryModel>[].obs;
   RxBool isLoadingCategory = false.obs;
-  getCategoryList() async {
+  Future getCategoryList() async {
     //     Map<String, dynamic> data = {
     //   "title": titleController.text,
     //   "type": selectedCategory // VEG, NON_VEG, DRINKS
     // };
     try {
-      var res = await BaseController.to.apiService.dio.get(URLS.categories);
-
+      var res = await BaseController.to.apiService.dio.get(URLS.mainCategories);
       if (res.statusCode == 200) {
         categoryList.assignAll((res.data["data"] as List)
-            .map((e) => SubCategoryModel.fromJson(e))
+            .map((e) => MainCategoryModel.fromJson(e))
             .toList());
 
         kLogger.e(categoryList.length);
@@ -70,192 +86,153 @@ class PosController extends GetxController {
     }
   }
 
+  //** find product by name**
+  final searchController = TextEditingController();
   //** Get all product **
-  RxBool isLoadingProduct = false.obs;
-  // getProduct({String? type, int? offset, int? limit, int? categoryIds}) async {
-  //   isLoadingProduct.value = true;
-  //   productList.clear();
-  //   categoryId = categoryIds;
-  //   Map<String, dynamic>? queryParameters = {
-  //     "product_type": type,
-  //     "offset": offset,
-  //     "limit": limit ?? 800,
-  //     "category_ids": categoryIds
-  //   };
-  //   try {
-  //     var res =
-  //         await Dio().get(URLS.products, queryParameters: queryParameters);
-  //     if (res.statusCode == 200) {
-  //       productList.assignAll((res.data["products"] as List)
-  //           .map((e) => ProductModel.fromJson(e))
-  //           .toList());
-  //       mainProductList.assignAll((res.data["products"] as List)
-  //           .map((e) => ProductModel.fromJson(e))
-  //           .toList());
+  bool isLoadingProduct = false;
+  List<ProductModel> productList = [];
+  List<ProductModel> mainProductList = [];
 
-  //       /// Save fetched posts to Hive for future use
-  //       // await MyHive.saveAllProducts(productList);
-
-  //       isLoadingProduct.value = false;
-  //     }
-  //     // kLogger.e(productList);
-  //   } catch (e) {
-  //     kLogger.e('Error from %%%% get categori %%%% => $e');
-  //   }
-  // }
-
-  RxList<ProductModel> productList = <ProductModel>[].obs;
-  RxList<ProductModel> mainProductList = <ProductModel>[].obs;
-  getProductList() async {
+  Future getProductList() async {
     //     Map<String, dynamic> data = {
     //   "title": titleController.text,
     //   "type": selectedCategory // VEG, NON_VEG, DRINKS
     // };
-    var res = await BaseController.to.apiService.dio.get(URLS.products);
+    var res = await BaseController.to.apiService.makeGetRequest(URLS.products);
 
     if (res.statusCode == 200) {
       mainProductList.assignAll((res.data["data"] as List)
           .map((e) => ProductModel.fromJson(e))
           .toList());
-      productList = mainProductList;
+
+      productList = [...mainProductList];
+      update();
+      Logger().i(mainProductList.length);
+      Logger().i(productList.length);
     }
   }
 
-  //** find product categoryId**
-void findProductsByCategoryId(String categoryId) {
-  List<ProductModel> filteredProducts = mainProductList
-      .where((product) => product.categoryId != null && product.categoryId.contains(categoryId))
-      .toList();
+  void findProductsByName(String name) async {
+    // Log the lengths of the lists
+    // Logger().e("M=> ${mainProductList.length}");
+    // Logger().e("S=> ${productList.length}");
 
-  if (filteredProducts.isEmpty) {
-    productList.assignAll([]);
-  } else {
-    productList.assignAll(filteredProducts);
+    // If the search name is empty, show the full main product list
+    if (name.isEmpty) {
+      productList.assignAll(mainProductList);
+    } else {
+      // Filter the products by name
+      List<ProductModel> filteredProducts = mainProductList
+          .where((product) =>
+              product.name.toLowerCase().contains(name.toLowerCase()))
+          .toList();
+
+      Logger().d(name);
+
+      // Assign the filtered products to the productList observable
+      productList.assignAll(filteredProducts);
+    }
+
+    // Update the UI
+    update();
   }
-}
+
+  //** find product categoryId**
+  void findProductsByCategoryId(String categoryId) {
+    List<ProductModel> filteredProducts = mainProductList
+        .where((product) => product.subCategory.id.contains(categoryId))
+        .toList();
+    if (filteredProducts.isEmpty) {
+      productList = [];
+    } else {
+      productList.assignAll(filteredProducts);
+    }
+    searchController.clear();
+    update();
+  }
 
   TextEditingController kitchenNoteTEC = TextEditingController();
   void addKitchenNote() {
-    cartList.last.kitchenNote = kitchenNoteTEC.text.trim();
+    myOrder.carts.last.kitchenNote = kitchenNoteTEC.text.trim();
     update();
     cartListScrollToBottom();
     kitchenNoteTEC.clear();
   }
 
-  TextEditingController itemSearchTEC = TextEditingController();
-  void searchItemList(String? value) {
-    if (value != null || value != '') {
-      productList.value = mainProductList.where((item) {
-        return item.name.toLowerCase().contains(value ?? '');
-      }).toList();
+  // ++++++ Add Extra info for order  +++++++
+  // zubair => Add Extra info for order
+  List<String> serveFirstList = ["APPETIZERS 1st", "ALL-TOGETHER"];
+  List<String> selectedserveFirstList = [];
+  onServeFirst(String value) {
+    if (myOrder.carts.isNotEmpty) {
+      selectedserveFirstList.clear();
+      if (selectedserveFirstList.contains(value)) {
+        selectedserveFirstList.remove(value);
+      } else {
+        selectedserveFirstList.add(value);
+        myOrder.carts.last.serveFirst = value;
+      }
+      update();
+      cartListScrollToBottom();
     }
-    update();
   }
 
-  void clearSearchItem() {
-    itemSearchTEC.clear();
-    productList.value = mainProductList.where((item) {
-      return item.name.toLowerCase().contains('');
-    }).toList();
-    update();
+  List<String> heatList = ['MILD', 'MEDIUM', 'HOT', 'EXTRA HOT'];
+  List<String> selectedHeatList = [];
+
+  onHeat(String value) {
+    if (myOrder.carts.isNotEmpty) {
+      selectedHeatList.clear();
+      if (selectedHeatList.contains(value)) {
+        selectedHeatList.remove(value);
+      } else {
+        selectedHeatList.add(value);
+        myOrder.carts.last.heat = value;
+      }
+      update();
+      cartListScrollToBottom();
+    }
   }
 
-  // List<String> orderTypes = ['TO GO', "DON'T MAKE", 'RUSH'];
-  bool isTogoSelected = false;
-  bool isDontMakeSelected = false;
-  bool isRushSelected = false;
-  void toggleOrderTypeSelection({
-    bool isTogo = false,
-    bool isDontMake = false,
-    bool isRush = false,
-  }) {
-    if (isTogo) {
-      isTogoSelected = !isTogoSelected;
-      if (isTogoSelected) {
-        cartList.last.togo = 'TO GO';
+  List<String> othermodifierList = ["TO GO", "DON'T MAKE", "RUSH"];
+  List<String> selectedOthermodifierList = [];
+  onOthermodifier(String value) {
+    if (myOrder.carts.isNotEmpty) {
+      if (selectedOthermodifierList.contains(value)) {
+        selectedOthermodifierList.remove(value);
+        if (value == "TO GO") {
+          myOrder.carts.last.toGo = "";
+        } else if (value == "DON'T MAKE") {
+          myOrder.carts.last.dontMake = "";
+        } else if (value == "RUSH") {
+          myOrder.carts.last.rush = "";
+        }
       } else {
-        cartList.last.togo = '';
+        selectedOthermodifierList.add(value);
+        if (value == "TO GO") {
+          myOrder.carts.last.toGo = value;
+        } else if (value == "DON'T MAKE") {
+          myOrder.carts.last.dontMake = value;
+        } else if (value == "RUSH") {
+          myOrder.carts.last.rush = value;
+        }
       }
+      update();
+      cartListScrollToBottom();
     }
-    if (isDontMake) {
-      isDontMakeSelected = !isDontMakeSelected;
-      if (isDontMakeSelected) {
-        cartList.last.dontMake = "DON'T MAKE";
-      } else {
-        cartList.last.dontMake = '';
-      }
-    }
-    if (isRush) {
-      isRushSelected = !isRushSelected;
-      if (isRushSelected) {
-        cartList.last.rush = 'RUSH';
-      } else {
-        cartList.last.rush = '';
-      }
-    }
-    cartListScrollToBottom();
-    update();
-  }
-
-  List<String> orderServeTypes = ['APPETIZERS 1st', "ALL-TOGETHER"];
-  int? selectedOrderServeTypesIndex;
-  void setSelectedOrderTypesIndex2(int index) {
-    if (selectedOrderServeTypesIndex == index) {
-      selectedOrderServeTypesIndex = null;
-      cartList.last.serveFirst = "";
-    } else {
-      selectedOrderServeTypesIndex = index;
-      if (index == 0) {
-        cartList.last.serveFirst = "APPETIZERS 1st";
-      } else {
-        cartList.last.serveFirst = "ALL-TOGETHER";
-      }
-    }
-    cartListScrollToBottom();
-    update();
-  }
-
-  List<String> orderHeatModifiers = ['MILD', 'MEDIUM', 'HOT', 'EXTRA HOT'];
-  int? selectedOrderHeatModifiersIndex;
-  void setSelectedOrderModifiersIndex(int index) {
-    if (selectedOrderHeatModifiersIndex == index) {
-      selectedOrderHeatModifiersIndex = null;
-      cartList.last.heat = "";
-    } else {
-      selectedOrderHeatModifiersIndex = index;
-      switch (index) {
-        case 0:
-          cartList.last.heat = "MILD";
-          break;
-        case 1:
-          cartList.last.heat = "MEDIUM";
-          break;
-        case 2:
-          cartList.last.heat = "HOT";
-          break;
-        case 3:
-          cartList.last.heat = "EXTRA HOT";
-          break;
-        default:
-          cartList.last.heat = "";
-          break;
-      }
-    }
-    cartListScrollToBottom();
-    update();
   }
 
   void resetModifierSelections() {
     orderQuantity = 1;
     selectedProductVariationValue = null;
-    selectedOrderServeTypesIndex = null;
-    selectedOrderHeatModifiersIndex = null;
-    isTogoSelected = false;
-    isDontMakeSelected = false;
-    isRushSelected = false;
+    selectedHeatList.clear();
+    selectedOthermodifierList.clear();
+    selectedserveFirstList.clear();
     kitchenNoteTEC.clear();
     update();
   }
+
+  // zubair => Add Extra info for order
 
   bool isDrink = true;
   void checkIsDrink(String productType) {
@@ -264,7 +241,7 @@ void findProductsByCategoryId(String categoryId) {
   }
 
   bool hasVariations = false;
-  void checkHasVariations(List<Variation> variations) {
+  void checkHasVariations(List<VariationModel> variations) {
     if (variations.isEmpty) {
       hasVariations = false;
     } else {
@@ -273,7 +250,7 @@ void findProductsByCategoryId(String categoryId) {
     }
   }
 
-  List<Variation> productVariations = [];
+  List<VariationModel> productVariations = [];
   int? selectedProductVariationValue;
   void setSelectedProductVariationValue(int index) {
     selectedProductVariationValue = index;
@@ -294,9 +271,113 @@ void findProductsByCategoryId(String categoryId) {
     }
   }
 
-  //** Order Process **
+  //** Order Process **ff
   // **======+=======**
   //** Order Process **
+
+// zubair ==== + +++++++
+// zubair ==== + +++++++
+  OrderModel myOrder = OrderModel();
+
+  onPlaseOrder(
+      {String orderType = "DINE_IN",
+      String orderStatus = "CONFIRMED",
+      String paymentStatus = "UNPAID"}) async {
+    if (guestController.text.isEmpty) {
+      PopupDialog.showErrorMessage("Guest required");
+    } else if (tableController.text.isEmpty) {
+      PopupDialog.showErrorMessage("Table required");
+    } else if (myOrder.carts.isEmpty) {
+      PopupDialog.showErrorMessage("Minimum one order is required");
+    } else {
+      myOrder.orderType = orderType;
+      myOrder.orderStatus = orderStatus;
+      myOrder.paymentStatus = paymentStatus;
+      PopupDialog.showLoadingDialog();
+      var res = await BaseController.to.apiService
+          .makePostRequest(URLS.placeOrder, myOrder.toJson());
+      PopupDialog.closeLoadingDialog();
+      if (res.statusCode == 201) {
+        clearCartList();
+        PopupDialog.showSuccessDialog(res.data["message"]);
+        myOrder.employeeId = '66a27bac841c686681819833';
+      }
+    }
+  }
+
+  //** Add cart item  **
+  onAddCartItem(CartModel item) {
+    myOrder.carts.add(item);
+    calculateTotalPrice();
+    //scroll listview to end
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      cartListScrollController.animateTo(
+        cartListScrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    });
+
+    update();
+  }
+
+  //** Remove cart item with index **
+  onRemoveCartItemWithIndex(int index) {
+    // Check if the index is within bounds
+    if (index >= 0 && index < myOrder.carts.length) {
+      myOrder.carts.removeAt(index);
+    }
+    calculateTotalPrice();
+    update();
+  }
+
+  //** Quantity Update **
+  void quantityUpdateWithCartListIndex(int index, {required bool isIncriment}) {
+    if (myOrder.carts[index].quantity < 10 && isIncriment) {
+      myOrder.carts[index].quantity = myOrder.carts[index].quantity + 1;
+    } else if (myOrder.carts[index].quantity > 1 && !isIncriment) {
+      myOrder.carts[index].quantity = myOrder.carts[index].quantity - 1;
+    }
+    calculateTotalPrice();
+    update();
+  }
+
+  calculateTotalPrice() {
+    // for subtotal
+    num totalPrice = 0;
+    for (var item in myOrder.carts) {
+      num discountedPrice = item.price - item.discountAmount;
+      totalPrice += discountedPrice * item.quantity;
+    }
+    myOrder.subTotal = totalPrice;
+    // for gratuityAmount
+    if (guestController.text.isNotEmpty) {
+      if (int.parse(guestController.text) >= 6) {
+        myOrder.totalGratuity = myOrder.subTotal * .18;
+      } else {
+        myOrder.totalGratuity = 0;
+      }
+    }
+    //for gst
+    myOrder.totalGst = myOrder.subTotal * .05;
+    //for pst
+    num pst = 0;
+    for (var item in myOrder.carts) {
+      if (item.isLiquor) {
+        pst += (item.price * item.quantity) * .10;
+      }
+    }
+    myOrder.totalPst = pst;
+    // for Total
+    myOrder.totalOrderAmount = myOrder.subTotal +
+        myOrder.totalGst +
+        myOrder.totalPst +
+        myOrder.totalGratuity;
+    update();
+  }
+
+// zubair ==== + +++++++
+// zubair ==== + +++++++ ^^^
 
   List<Cart> cartList = <Cart>[];
   final ScrollController cartListScrollController = ScrollController();
@@ -310,32 +391,11 @@ void findProductsByCategoryId(String categoryId) {
     });
   }
 
-  //** Add cart item  **
-  onAddCartItem(Cart item) {
-    cartList.add(item);
-    // for (var cart in cartList) {
-    //   kLogger.i(cart);
-    // }
-    getTotalPrice();
-    kitchenNoteTEC.clear();
-
-    //scroll listview to end
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      cartListScrollController.animateTo(
-        cartListScrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    });
-
-    update();
-  }
-
   void clearCartList() {
-    TablesController.to.clearSelections();
-    cartList.clear();
-    getTotalPrice();
-    clearSearchItem();
+    myOrder = OrderModel();
+    resetModifierSelections();
+    guestController.clear();
+    tableController.clear();
     update();
   }
 
@@ -357,11 +417,11 @@ void findProductsByCategoryId(String categoryId) {
     }
     cartGSTAmount.value = cartSubTotalPrice * 0.05;
     cartPSTAmount.value = cartSubTotalLiquorPrice * 0.10;
-    if (TablesController.to.selectedGuestNumbers != null) {
-      if (int.parse(TablesController.to.selectedGuestNumbers!) >= 6) {
-        cartGratuityAmount.value = cartSubTotalPrice * 0.18;
-      }
-    }
+    // if (TablesController.to.selectedGuestNumbers != null) {
+    //   if (int.parse(TablesController.to.selectedGuestNumbers!) >= 6) {
+    //     cartGratuityAmount.value = cartSubTotalPrice * 0.18;
+    //   }
+    // }
 
     cartTotalAmount.value = cartSubTotalPrice.value +
         cartGSTAmount.value +
@@ -369,95 +429,107 @@ void findProductsByCategoryId(String categoryId) {
         cartGratuityAmount.value;
   }
 
-  //** Remove cart item with index **
-  onRemoveCartItemWithIndex(int index) {
-    // Check if the index is within bounds
-    if (index >= 0 && index < cartList.length) {
-      cartList.removeAt(index);
-    }
-    getTotalPrice();
-    update();
-  }
+// //place order
+//   void postPlaceOrder() async {
+//     if (cartList.isEmpty) {
+//       PopupDialog.showErrorMessage("Please add item!");
+//       return;
+//     }
+//     if (!TablesController.to.isTableOrBarSelected()) {
+//       PopupDialog.showErrorMessage("Please select Table or Bar!");
+//       return;
+//     }
+//     if (TablesController.to.selectedGuestNumbers == null) {
+//       PopupDialog.showErrorMessage("Please select Number of Guests!");
+//       return;
+//     }
 
-  //** Quantity Update **
-  void quantityUpdateWithCartListIndex(int index, {required bool isIncriment}) {
-    if (cartList[index].quantity < 10 && isIncriment) {
-      cartList[index].quantity = cartList[index].quantity + 1;
-    } else if (cartList[index].quantity > 1 && !isIncriment) {
-      cartList[index].quantity = cartList[index].quantity - 1;
-    }
-    getTotalPrice();
-    update();
-  }
+//     List<Map<String, dynamic>> cartItems = [];
 
-//place order
-  void postPlaceOrder() async {
-    if (cartList.isEmpty) {
-      PopupDialog.showErrorMessage("Please add item!");
-      return;
-    }
-    if (!TablesController.to.isTableOrBarSelected()) {
-      PopupDialog.showErrorMessage("Please select Table or Bar!");
-      return;
-    }
-    if (TablesController.to.selectedGuestNumbers == null) {
-      PopupDialog.showErrorMessage("Please select Number of Guests!");
-      return;
-    }
-
-    List<Map<String, dynamic>> cartItems = [];
-
-    for (var cart in cartList) {
-      cartItems.add(cart.toJson());
-    }
-    Map<String, dynamic> data = {
-      "cart": cartItems,
-      "table_id":
-          num.parse(TablesController.to.selectedTable?.id.toString() ?? ''),
-      "bar_id": num.parse(TablesController.to.selectedBar?.id.toString() ?? ''),
-      "server_id": 1,
-      "branch_id": 1,
-      "number_of_people": TablesController.to.selectedGuestNumbers,
-      "payment_status": "unpaid",
-      "payment_method": "pay_after_eating",
-      "order_amount": cartTotalAmount.toStringAsFixed(2),
-      "gratuity_amount": 0,
-      "gst_amount": cartGSTAmount.toStringAsFixed(2),
-      "pst_amount": cartPSTAmount.toStringAsFixed(2),
-      "order_note": kitchenNoteTEC.text,
-    };
-    try {
-      kLogger.i(data);
-      PopupDialog.showLoadingDialog();
-      var res = await Dio().post(
-        URLS.placeOrder,
-        data: data,
-      );
-      if (res.statusCode == 200 || res.statusCode == 201) {
-        PopupDialog.showSuccessDialog("Order placed successfully!");
-        TablesController.to.getTables();
-        OrdersController.to.getOrders();
-      } else if (res.statusCode == 403) {
-        PopupDialog.showErrorMessage("Failed to place order!");
-      }
-      kLogger.i("response: ${res.data}");
-      PopupDialog.closeLoadingDialog();
-    } catch (e) {
-      kLogger.e('Error from %%%% login %%%% => $e');
-      PopupDialog.closeLoadingDialog();
-    }
-  }
+//     for (var cart in cartList) {
+//       cartItems.add(cart.toJson());
+//     }
+//     Map<String, dynamic> data = {
+//       "cart": cartItems,
+//       "table_id":
+//           num.parse(TablesController.to.selectedTable?.id.toString() ?? ''),
+//       "bar_id": num.parse(TablesController.to.selectedBar?.id.toString() ?? ''),
+//       "server_id": 1,
+//       "branch_id": 1,
+//       "number_of_people": TablesController.to.selectedGuestNumbers,
+//       "payment_status": "unpaid",
+//       "payment_method": "pay_after_eating",
+//       "order_amount": cartTotalAmount.toStringAsFixed(2),
+//       "gratuity_amount": 0,
+//       "gst_amount": cartGSTAmount.toStringAsFixed(2),
+//       "pst_amount": cartPSTAmount.toStringAsFixed(2),
+//       "order_note": kitchenNoteTEC.text,
+//     };
+//     try {
+//       kLogger.i(data);
+//       PopupDialog.showLoadingDialog();
+//       var res = await Dio().post(
+//         URLS.placeOrder,
+//         data: data,
+//       );
+//       if (res.statusCode == 200 || res.statusCode == 201) {
+//         PopupDialog.showSuccessDialog("Order placed successfully!");
+//         TablesController.to.getTables();
+//         OrdersController.to.getOrders();
+//       } else if (res.statusCode == 403) {
+//         PopupDialog.showErrorMessage("Failed to place order!");
+//       }
+//       kLogger.i("response: ${res.data}");
+//       PopupDialog.closeLoadingDialog();
+//     } catch (e) {
+//       kLogger.e('Error from %%%% login %%%% => $e');
+//       PopupDialog.closeLoadingDialog();
+//     }
+//   }
 
   @override
   void onInit() {
-    getCategoryList();
-    getProductList();
+    searchController
+        .addListener(() => findProductsByName(searchController.text));
+    guestController.addListener(() {
+      calculateTotalPrice();
+      if (guestController.text.isNotEmpty) {
+        myOrder.numberOfPeople = int.parse(guestController.text);
+      }
+    });
+
     super.onInit();
+  }
+
+  @override
+  void onReady() async {
+    myOrder.employeeId = '66a27bac841c686681819833';
+    PopupDialog.showLoadingDialog();
+    await getCategoryList();
+    await getProductList();
+    PopupDialog.closeLoadingDialog();
+    // TODO: implement onReady
+    super.onReady();
   }
 
   @override
   void onClose() {
     pageController.dispose();
+    tableFocusNode.dispose();
+    guestController.dispose();
     super.onClose();
   }
+}
+
+enum OrderType {
+  DINE_IN,
+  TAKE_OUT,
+  DELIVERY,
+}
+
+enum OrderStatus { COMPLETED, CONFIRMED, DELIVERED, CANCELED }
+
+enum PaymentStatus {
+  PAID,
+  UNPAID,
 }

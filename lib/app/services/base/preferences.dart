@@ -7,7 +7,8 @@ class Preferences {
   static late SharedPreferences preferences;
 
   static const String KEY_IS_FIRST_TIME = 'is_first_time';
-  static const String KEY_TOKEN = 'token';
+  static const String ACCESS_TOKEN = 'access_token';
+  static const String CLOCK_IN_ID = 'Clock_in_id';
   static const String IS_USER_SIGNIN = 'is_user_signin';
   static const String KEY_IS_ACTIVER_EXPERT = 'is_active_Expert';
   static const String KEY_IS_LIGHT = 'is_light';
@@ -27,10 +28,13 @@ class Preferences {
   static set isFirstTime(bool value) =>
       preferences.setBool(KEY_IS_FIRST_TIME, value);
 
-  /// token
-  static String get token => preferences.getString(KEY_TOKEN) ?? '';
-  static set token(String value) => preferences.setString(KEY_TOKEN, value);
+  /// ACCESS_TOKEN
+  static String get accessToken => preferences.getString(ACCESS_TOKEN) ?? '';
+  static set accessToken(String value) => preferences.setString(ACCESS_TOKEN, value);
 
+  /// CLOCK_IN_ID
+  static String get clockInId => preferences.getString(CLOCK_IN_ID) ?? '';
+  static set clockInId(String value) => preferences.setString(CLOCK_IN_ID, value);
   /// is light theme
   static bool get isLight =>
       preferences.getBool(KEY_IS_LIGHT) ?? ThemeMode.system == ThemeMode.light;
