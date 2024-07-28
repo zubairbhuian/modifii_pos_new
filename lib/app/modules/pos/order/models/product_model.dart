@@ -1,7 +1,6 @@
 import 'package:flutter_base/app/modules/pos/order/models/sub_category_model.dart';
 import 'package:flutter_base/app/modules/pos/order/models/variation_model.dart';
 
-
 class ProductModel {
   ProductModel({
     required this.id,
@@ -14,7 +13,7 @@ class ProductModel {
     required this.variations,
   });
 
-  final int id;
+  final String id;
   final String name;
   final String description;
   final num price;
@@ -25,7 +24,7 @@ class ProductModel {
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
-      id: json["id"] ?? 0,
+      id: json["id"] ?? "",
       name: json["name"] ?? "",
       description: json["description"] ?? "",
       price: json["price"] ?? 0,

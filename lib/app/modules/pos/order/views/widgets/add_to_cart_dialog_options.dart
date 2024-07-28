@@ -48,7 +48,7 @@ class AddToCartDialogOptions extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           MyCustomText(
-            item.description == '' ? 'N/A' : item.description ?? '',
+            item.description == '' ? 'N/A' : item.description ,
             fontSize: 14,
           ),
           const SizedBox(height: 24),
@@ -165,7 +165,6 @@ class AddToCartDialogOptions extends StatelessWidget {
                 onPressed: () {
                   PosController.to.resetModifierSelections();
                   CartModel order = CartModel(
-                    id: item.id.toString(),
                     name: item.name,
                     description: item.description,
                     price: price,

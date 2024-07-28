@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_base/app/modules/pos/controllers/tables_controller.dart';
+import 'package:flutter_base/app/modules/pos/dine-in-orders/controllers/dine_in_order_controller.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
+import 'package:flutter_base/app/widgets/popup_dialogs.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:get/get_state_manager/get_state_manager.dart';
+import 'package:intl/intl.dart';
 import '../../../../utils/static_colors.dart';
 import '../../../../widgets/custom_alert_dialog.dart';
 import '../../../../widgets/custom_dropdown.dart';
@@ -12,7 +17,7 @@ import '../../../../widgets/my_custom_text.dart';
 import '../../controllers/orders_controller.dart';
 import '../widgets/order_table_data_row.dart';
 
-class TableOrdersList extends StatelessWidget {
+class TableOrdersList extends GetView<DineInOrderController> {
   const TableOrdersList({super.key});
 
   @override
@@ -23,18 +28,20 @@ class TableOrdersList extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          const MyCustomText(
-            'All Table Orders         33',
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
-          ),
-          const SizedBox(height: 48.0),
+          GetBuilder<DineInOrderController>(builder: (controller) {
+            return MyCustomText(
+              'All Table Orders         ${controller.pagination?.total}',
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+            );
+          }),
+          const SizedBox(height: 24.0),
           _dateRange(context),
-          const SizedBox(height: 48.0),
-          _overviews(theme),
-          const SizedBox(height: 48.0),
+          const SizedBox(height: 24.0),
+          _orderStatus(theme),
+          const SizedBox(height: 24.0),
           _searchAndExportRow(),
-          const SizedBox(height: 48.0),
+          const SizedBox(height: 24.0),
           _orderTable(theme, context),
         ],
       ),
@@ -89,13 +96,6 @@ class TableOrdersList extends StatelessWidget {
               )),
               SizedBox(width: 4.0),
               Expanded(
-                  child: MyCustomText(
-                'Order ID',
-                fontSize: titleFontSize,
-                fontWeight: FontWeight.w600,
-              )),
-              SizedBox(width: 4.0),
-              Expanded(
                   flex: 2,
                   child: MyCustomText(
                     'Order Date',
@@ -133,12 +133,12 @@ class TableOrdersList extends StatelessWidget {
             ],
           ),
         ),
-        GetBuilder<OrdersController>(builder: (c) {
+        GetBuilder<DineInOrderController>(builder: (controller) {
           return Column(
             children: List.generate(
-              c.ordersList.length,
+              controller.orderList.length,
               (index) {
-                var order = c.ordersList[index];
+                var order = controller.orderList[index];
                 return OrderTableDataRow(
                   onOrderDetails: () {
                     // TablesController.to.updateIsShowOrderDetails(true);
@@ -151,16 +151,20 @@ class TableOrdersList extends StatelessWidget {
                     );
                   },
                   sl: index + 1,
-                  tableNo: order.tableId ?? 0,
-                  userName: order.serverName ?? 'N/A',
-                  authCode: order.authorizationCode ?? 'null',
-                  orderId: order.id ?? 0,
-                  orderDateTime:
-                      '${order.deliveryDate.toString().split(' ').first} ${order.deliveryTime}',
-                  orderType: order.orderType ?? '',
-                  orderStatus: order.orderStatus ?? '',
-                  totalAmount: order.orderAmount?.toDouble() ?? 0,
-                  paymetStatus: order.paymentStatus ?? '',
+                  tableNo: order.table?.tableName ?? "",
+                  userName:
+                      "${order.employee?.firstName} ${order.employee?.lastName}",
+                  orderDateTime: DateFormat('MMM d, yyyy h:mm a')
+                      .format(order.createdAt ?? DateTime.now()),
+
+                  // authCode: order.authorizationCode ?? 'null',
+                  // orderId: order.id ?? 0,
+                  // orderDateTime:
+                  //     '${order..toString().split(' ').first} ${order.deliveryTime}',
+                  orderType: order.orderType,
+                  orderStatus: order.orderStatus,
+                  totalAmount: order.totalOrderAmount.toDouble(),
+                  paymetStatus: order.paymentStatus,
                 );
               },
             ),
@@ -193,7 +197,7 @@ class TableOrdersList extends StatelessWidget {
           GetBuilder<OrdersController>(builder: (c) {
             return Row(
               children: [
-                Expanded(
+                const Expanded(
                   child: SizedBox(),
                   // child: PrimaryBtn(
                   //     onPressed: () {},
@@ -201,7 +205,7 @@ class TableOrdersList extends StatelessWidget {
                   //     textColor: Colors.white),
                 ),
                 const SizedBox(width: 6.0),
-                Expanded(
+                const Expanded(
                   child: SizedBox(),
                   // child: PrimaryBtn(
                   //     onPressed: () {},
@@ -402,7 +406,11 @@ class TableOrdersList extends StatelessWidget {
         const SizedBox(width: 12.0),
         Expanded(
             child: PrimaryBtn(
-          onPressed: () {},
+          onPressed: () async {
+            PopupDialog.showLoadingDialog();
+            await controller.getOrder();
+            PopupDialog.closeLoadingDialog();
+          },
           text: 'Search',
           textColor: Colors.white,
         )),
@@ -464,9 +472,9 @@ class TableOrdersList extends StatelessWidget {
             Expanded(
               flex: 2,
               child: CustomTextField(
-                // controller: TablesController.to.startDateTEC,
+                controller: controller.startDate,
                 extraLabel: 'Start Date',
-                hintText: 'dd/mm/yyyy',
+                hintText: 'mm/dd/yyyy',
                 style:
                     TextStyle(color: Theme.of(context).colorScheme.background),
                 onTap: () {
@@ -477,7 +485,8 @@ class TableOrdersList extends StatelessWidget {
                     firstDate: DateTime(2010, 1),
                     lastDate: DateTime(2050, 12),
                   ).then((date) {
-                    // TablesController.to.updateStartDate(date);
+                    controller.startDate.text =
+                        DateFormat('MM/dd/yyyy').format(date!);
                   });
                 },
               ),
@@ -486,9 +495,9 @@ class TableOrdersList extends StatelessWidget {
             Expanded(
               flex: 2,
               child: CustomTextField(
-                // controller: TablesController.to.endDateTEC,
+                controller: controller.endDate,
                 extraLabel: 'End Date',
-                hintText: 'dd/mm/yyyy',
+                hintText: 'mm/dd/yyyy',
                 style:
                     TextStyle(color: Theme.of(context).colorScheme.background),
                 onTap: () {
@@ -499,6 +508,8 @@ class TableOrdersList extends StatelessWidget {
                     firstDate: DateTime(2010, 1),
                     lastDate: DateTime(2050, 12),
                   ).then((date) {
+                    controller.endDate.text =
+                        DateFormat('MM/dd/yyyy').format(date!);
                     // TablesController.to.updateEndDate(date);
                   });
                 },
@@ -508,7 +519,10 @@ class TableOrdersList extends StatelessWidget {
             Expanded(
               flex: 1,
               child: PrimaryBtn(
-                onPressed: () {},
+                onPressed: () {
+                  controller.endDate.clear();
+                  controller.startDate.clear();
+                },
                 text: 'Clear',
                 color: Colors.white,
                 textColor: Colors.black87,
@@ -518,7 +532,11 @@ class TableOrdersList extends StatelessWidget {
             Expanded(
               flex: 1,
               child: PrimaryBtn(
-                onPressed: () {},
+                onPressed: () async {
+                  PopupDialog.showLoadingDialog();
+                  await controller.getOrder();
+                  PopupDialog.closeLoadingDialog();
+                },
                 text: 'Show Data',
                 textColor: Colors.white,
               ),
@@ -529,59 +547,66 @@ class TableOrdersList extends StatelessWidget {
     );
   }
 
-  Widget _overviews(ThemeData theme) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _labelWithValue(label: 'Confirmed', value: 33, theme: theme),
-            const SizedBox(width: 25),
-            _labelWithValue(label: 'Cooking', value: 33, theme: theme),
-            const SizedBox(width: 25),
-            _labelWithValue(label: 'Ready to Serve', value: 33, theme: theme),
-          ],
-        ),
-        const SizedBox(height: 25.0),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _labelWithValue(label: 'Completed', value: 33, theme: theme),
-            const SizedBox(width: 25),
-            _labelWithValue(label: 'Canceled', value: 33, theme: theme),
-            const SizedBox(width: 25),
-            _labelWithValue(label: 'Running', value: 33, theme: theme),
-          ],
-        ),
-      ],
-    );
-  }
+  Widget _orderStatus(ThemeData theme) {
+    return GetBuilder<DineInOrderController>(builder: (controller) {
+      return StaggeredGrid.count(
+        crossAxisCount: 4,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
+        children: List.generate(controller.orderStatusList.length, (index) {
+          return InkWell(
+            onTap: () async {
+              PopupDialog.showLoadingDialog();
+              await controller.getOrder();
+              PopupDialog.closeLoadingDialog();
+            },
+            child: Container(
+              color: theme.dividerColor,
+              padding: const EdgeInsets.all(24),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  MyCustomText(
+                    controller.orderStatusList[index].status,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  MyCustomText(
+                    controller.orderStatusList[index].count.toString(),
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
+      );
+    });
+    // return Column(
+    //   children: [
+    //     Row(
+    //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //       children: [
 
-  Widget _labelWithValue({
-    required String label,
-    required int value,
-    required ThemeData theme,
-  }) {
-    return Expanded(
-      child: Container(
-        color: theme.dividerColor,
-        padding: const EdgeInsets.all(24),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            MyCustomText(
-              label,
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-            ),
-            MyCustomText(
-              value.toString(),
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-            ),
-          ],
-        ),
-      ),
-    );
+    //         const SizedBox(width: 25),
+    //         _labelWithValue(label: 'Cooking', value: 33, theme: theme),
+    //         const SizedBox(width: 25),
+    //         _labelWithValue(label: 'Ready to Serve', value: 33, theme: theme),
+    //       ],
+    //     ),
+    //     const SizedBox(height: 25.0),
+    //     Row(
+    //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //       children: [
+    //         _labelWithValue(label: 'Completed', value: 33, theme: theme),
+    //         const SizedBox(width: 25),
+    //         _labelWithValue(label: 'Canceled', value: 33, theme: theme),
+    //         const SizedBox(width: 25),
+    //         _labelWithValue(label: 'Running', value: 33, theme: theme),
+    //       ],
+    //     ),
+    //   ],
+    // );
   }
 }

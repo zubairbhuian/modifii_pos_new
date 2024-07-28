@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_base/app/services/controller/config_controller.dart';
 import 'package:flutter_base/app/widgets/my_custom_text.dart';
@@ -83,8 +84,8 @@ class PopupDialog {
         ThemeData theme = Theme.of(context);
         return Center(
           child: SizedBox(
-            height: height ?? MediaQuery.sizeOf(context).height * 0.8,
-            width: width ?? MediaQuery.sizeOf(context).width * 0.5,
+            // height: height ?? MediaQuery.sizeOf(context).height * 0.8,
+            width: width ?? MediaQuery.sizeOf(context).width * 0.7,
             child: Material(
               elevation: 3,
               // dialog color
@@ -116,7 +117,7 @@ class PopupDialog {
                       ),
                     ),
                   ),
-                  Expanded(
+                  Flexible(
                     child: SingleChildScrollView(
                       child: Padding(
                         padding: const EdgeInsets.only(

@@ -1,27 +1,26 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_base/app/modules/pos/controllers/orders_controller.dart';
-import 'package:flutter_base/app/modules/pos/controllers/tables_controller.dart';
-import 'package:flutter_base/app/modules/pos/dine-in/widgets/order_setup.dart';
+import 'package:flutter_base/app/modules/pos/dine-in/controllers/dine_in_controller.dart';
+import 'package:flutter_base/app/modules/pos/dine-in/views/split_order_view.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/widgets/table_dialog.dart';
 import 'package:flutter_base/app/utils/static_colors.dart';
 import 'package:flutter_base/app/widgets/appbar.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
-import 'package:flutter_base/app/widgets/custom_textfield.dart';
 import 'package:flutter_base/app/widgets/my_custom_text.dart';
 import 'package:get/get.dart';
 
 import '../widgets/custom_table_item.dart';
 
-class OrderDetails extends GetView {
+class OrderDetails extends GetView<DineInController> {
   const OrderDetails({super.key});
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     return Scaffold(
-      appBar: const CustomAppBar(),
+      appBar: const CustomAppBar(
+        isPrimary: false,
+      ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
@@ -197,7 +196,7 @@ class OrderDetails extends GetView {
                               controller.paymentMathodActiveIndex.value == index
                                   ? theme.primaryColor
                                   : theme.disabledColor,
-                                   isOutline: true,
+                          isOutline: true,
                         );
                       });
                     },
@@ -453,7 +452,9 @@ class OrderDetails extends GetView {
               ),
               Expanded(
                 child: PrimaryBtn(
-                  onPressed: () {},
+                  onPressed: () {
+                    Get.to(() => const SplitOrderView());
+                  },
                   // width: double.infinity,
                   text: 'Split Order',
                   textColor: Colors.white,

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_base/app/modules/pos/dine-in-orders/controllers/dine_in_order_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/widgets/table_dialog.dart';
 import 'package:flutter_base/app/utils/static_colors.dart';
 import 'package:flutter_base/app/widgets/appbar.dart';
@@ -11,15 +12,18 @@ import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 
 import '../../controllers/tables_controller.dart';
+import '../controllers/dine_in_controller.dart';
 
-class SplitOrder extends GetView {
-  const SplitOrder({super.key});
+class SplitOrderView extends GetView<DineInController> {
+  const SplitOrderView({super.key});
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     return Scaffold(
-      appBar: const CustomAppBar(),
+      appBar: const CustomAppBar(
+        isPrimary: false,
+      ),
       body: Padding(
         padding:
             const EdgeInsetsDirectional.symmetric(horizontal: 16, vertical: 24),

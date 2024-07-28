@@ -37,13 +37,13 @@ class CartItem extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(
                 child: Column(
@@ -53,6 +53,7 @@ class CartItem extends StatelessWidget {
                       title,
                       fontWeight: FontWeight.bold,
                       maxLines: 2,
+                      fontSize: 16,
                     ),
                     const SizedBox(height: 4),
                     _modifiers(serveFirst),
@@ -70,14 +71,19 @@ class CartItem extends StatelessWidget {
                 children: [
                   PrimaryBtnWithChild(
                     onPressed: onDecrement!,
-                    width: 32,
-                    height: 32,
+                    width: 29,
+                    height: 29,
                     padding: const EdgeInsets.all(4),
-                    child: const Center(child: Icon(Icons.remove)),
+                    child: const Center(
+                        child: Icon(
+                      Icons.remove,
+                      size: 16,
+                    )),
                   ),
                   Container(
                     width: 40,
                     height: 28,
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
                     decoration: BoxDecoration(
                         border: Border.all(color: theme.hintColor)),
                     child: Center(
@@ -90,23 +96,29 @@ class CartItem extends StatelessWidget {
                   ),
                   PrimaryBtnWithChild(
                     onPressed: onIncrement!,
-                    width: 32,
-                    height: 32,
+                    width: 29,
+                    height: 29,
                     padding: const EdgeInsets.all(4),
-                    child: const Center(child: Icon(Icons.add)),
+                    child: const Center(
+                        child: Icon(
+                      Icons.add,
+                      size: 16,
+                    )),
                   ),
                 ],
               ),
               const SizedBox(width: 4),
               // amount
               SizedBox(
-                // width: 70,
+                width: 70,
                 child: Align(
                   alignment: Alignment.centerRight,
-                  child: Text(
-                    "\$${amount.toStringAsFixed(2)}",
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w500,
+                  child: FittedBox(
+                    child: Text(
+                      "\$${amount.toStringAsFixed(2)}",
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ),

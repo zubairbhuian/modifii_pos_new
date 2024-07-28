@@ -24,6 +24,7 @@ class CustomTextField extends StatelessWidget {
   final String? Function(String?)? validator;
   final Function(String)? onChange;
   final EdgeInsetsGeometry? padding;
+  final FocusNode? focusNode;
   final Color? cursorColor;
   final TextAlign? textAlign;
   final double? fontSize;
@@ -68,7 +69,7 @@ class CustomTextField extends StatelessWidget {
     this.errorStyle,
     this.marginBottom,
     this.hintStyle,
-    this.isFilled = false,
+    this.isFilled = false, this.focusNode,
   });
 
   @override
@@ -88,6 +89,8 @@ class CustomTextField extends StatelessWidget {
           controller: controller,
           // ********** validator ********
           validator: validator,
+          // ********** focusNode ********
+          focusNode: focusNode,
           // ********** onChanged ********
           onChanged: onChange,
           // ********** obscureText ********

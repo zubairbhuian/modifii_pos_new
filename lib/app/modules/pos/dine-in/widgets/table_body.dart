@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_base/app/modules/pos/controllers/pos_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/controllers/dine_in_controller.dart';
 import 'package:flutter_base/app/services/controller/base_controller.dart';
@@ -9,6 +10,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:logger/web.dart';
 import '../../../../utils/static_colors.dart';
+import '../views/order_details.dart';
 
 class TableBody extends GetView<DineInController> {
   final bool isScrollable;
@@ -16,7 +18,6 @@ class TableBody extends GetView<DineInController> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
     return Obx(() {
       return ListView.builder(
         shrinkWrap: isScrollable ? false : true,
@@ -32,7 +33,7 @@ class TableBody extends GetView<DineInController> {
                 // header
                 _title(controller.tableCategoryList[index].name),
                 StaggeredGrid.count(
-                  crossAxisCount: 8,
+                  crossAxisCount: 10,
                   mainAxisSpacing: 8,
                   crossAxisSpacing: 8,
                   children: List.generate(tables.length, (index) {
@@ -41,36 +42,45 @@ class TableBody extends GetView<DineInController> {
                       //onTap
                       onTap: () {
                         BaseController.to.playTapSound();
+
+                        // if table is avaiable
                         if (table.tableAvailability == "AVAILABLE") {
-                          if (Get.isDialogOpen ?? false) {
-                            PosController.to.updateTableName(table.tableName);
+                          if (isScrollable) {
+                            PosController.to.updateTableName(table);
                           } else {
                             PosController.to.onchangePage(0);
+                            PosController.to.updateTableName(table);
+                            Get.back();
                           }
-                          Get.back();
-                          print("fsdfsdfsdfsd");
+                          // if table is BOOKING
+                        } else if (table.tableAvailability == "BOOKING") {
+                          Get.to(() => const OrderDetails());
                         }
                       },
                       // for onDoubleTap
                       onDoubleTap: () {
-                        BaseController.to.playTapSound();
-                        if (table.tableAvailability == "HOLD_TABLES") {
-                          controller.onChangeTableStatus(
-                              id: table.id, status: "AVAILABLE");
-                        } else {
-                          controller.onChangeTableStatus(
-                              id: table.id, status: "HOLD_TABLES");
+                        if (table.tableAvailability == "AVAILABLE") {
+                          BaseController.to.playTapSound();
+                          if (table.tableAvailability == "HOLD_TABLES") {
+                            controller.onChangeTableStatus(
+                                id: table.id, status: "AVAILABLE");
+                          } else {
+                            controller.onChangeTableStatus(
+                                id: table.id, status: "HOLD_TABLES");
+                          }
                         }
                       },
                       // onLongPressStart
                       onLongPressStart: (details) {
-                        BaseController.to.playTapSound();
-                        if (table.tableAvailability == "HOLD_TABLES") {
-                          controller.onChangeTableStatus(
-                              id: table.id, status: "AVAILABLE");
-                        } else {
-                          controller.onChangeTableStatus(
-                              id: table.id, status: "HOLD_TABLES");
+                        if (table.tableAvailability == "AVAILABLE") {
+                          BaseController.to.playTapSound();
+                          if (table.tableAvailability == "HOLD_TABLES") {
+                            controller.onChangeTableStatus(
+                                id: table.id, status: "AVAILABLE");
+                          } else {
+                            controller.onChangeTableStatus(
+                                id: table.id, status: "HOLD_TABLES");
+                          }
                         }
                       },
                       child: Container(
@@ -95,23 +105,29 @@ class TableBody extends GetView<DineInController> {
                                 ),
                                 MyCustomText(
                                   '${table.tableCapacity}',
-                                  fontSize: 10,
+                                  fontSize: 16,
                                   color: Colors.white,
                                 ),
                               ],
                             ),
                             const SizedBox(height: 12),
-                            const MyCustomText(
-                              'username',
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white,
+                            const Align(
+                              alignment: Alignment.bottomLeft,
+                              child: MyCustomText(
+                                'username',
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                              ),
                             ),
                             const SizedBox(height: 10),
-                            const MyCustomText(
-                              '\$34.99',
-                              fontSize: 12,
-                              color: Colors.white,
+                            const Align(
+                              alignment: Alignment.bottomLeft,
+                              child: MyCustomText(
+                                '\$34.99',
+                                fontSize: 14,
+                                color: Colors.white,
+                              ),
                             )
                           ],
                         ),

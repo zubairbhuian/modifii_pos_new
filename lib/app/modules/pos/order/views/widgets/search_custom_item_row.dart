@@ -56,7 +56,10 @@ class SearchAndCustomItemRow extends GetView<PosController> {
             child: PrimaryBtn(
           onPressed: () {
             PopupDialog.customDialog(
-              child: const CustomOrderDialogOptions(productType: "Custom Bar"),
+              child: const CustomOrderDialogOptions(
+                productType: "Custom Bar",
+                isLiquor: true,
+              ),
             );
           },
           color: StaticColors.blueColor,

@@ -45,8 +45,10 @@ class MyFunc {
     switch (status) {
       case "AVAILABLE":
         return const Color(0xff118A01); // Available
-      case "WALK_IN":
+      case "BOOKING":
         return const Color(0xffF8931D); // Booked
+      // case "WALK-IN":
+      //   return const Color(0xffF8931D);
       case "COOKING":
         return const Color.fromARGB(255, 255, 106, 52); // COOKING
       case "SERVING":
@@ -77,5 +79,10 @@ class MyFunc {
       default:
         return "Hold"; // Hold
     }
+  }
+
+  static num yogotRound(num value) {
+    num roundToNearest = 0.05;
+    return (value / roundToNearest).ceil() * roundToNearest;
   }
 }

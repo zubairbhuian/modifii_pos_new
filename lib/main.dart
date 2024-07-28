@@ -90,7 +90,7 @@ class MyApp extends StatelessWidget {
       darkTheme: darkTheme,
       initialBinding: BaseBinding(apiService: apiService),
       // initialRoute: AppPages.INITIAL,
-      initialRoute: Routes.POS,
+      initialRoute: Routes.AUTH,
       getPages: AppPages.routes,
     );
   }

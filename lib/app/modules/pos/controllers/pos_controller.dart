@@ -1,10 +1,9 @@
-import 'package:dio/dio.dart';
-import 'package:dropdown_textfield/dropdown_textfield.dart';
+// ignore_for_file: constant_identifier_names
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_base/app/modules/pos/controllers/orders_controller.dart';
-import 'package:flutter_base/app/modules/pos/controllers/tables_controller.dart';
+import 'package:flutter_base/app/modules/pos/dine-in/models/table_model.dart';
 import 'package:flutter_base/app/modules/pos/order/models/order_model.dart';
 import 'package:flutter_base/app/modules/pos/order/models/order_place_model.dart';
 import 'package:flutter_base/app/modules/pos/order/models/product_model.dart';
@@ -22,8 +21,19 @@ class PosController extends GetxController {
   // for table number
   TextEditingController tableController = TextEditingController();
   TextEditingController guestController = TextEditingController();
-  void updateTableName(String newName) {
-    tableController = TextEditingController(text: newName);
+  // for Focus
+  final FocusNode tableFocusNode = FocusNode();
+  final FocusNode guestFocusNode = FocusNode();
+
+  void changeFocusToGuest() {
+    tableFocusNode.unfocus();
+    FocusScope.of(Get.context!).requestFocus(guestFocusNode);
+  }
+
+  void updateTableName(TableModel table) {
+    tableController = TextEditingController(text: table.tableName);
+    myOrder.tableId = table.id;
+    changeFocusToGuest();
     update();
   }
 
@@ -64,7 +74,6 @@ class PosController extends GetxController {
     // };
     try {
       var res = await BaseController.to.apiService.dio.get(URLS.mainCategories);
-
       if (res.statusCode == 200) {
         categoryList.assignAll((res.data["data"] as List)
             .map((e) => MainCategoryModel.fromJson(e))
@@ -144,108 +153,86 @@ class PosController extends GetxController {
 
   TextEditingController kitchenNoteTEC = TextEditingController();
   void addKitchenNote() {
-    cartList.last.kitchenNote = kitchenNoteTEC.text.trim();
+    myOrder.carts.last.kitchenNote = kitchenNoteTEC.text.trim();
     update();
     cartListScrollToBottom();
     kitchenNoteTEC.clear();
   }
 
   // ++++++ Add Extra info for order  +++++++
-  bool isTogoSelected = false;
-  bool isDontMakeSelected = false;
-  bool isRushSelected = false;
-  void toggleOrderTypeSelection({
-    bool isTogo = false,
-    bool isDontMake = false,
-    bool isRush = false,
-  }) {
-    if (isTogo) {
-      isTogoSelected = !isTogoSelected;
-      if (isTogoSelected) {
-        cartList.last.togo = 'TO GO';
+  // zubair => Add Extra info for order
+  List<String> serveFirstList = ["APPETIZERS 1st", "ALL-TOGETHER"];
+  List<String> selectedserveFirstList = [];
+  onServeFirst(String value) {
+    if (myOrder.carts.isNotEmpty) {
+      selectedserveFirstList.clear();
+      if (selectedserveFirstList.contains(value)) {
+        selectedserveFirstList.remove(value);
       } else {
-        cartList.last.togo = '';
+        selectedserveFirstList.add(value);
+        myOrder.carts.last.serveFirst = value;
       }
+      update();
+      cartListScrollToBottom();
     }
-    if (isDontMake) {
-      isDontMakeSelected = !isDontMakeSelected;
-      if (isDontMakeSelected) {
-        cartList.last.dontMake = "DON'T MAKE";
-      } else {
-        cartList.last.dontMake = '';
-      }
-    }
-    if (isRush) {
-      isRushSelected = !isRushSelected;
-      if (isRushSelected) {
-        cartList.last.rush = 'RUSH';
-      } else {
-        cartList.last.rush = '';
-      }
-    }
-    cartListScrollToBottom();
-    update();
   }
 
-  List<String> orderServeTypes = ['APPETIZERS 1st', "ALL-TOGETHER"];
-  int? selectedOrderServeTypesIndex;
-  void setSelectedOrderTypesIndex2(int index) {
-    if (selectedOrderServeTypesIndex == index) {
-      selectedOrderServeTypesIndex = null;
-      cartList.last.serveFirst = "";
-    } else {
-      selectedOrderServeTypesIndex = index;
-      if (index == 0) {
-        cartList.last.serveFirst = "APPETIZERS 1st";
+  List<String> heatList = ['MILD', 'MEDIUM', 'HOT', 'EXTRA HOT'];
+  List<String> selectedHeatList = [];
+
+  onHeat(String value) {
+    if (myOrder.carts.isNotEmpty) {
+      selectedHeatList.clear();
+      if (selectedHeatList.contains(value)) {
+        selectedHeatList.remove(value);
       } else {
-        cartList.last.serveFirst = "ALL-TOGETHER";
+        selectedHeatList.add(value);
+        myOrder.carts.last.heat = value;
       }
+      update();
+      cartListScrollToBottom();
     }
-    cartListScrollToBottom();
-    update();
   }
 
-  List<String> orderHeatModifiers = ['MILD', 'MEDIUM', 'HOT', 'EXTRA HOT'];
-  int? selectedOrderHeatModifiersIndex;
-  void setSelectedOrderModifiersIndex(int index) {
-    if (selectedOrderHeatModifiersIndex == index) {
-      selectedOrderHeatModifiersIndex = null;
-      cartList.last.heat = "";
-    } else {
-      selectedOrderHeatModifiersIndex = index;
-      switch (index) {
-        case 0:
-          cartList.last.heat = "MILD";
-          break;
-        case 1:
-          cartList.last.heat = "MEDIUM";
-          break;
-        case 2:
-          cartList.last.heat = "HOT";
-          break;
-        case 3:
-          cartList.last.heat = "EXTRA HOT";
-          break;
-        default:
-          cartList.last.heat = "";
-          break;
+  List<String> othermodifierList = ["TO GO", "DON'T MAKE", "RUSH"];
+  List<String> selectedOthermodifierList = [];
+  onOthermodifier(String value) {
+    if (myOrder.carts.isNotEmpty) {
+      if (selectedOthermodifierList.contains(value)) {
+        selectedOthermodifierList.remove(value);
+        if (value == "TO GO") {
+          myOrder.carts.last.toGo = "";
+        } else if (value == "DON'T MAKE") {
+          myOrder.carts.last.dontMake = "";
+        } else if (value == "RUSH") {
+          myOrder.carts.last.rush = "";
+        }
+      } else {
+        selectedOthermodifierList.add(value);
+        if (value == "TO GO") {
+          myOrder.carts.last.toGo = value;
+        } else if (value == "DON'T MAKE") {
+          myOrder.carts.last.dontMake = value;
+        } else if (value == "RUSH") {
+          myOrder.carts.last.rush = value;
+        }
       }
+      update();
+      cartListScrollToBottom();
     }
-    cartListScrollToBottom();
-    update();
   }
 
   void resetModifierSelections() {
     orderQuantity = 1;
     selectedProductVariationValue = null;
-    selectedOrderServeTypesIndex = null;
-    selectedOrderHeatModifiersIndex = null;
-    isTogoSelected = false;
-    isDontMakeSelected = false;
-    isRushSelected = false;
+    selectedHeatList.clear();
+    selectedOthermodifierList.clear();
+    selectedserveFirstList.clear();
     kitchenNoteTEC.clear();
     update();
   }
+
+  // zubair => Add Extra info for order
 
   bool isDrink = true;
   void checkIsDrink(String productType) {
@@ -284,7 +271,7 @@ class PosController extends GetxController {
     }
   }
 
-  //** Order Process **
+  //** Order Process **ff
   // **======+=======**
   //** Order Process **
 
@@ -292,19 +279,30 @@ class PosController extends GetxController {
 // zubair ==== + +++++++
   OrderModel myOrder = OrderModel();
 
-  onPlaseOrder() {
-    update();
-    
-    /// for test
-    // Logger().e("gratuityAmount => ${myOrder.gratuityAmount}");
-    // Logger().e("gstAmount => ${myOrder.gstAmount}");
-    // Logger().e("pstAmount => ${myOrder.pstAmount}");
-    Logger().e("length => ${myOrder.carts.length}");
-    // Logger().e("numberOfPeople => ${myOrder.numberOfPeople}");
-    // Logger().e("orderAmount => ${myOrder.orderAmount}");
-    // Logger().e("paymentMethod => ${myOrder.paymentMethod}");
-    // Logger().e("gratuityAmount => ${myOrder.gratuityAmount}");
-    // Logger().e("gratuityAmount => ${myOrder.tableId}");
+  onPlaseOrder(
+      {String orderType = "DINE_IN",
+      String orderStatus = "CONFIRMED",
+      String paymentStatus = "UNPAID"}) async {
+    if (guestController.text.isEmpty) {
+      PopupDialog.showErrorMessage("Guest required");
+    } else if (tableController.text.isEmpty) {
+      PopupDialog.showErrorMessage("Table required");
+    } else if (myOrder.carts.isEmpty) {
+      PopupDialog.showErrorMessage("Minimum one order is required");
+    } else {
+      myOrder.orderType = orderType;
+      myOrder.orderStatus = orderStatus;
+      myOrder.paymentStatus = paymentStatus;
+      PopupDialog.showLoadingDialog();
+      var res = await BaseController.to.apiService
+          .makePostRequest(URLS.placeOrder, myOrder.toJson());
+      PopupDialog.closeLoadingDialog();
+      if (res.statusCode == 201) {
+        clearCartList();
+        PopupDialog.showSuccessDialog(res.data["message"]);
+        myOrder.employeeId = '66a27bac841c686681819833';
+      }
+    }
   }
 
   //** Add cart item  **
@@ -355,22 +353,31 @@ class PosController extends GetxController {
     // for gratuityAmount
     if (guestController.text.isNotEmpty) {
       if (int.parse(guestController.text) >= 6) {
-        myOrder.gratuityAmount = myOrder.gratuityAmount * .18;
+        myOrder.totalGratuity = myOrder.subTotal * .18;
+      } else {
+        myOrder.totalGratuity = 0;
       }
     }
     //for gst
-    myOrder.gstAmount = myOrder.subTotal * .05;
+    myOrder.totalGst = myOrder.subTotal * .05;
     //for pst
-    myOrder.pstAmount = 0; //myOrder.subTotal * .1;
+    num pst = 0;
+    for (var item in myOrder.carts) {
+      if (item.isLiquor) {
+        pst += (item.price * item.quantity) * .10;
+      }
+    }
+    myOrder.totalPst = pst;
     // for Total
-    myOrder.orderAmount = myOrder.subTotal +
-        myOrder.gstAmount +
-        myOrder.pstAmount +
-        myOrder.gratuityAmount;
+    myOrder.totalOrderAmount = myOrder.subTotal +
+        myOrder.totalGst +
+        myOrder.totalPst +
+        myOrder.totalGratuity;
+    update();
   }
 
 // zubair ==== + +++++++
-// zubair ==== + +++++++
+// zubair ==== + +++++++ ^^^
 
   List<Cart> cartList = <Cart>[];
   final ScrollController cartListScrollController = ScrollController();
@@ -386,6 +393,9 @@ class PosController extends GetxController {
 
   void clearCartList() {
     myOrder = OrderModel();
+    resetModifierSelections();
+    guestController.clear();
+    tableController.clear();
     update();
   }
 
@@ -481,12 +491,19 @@ class PosController extends GetxController {
   void onInit() {
     searchController
         .addListener(() => findProductsByName(searchController.text));
+    guestController.addListener(() {
+      calculateTotalPrice();
+      if (guestController.text.isNotEmpty) {
+        myOrder.numberOfPeople = int.parse(guestController.text);
+      }
+    });
 
     super.onInit();
   }
 
   @override
   void onReady() async {
+    myOrder.employeeId = '66a27bac841c686681819833';
     PopupDialog.showLoadingDialog();
     await getCategoryList();
     await getProductList();
@@ -498,6 +515,21 @@ class PosController extends GetxController {
   @override
   void onClose() {
     pageController.dispose();
+    tableFocusNode.dispose();
+    guestController.dispose();
     super.onClose();
   }
+}
+
+enum OrderType {
+  DINE_IN,
+  TAKE_OUT,
+  DELIVERY,
+}
+
+enum OrderStatus { COMPLETED, CONFIRMED, DELIVERED, CANCELED }
+
+enum PaymentStatus {
+  PAID,
+  UNPAID,
 }

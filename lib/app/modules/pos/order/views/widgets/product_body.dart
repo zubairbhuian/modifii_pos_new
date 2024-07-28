@@ -34,7 +34,6 @@ class ProductBody extends GetView<PosController> {
                     child: AddToCartDialogOptions(item: item));
               } else {
                 CartModel order = CartModel(
-                  id: item.id.toString(),
                   name: item.name,
                   description: item.description,
                   price: item.price,

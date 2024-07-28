@@ -10,9 +10,8 @@ class OrderTableDataRow extends StatelessWidget {
     required this.sl,
     required this.tableNo,
     required this.userName,
-    required this.authCode,
-    required this.orderId,
-    required this.orderDateTime,
+    this.authCode = "",
+    this.orderDateTime = "",
     required this.orderType,
     required this.orderStatus,
     required this.totalAmount,
@@ -22,10 +21,9 @@ class OrderTableDataRow extends StatelessWidget {
   });
 
   final int sl;
-  final int tableNo;
+  final String tableNo;
   final String userName;
   final String authCode;
-  final int orderId;
   final String orderDateTime;
   final String orderType;
   final String orderStatus;
@@ -65,12 +63,6 @@ class OrderTableDataRow extends StatelessWidget {
           Expanded(
               child: MyCustomText(
             authCode,
-            fontSize: contentFontSize,
-          )),
-          const SizedBox(width: 4.0),
-          Expanded(
-              child: MyCustomText(
-            orderId.toString(),
             fontSize: contentFontSize,
           )),
           const SizedBox(width: 4.0),
@@ -121,7 +113,8 @@ class OrderTableDataRow extends StatelessWidget {
                 ),
                 const SizedBox(width: 4.0),
                 IconButton(
-                  onPressed: onPrint,
+                  // onPressed: onPrint,
+                  onPressed: () {},
                   icon: const Icon(
                     FontAwesomeIcons.print,
                     size: 18,

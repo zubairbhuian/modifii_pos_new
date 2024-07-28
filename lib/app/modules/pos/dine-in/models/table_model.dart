@@ -9,7 +9,7 @@ class TableModel {
     final String id;
     final String tableName;
     final String tableAvailability;
-    final num tableCapacity;
+    final int tableCapacity;
 
     factory TableModel.fromJson(Map<String, dynamic> json){ 
         return TableModel(
@@ -26,5 +26,4 @@ class TableModel {
         "tableAvailability": tableAvailability,
         "tableCapacity": tableCapacity,
     };
-
 }

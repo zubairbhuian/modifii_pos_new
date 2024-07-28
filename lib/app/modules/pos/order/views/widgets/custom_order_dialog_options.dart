@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_base/app/modules/pos/controllers/pos_controller.dart';
 import 'package:flutter_base/app/modules/pos/order/models/order_model.dart';
-import 'package:flutter_base/app/modules/pos/order/models/order_place_model.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
 import 'package:flutter_base/app/widgets/custom_textfield.dart';
 import 'package:flutter_base/app/widgets/my_custom_text.dart';
@@ -11,7 +10,9 @@ import 'package:get/get.dart';
 
 class CustomOrderDialogOptions extends StatefulWidget {
   final String productType;
-  const CustomOrderDialogOptions({super.key, required this.productType});
+  final bool? isLiquor;
+  const CustomOrderDialogOptions(
+      {super.key, required this.productType, this.isLiquor});
 
   @override
   State<CustomOrderDialogOptions> createState() =>
@@ -77,8 +78,8 @@ class _CustomOrderDialogOptionsState extends State<CustomOrderDialogOptions> {
                 children: [
                   MyCustomText(
                     'Product Name',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
                     color: Theme.of(context).hintColor,
                   ),
                   const SizedBox(height: 4),
@@ -98,8 +99,8 @@ class _CustomOrderDialogOptionsState extends State<CustomOrderDialogOptions> {
                 children: [
                   MyCustomText(
                     'Price',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
                     color: Theme.of(context).hintColor,
                   ),
                   const SizedBox(height: 4),
@@ -124,17 +125,17 @@ class _CustomOrderDialogOptionsState extends State<CustomOrderDialogOptions> {
         //description
         MyCustomText(
           'Description',
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
           color: Theme.of(context).hintColor,
         ),
         const SizedBox(height: 4),
         CustomTextField(
           controller: _descriptionController,
-          maxLines: 5,
+          maxLines: 10,
           isFilled: true,
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 26),
         //quantity row
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -142,7 +143,7 @@ class _CustomOrderDialogOptionsState extends State<CustomOrderDialogOptions> {
             const Expanded(
               child: MyCustomText(
                 'Quantity',
-                fontSize: 20,
+                fontSize: 24,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -156,7 +157,8 @@ class _CustomOrderDialogOptionsState extends State<CustomOrderDialogOptions> {
                         false,
                       );
                     },
-                    width: 48,
+                    width: 60,
+                    height: 60,
                     child: const Icon(
                       Icons.remove,
                       size: 24,
@@ -168,7 +170,7 @@ class _CustomOrderDialogOptionsState extends State<CustomOrderDialogOptions> {
                     child: Center(
                       child: MyCustomText(
                         quantity.toString(),
-                        fontSize: 28,
+                        fontSize: 32,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -177,7 +179,8 @@ class _CustomOrderDialogOptionsState extends State<CustomOrderDialogOptions> {
                     onPressed: () {
                       updateOrderQuantity(true);
                     },
-                    width: 48,
+                    width: 60,
+                    height: 60,
                     child: const Icon(
                       Icons.add,
                       size: 24,
@@ -205,15 +208,14 @@ class _CustomOrderDialogOptionsState extends State<CustomOrderDialogOptions> {
           child: PrimaryBtn(
             onPressed: () {
               CartModel item = CartModel(
-                  id: "custom_food",
+                  isLiquor: widget.isLiquor ?? false,
+                  isCustomProduct: true,
                   name: _nameController.text,
                   description: _descriptionController.text,
                   // type: widget.productType,
                   price: num.parse(_priceController.text),
                   quantity: quantity,
-                  kitchenNote: ""
-                  
-                  );
+                  kitchenNote: "");
               if (_nameController.text.isEmpty) {
                 PopupDialog.showErrorMessage(
                     "Name Field Is Required For ${widget.productType}");
@@ -229,6 +231,9 @@ class _CustomOrderDialogOptionsState extends State<CustomOrderDialogOptions> {
                 // PopupDialog.showSuccessDialog("Cart Items Added Successfully");
               }
             },
+            width: 200,
+            height: 70,
+            // padding: const EdgeInsets.symmetric(horizontal: 200, vertical: 100),
             text: 'Add',
             textColor: Colors.white,
             textMaxSize: 20,

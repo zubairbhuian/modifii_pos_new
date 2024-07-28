@@ -21,8 +21,8 @@ class TableAvailabilityHeader extends StatelessWidget {
           text: 'Available',
         ),
         ColorTextRow(
-          color: MyFunc.getTableColorWithStatus("WALK_IN"),
-          text: 'Walk-In',
+          color: MyFunc.getTableColorWithStatus("BOOKING"),
+          text: 'Booking',
         ),
         ColorTextRow(
           color: MyFunc.getTableColorWithStatus("COOKING"),

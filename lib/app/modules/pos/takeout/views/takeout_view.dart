@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_base/app/modules/pos/controllers/tables_controller.dart';
-import 'package:flutter_base/app/modules/pos/dine-in/widgets/booked_table.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/widgets/table_availability_header.dart';
 import 'package:flutter_base/app/modules/pos/takeout/controllers/takeout_controller.dart';
+import 'package:flutter_base/app/modules/pos/views/widgets/top_menu.dart';
 import 'package:flutter_base/app/utils/static_colors.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
-
-
 
 class TakeOutView extends GetView<TakeOutController> {
   const TakeOutView({super.key});
@@ -20,6 +15,8 @@ class TakeOutView extends GetView<TakeOutController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const TopMenu(),
+        const SizedBox(height: 16),
         // title
         const Row(
           children: [
