@@ -24,6 +24,8 @@ class ClockInController extends GetxController {
       });
       Preferences.clockInId = res.data["data"]["id"];
       Get.offAllNamed(Routes.ENTRY_POINT);
+    } else if (res.statusCode == 406) {
+      PopupDialog.showErrorMessage(res.data["message"]);
     }
   }
 

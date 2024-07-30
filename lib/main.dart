@@ -29,7 +29,7 @@ Future<void> main() async {
 
   WindowOptions windowOptions = const WindowOptions(
     // size: Size(1250, 673),
-    minimumSize: Size(1250, 673),
+    minimumSize: Size(1350, 700),
     center: true,
     backgroundColor: Colors.transparent,
     // fullScreen: true,
@@ -88,6 +88,7 @@ class MyApp extends StatelessWidget {
           ConfigController.to.isLightTheme ? ThemeMode.light : ThemeMode.dark,
       theme: lightTheme,
       darkTheme: darkTheme,
+
       initialBinding: BaseBinding(apiService: apiService),
       // initialRoute: AppPages.INITIAL,
       initialRoute: Routes.AUTH,

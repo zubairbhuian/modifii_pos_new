@@ -10,6 +10,7 @@ import 'package:flutter_base/app/modules/pos/order/models/product_model.dart';
 import 'package:flutter_base/app/modules/pos/order/models/variation_model.dart';
 import 'package:flutter_base/app/services/controller/base_controller.dart';
 import 'package:flutter_base/app/utils/logger.dart';
+import 'package:flutter_base/app/utils/my_func.dart';
 import 'package:flutter_base/app/utils/urls.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
@@ -24,6 +25,7 @@ class PosController extends GetxController {
   // for Focus
   final FocusNode tableFocusNode = FocusNode();
   final FocusNode guestFocusNode = FocusNode();
+  bool isUpdateView = false;
 
   void changeFocusToGuest() {
     tableFocusNode.unfocus();
@@ -300,8 +302,26 @@ class PosController extends GetxController {
       if (res.statusCode == 201) {
         clearCartList();
         PopupDialog.showSuccessDialog(res.data["message"]);
+        // Todo remove this
         myOrder.employeeId = '66a27bac841c686681819833';
       }
+    }
+  }
+
+  // ** Update order
+  onUpdateOrder(String id) async {
+    try {
+      var res = await BaseController.to.apiService
+          .makePatchRequest("${URLS.orders}/$id", myOrder.toJson());
+
+      if (res.statusCode == 200) {
+        clearCartList();
+        PopupDialog.showSuccessDialog(res.data["message"]);
+        // Todo remove this
+        myOrder.employeeId = '66a27bac841c686681819833';
+      }
+    } catch (e) {
+      kLogger.e('Error from %%%% update order %%%% => $e');
     }
   }
 
@@ -369,12 +389,14 @@ class PosController extends GetxController {
     }
     myOrder.totalPst = pst;
     // for Total
-    myOrder.totalOrderAmount = myOrder.subTotal +
+    myOrder.totalOrderAmount = MyFunc.yogotRound(myOrder.subTotal +
         myOrder.totalGst +
         myOrder.totalPst +
-        myOrder.totalGratuity;
+        myOrder.totalGratuity);
     update();
   }
+
+  ///
 
 // zubair ==== + +++++++
 // zubair ==== + +++++++ ^^^
@@ -396,6 +418,7 @@ class PosController extends GetxController {
     resetModifierSelections();
     guestController.clear();
     tableController.clear();
+    isUpdateView = false;
     update();
   }
 

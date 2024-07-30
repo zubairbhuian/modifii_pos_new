@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_base/app/modules/pos/controllers/pos_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/controllers/dine_in_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/widgets/table_body.dart';
@@ -174,7 +175,40 @@ class OrderView extends GetView<PosController> {
             const SizedBox(height: 18),
             _popupPrimaryBtn(
                 onPressed: () {
-                  _kitchenNoteDialog(context);
+                  PopupDialog.customDialog(
+                      child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          MyCustomText(
+                            'Add Kitchen Note',
+                            fontSize: 24,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      CustomTextField(
+                          controller: controller.kitchenNoteTEC,
+                          hintText: 'Kitchen Note',
+                          maxLines: 10,
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 16, horizontal: 16)),
+                      const SizedBox(height: 20),
+                      PrimaryBtn(
+                        width: 200,
+                        height: 70,
+                        onPressed: () {
+                          controller.addKitchenNote();
+                          Get.back();
+                        },
+                        text: 'Submit',
+                        textColor: Colors.white,
+                      )
+                    ],
+                  ));
                   c.update();
                 },
                 text: 'KITCHEN NOTE',
@@ -187,45 +221,6 @@ class OrderView extends GetView<PosController> {
         ),
       );
     });
-  }
-
-  void _kitchenNoteDialog(BuildContext context) {
-    return customAlertDialog(
-      context: context,
-      child: SizedBox(
-        width: 400,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const MyCustomText('Add Kitchen Note'),
-                IconButton(
-                  onPressed: Get.back,
-                  icon: const Icon(FontAwesomeIcons.xmark, size: 16),
-                ),
-              ],
-            ),
-            const SizedBox(height: 14),
-            CustomTextField(
-              controller: controller.kitchenNoteTEC,
-              hintText: 'Kitchen Note',
-              maxLines: 5,
-            ),
-            const SizedBox(height: 14),
-            PrimaryBtn(
-              onPressed: () {
-                controller.addKitchenNote();
-                Get.back();
-              },
-              text: 'Submit',
-              textColor: Colors.white,
-            )
-          ],
-        ),
-      ),
-    );
   }
 
   //** cart **
@@ -347,8 +342,7 @@ class OrderView extends GetView<PosController> {
             _row(
               theme,
               title: "Total : ",
-              value:
-                  "\$${MyFunc.yogotRound(controller.myOrder.totalOrderAmount).toStringAsFixed(2)}",
+              value: controller.myOrder.totalOrderAmount.toStringAsFixed(2),
             ),
             // order btn
             Padding(
@@ -357,13 +351,23 @@ class OrderView extends GetView<PosController> {
                 children: [
                   Expanded(
                     child: PrimaryBtn(
-                      onPressed: () {
-                        controller.onPlaseOrder();
+                      onPressed: () async {
+                        if (controller.isUpdateView) {
+                          PopupDialog.showLoadingDialog();
+                          await controller.onUpdateOrder(controller.myOrder.id);
+                          PopupDialog.closeLoadingDialog();
+                        } else {
+                          PopupDialog.showLoadingDialog();
+                          await controller.onPlaseOrder();
+                          PopupDialog.closeLoadingDialog();
+                        }
                       },
                       height: 48,
                       color: StaticColors.greenColor,
                       textColor: Colors.white,
-                      text: 'Place Order',
+                      text: controller.isUpdateView
+                          ? "Update Order"
+                          : 'Place Order',
                     ),
                   ),
                   const SizedBox(width: 20),

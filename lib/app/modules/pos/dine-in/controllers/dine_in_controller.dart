@@ -10,8 +10,6 @@ import 'package:get/get.dart';
 class DineInController extends GetxController {
   static DineInController get to => Get.find();
 
-  OrderModel myOrder = OrderModel();
-
   // is show order details
   bool isShowOrderDetails = false;
   void updateIsShowOrderDetails(bool value) {
@@ -77,17 +75,24 @@ class DineInController extends GetxController {
     "Others",
     "Cash & Card"
   ];
-
-  getOrderById(String id) async {
+  OrderModel? myOrder;
+  Future<bool> getOrderById(String id) async {
     try {
       var res = await BaseController.to.apiService
           .makeGetRequest("${URLS.orders}/$id");
       if (res.statusCode == 200) {
-        myOrder = OrderModel.fromJson(res.data["data"]);
+        // myOrder = OrderModel.fromJson(res.data["data"]);
+        update();
         PosController.to.myOrder = OrderModel.fromJson(res.data["data"]);
+        PosController.to.calculateTotalPrice();
+        return true;
+      } else if (res.statusCode == 404) {
+        PopupDialog.showErrorMessage(res.data["message"]);
       }
+      return false;
     } catch (e) {
       kLogger.e('Error from %%%% getOrderById %%%% => $e');
+      return false;
     }
   }
 

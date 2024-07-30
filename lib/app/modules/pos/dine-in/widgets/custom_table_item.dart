@@ -6,7 +6,23 @@ import 'package:get/get.dart';
 
 class CustomTableItem extends StatefulWidget {
   final bool isHeader;
-  const CustomTableItem({super.key, this.isHeader = false});
+  final String name;
+  final String sl;
+  final String qty;
+  final String price;
+  final String discount;
+  final String tax;
+  final String totalPrice;
+  const CustomTableItem(
+      {super.key,
+      this.isHeader = false,
+      this.sl = "",
+      this.name = "",
+      this.qty = "",
+      this.price = "",
+      this.discount = "",
+      this.tax = "",
+      this.totalPrice = ""});
 
   @override
   State<CustomTableItem> createState() => _CustomTableItemState();
@@ -43,7 +59,7 @@ class _CustomTableItemState extends State<CustomTableItem> {
             SizedBox(
               width: 30,
               child: Text(
-                widget.isHeader == true ? "SL" : "",
+                widget.isHeader == true ? "SL" : widget.sl,
                 style: widget.isHeader == true
                     ? theme.textTheme.labelMedium
                     : theme.textTheme.bodyLarge,
@@ -63,9 +79,7 @@ class _CustomTableItemState extends State<CustomTableItem> {
               child: SizedBox(
                 // width: 100,
                 child: Text(
-                  widget.isHeader == true
-                      ? "Items"
-                      : "Name of the item fsdfsdfsdf",
+                  widget.isHeader == true ? "Items" : widget.name,
                   style: widget.isHeader == true
                       ? theme.textTheme.labelMedium
                       : theme.textTheme.titleSmall,
@@ -77,7 +91,7 @@ class _CustomTableItemState extends State<CustomTableItem> {
               width: 80,
               child: Center(
                 child: Text(
-                  widget.isHeader == true ? "Qty" : "3",
+                  widget.isHeader == true ? "Qty" : widget.qty,
                   style: widget.isHeader == true
                       ? theme.textTheme.labelMedium
                       : theme.textTheme.bodyLarge,
@@ -89,7 +103,7 @@ class _CustomTableItemState extends State<CustomTableItem> {
               child: SizedBox(
                 // width: 100,
                 child: Text(
-                  widget.isHeader == true ? "Price" : "234",
+                  widget.isHeader == true ? "Price" : widget.price,
                   style: widget.isHeader == true
                       ? theme.textTheme.labelMedium
                       : theme.textTheme.bodyLarge,
@@ -101,7 +115,7 @@ class _CustomTableItemState extends State<CustomTableItem> {
               child: SizedBox(
                 // width: 100,
                 child: Text(
-                  widget.isHeader == true ? "Discount" : "23",
+                  widget.isHeader == true ? "Discount" : widget.discount,
                   style: widget.isHeader == true
                       ? theme.textTheme.labelMedium
                       : theme.textTheme.bodyLarge,
@@ -113,7 +127,7 @@ class _CustomTableItemState extends State<CustomTableItem> {
               child: SizedBox(
                 // width: 100,
                 child: Text(
-                  widget.isHeader == true ? "Tax" : "23",
+                  widget.isHeader == true ? "Tax" : widget.tax,
                   style: widget.isHeader == true
                       ? theme.textTheme.labelMedium
                       : theme.textTheme.bodyLarge,
@@ -125,7 +139,7 @@ class _CustomTableItemState extends State<CustomTableItem> {
               child: SizedBox(
                 // width: 100,
                 child: Text(
-                  widget.isHeader == true ? "Totel Price" : "13",
+                  widget.isHeader == true ? "Totel Price" : widget.totalPrice,
                   style: widget.isHeader == true
                       ? theme.textTheme.labelMedium
                       : theme.textTheme.bodyLarge,

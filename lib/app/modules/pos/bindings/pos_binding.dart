@@ -9,10 +9,10 @@ import '../controllers/pos_controller.dart';
 class PosBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<PosController>(() => PosController(),);
-    Get.put<DineInController>(DineInController(), permanent: true);
-    Get.put<DineInOrderController>(DineInOrderController(), permanent: true);
-    Get.put<OrdersController>(OrdersController(), permanent: true);
-    Get.put<ClockInController>(ClockInController(), permanent: true);
+    // Get.lazyPut<PosController>(() => PosController(),);
+    // Get.put<DineInController>(DineInController(), permanent: true);
+    // Get.put<DineInOrderController>(DineInOrderController(), permanent: true);
+    // Get.put<OrdersController>(OrdersController(), permanent: true);
+    // Get.put<ClockInController>(ClockInController(), permanent: true);
   }
 }

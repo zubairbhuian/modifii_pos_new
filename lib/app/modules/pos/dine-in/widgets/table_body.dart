@@ -6,11 +6,12 @@ import 'package:flutter_base/app/services/controller/base_controller.dart';
 import 'package:flutter_base/app/utils/logger.dart';
 import 'package:flutter_base/app/utils/my_func.dart';
 import 'package:flutter_base/app/widgets/my_custom_text.dart';
+import 'package:flutter_base/app/widgets/popup_dialogs.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:logger/web.dart';
 import '../../../../utils/static_colors.dart';
-import '../views/order_details.dart';
+import '../views/order_details_view.dart';
 
 class TableBody extends GetView<DineInController> {
   final bool isScrollable;
@@ -40,7 +41,7 @@ class TableBody extends GetView<DineInController> {
                     var table = tables[index];
                     return GestureDetector(
                       //onTap
-                      onTap: () {
+                      onTap: () async {
                         BaseController.to.playTapSound();
 
                         // if table is avaiable
@@ -54,7 +55,13 @@ class TableBody extends GetView<DineInController> {
                           }
                           // if table is BOOKING
                         } else if (table.tableAvailability == "BOOKING") {
-                          Get.to(() => const OrderDetails());
+                          PopupDialog.showLoadingDialog();
+                          bool hasData = await controller
+                              .getOrderById(table.currentOrderId ?? "");
+                          PopupDialog.closeLoadingDialog();
+                          if (hasData) {
+                            Get.to(() => const OrderDetailsView());
+                          }
                         }
                       },
                       // for onDoubleTap

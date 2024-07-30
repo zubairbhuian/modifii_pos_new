@@ -5,6 +5,7 @@ import 'package:flutter_base/app/modules/pos/dine-in-orders/views/table_order_de
 import 'package:flutter_base/app/modules/pos/dine-in-orders/views/table_orders_list.dart';
 import 'package:flutter_base/app/modules/pos/views/widgets/top_menu.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
+import 'package:flutter_base/app/widgets/popup_dialogs.dart';
 import 'package:get/get.dart';
 
 class DineInOrderView extends GetView<DineInOrderController> {
@@ -25,6 +26,7 @@ class DineInOrderView extends GetView<DineInOrderController> {
           // pagination
           Container(
             padding: const EdgeInsets.symmetric(vertical: 12),
+            color: theme.scaffoldBackgroundColor,
             // decoration:
             //     BoxDecoration(color: theme.disabledColor.withOpacity(.3)),
             child: GetBuilder<DineInOrderController>(builder: (controller) {
@@ -34,19 +36,27 @@ class DineInOrderView extends GetView<DineInOrderController> {
                   children:
                       List.generate(controller.pagination!.totalPages, (index) {
                     var data = controller.pagination;
-
                     return PrimaryBtn(
-                        onPressed: () {},
-                        width: 40,
-                        height: 40,
-                        color: data?.currentPage == index + 1
-                            ? theme.primaryColor
-                            : theme.disabledColor,
-                        style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white),
-                        text: "${index + 1}");
+                            onPressed: () async {
+                              PopupDialog.showLoadingDialog();
+                              await controller.getOrder(page: "${index + 1}");
+                              PopupDialog.closeLoadingDialog();
+                            },
+                            width: 40,
+                            height: 40,
+                            color: data?.currentPage == index + 1
+                                ? theme.primaryColor
+                                : theme.disabledColor,
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white),
+                            text: "${index + 1}")
+                        .marginOnly(
+                            right:
+                                controller.pagination!.totalPages == index + 1
+                                    ? 0
+                                    : 2);
                   }),
                 );
               }

@@ -21,25 +21,26 @@ class PrimaryBtn extends StatelessWidget {
   final bool isdisabled;
   final double textMaxSize;
   final double textMinSize;
+  final int? maxLines;
 
-  const PrimaryBtn({
-    super.key,
-    this.color,
-    this.textColor,
-    this.borderColor,
-    required this.onPressed,
-    this.borderRadius,
-    required this.text,
-    this.style,
-    this.height,
-    this.width,
-    this.elevation,
-    this.padding,
-    this.isOutline = false,
-    this.isdisabled = false,
-    this.textMaxSize = 18,
-    this.textMinSize = 14,
-  });
+  const PrimaryBtn(
+      {super.key,
+      this.color,
+      this.textColor,
+      this.borderColor,
+      required this.onPressed,
+      this.borderRadius,
+      required this.text,
+      this.style,
+      this.height,
+      this.width,
+      this.elevation,
+      this.padding,
+      this.isOutline = false,
+      this.isdisabled = false,
+      this.textMaxSize = 18,
+      this.textMinSize = 14,
+      this.maxLines});
 
   @override
   Widget build(BuildContext context) {
@@ -126,7 +127,8 @@ class PrimaryBtn extends StatelessWidget {
         // ),
         child: AutoSizeText(
           text,
-          maxLines: 2, maxFontSize: textMaxSize, minFontSize: textMinSize,
+          maxLines: maxLines ?? 2, maxFontSize: textMaxSize,
+          minFontSize: textMinSize,
           textAlign: TextAlign.center,
           style: style ??
               TextStyle(
