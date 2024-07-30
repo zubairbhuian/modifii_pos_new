@@ -396,6 +396,39 @@ class PosController extends GetxController {
     update();
   }
 
+  /// ==== Discount ======
+  List percentageDiscountList = [5, 10, 15, 20, 25, 30, 40, 50, 60];
+  List amountDiscountList = [5, 10, 15, 20, 25, 30, 40, 50, 60];
+  void applyDiscount(num amount, List<int> indices,
+      {bool isPercentage = true}) {
+    if (indices.isNotEmpty) {
+      for (var index in indices) {
+        if (index >= 0 && index < myOrder.carts.length) {
+          if (isPercentage) {
+            var discount = myOrder.carts[index].price * amount / 100;
+            if (discount <= myOrder.carts[index].price) {
+              myOrder.carts[index].discountAmount = discount;
+            } else {
+              PopupDialog.showErrorMessage(
+                  "Discount amount must be less than the Total amount");
+            }
+          } else {
+            if (amount <= myOrder.carts[index].price) {
+              myOrder.carts[index].discountAmount = amount;
+            } else {
+              PopupDialog.showErrorMessage(
+                  "Discount amount  must be less than the Total amount");
+            }
+          }
+        }
+      }
+      calculateTotalPrice();
+    } else {
+      PopupDialog.showErrorMessage(
+          "Select at least one item.");
+    }
+  }
+
   ///
 
 // zubair ==== + +++++++

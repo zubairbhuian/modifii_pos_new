@@ -14,7 +14,7 @@ class PopupDialog {
       behavior: SnackBarBehavior.floating,
       width: 500,
       backgroundColor: StaticColors.greenColor,
-      content: Center(child: MyCustomText(message)),
+      content: Center(child: MyCustomText(message, color: Colors.white)),
     );
     ScaffoldMessenger.of(Get.context!).showSnackBar(snackBar);
   }

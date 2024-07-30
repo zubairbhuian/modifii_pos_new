@@ -111,7 +111,8 @@ class _CustomOrderDialogOptionsState extends State<CustomOrderDialogOptions> {
                     },
                     inputFormatters: [
                       LengthLimitingTextInputFormatter(8),
-                      FilteringTextInputFormatter.allow(RegExp('[0-9.]'))
+                      FilteringTextInputFormatter.allow(
+                          RegExp(r'^\d*\.?\d{0,2}$'))
                     ],
                   ),
                 ],

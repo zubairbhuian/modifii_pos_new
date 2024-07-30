@@ -69,7 +69,7 @@ class PrimaryBtn extends StatelessWidget {
             //   return theme.disabledColor.withOpacity(.6);
             // }
             return isdisabled
-                ? theme.disabledColor.withOpacity(.4)
+                ? const Color.fromARGB(255, 231, 231, 231)
                 : color ?? theme.primaryColor;
           }),
           padding: MaterialStateProperty.all(

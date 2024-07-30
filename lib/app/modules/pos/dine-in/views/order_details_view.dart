@@ -3,6 +3,7 @@ import 'package:flutter_base/app/modules/pos/controllers/orders_controller.dart'
 import 'package:flutter_base/app/modules/pos/controllers/pos_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/controllers/dine_in_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/views/split_order_view.dart';
+import 'package:flutter_base/app/modules/pos/dine-in/widgets/dialogs/discount_dialog.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/widgets/table_dialog.dart';
 import 'package:flutter_base/app/modules/pos/order/models/order_model.dart';
 import 'package:flutter_base/app/routes/app_pages.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_base/app/utils/static_colors.dart';
 import 'package:flutter_base/app/widgets/appbar.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
 import 'package:flutter_base/app/widgets/my_custom_text.dart';
+import 'package:flutter_base/app/widgets/popup_dialogs.dart';
 import 'package:get/get.dart';
 
 import '../widgets/custom_table_item.dart';
@@ -21,6 +23,10 @@ class OrderDetailsView extends GetView<DineInController> {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
+    const double btnSize = 115;
+    const double height = 80;
+    const double textMaxSize = 30;
+    const double textMinSize = 11;
     return Scaffold(
       appBar: const CustomAppBar(
         isPrimary: false,
@@ -31,8 +37,165 @@ class OrderDetailsView extends GetView<DineInController> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Column(
             children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // left area
+                  // Expanded(
+                  //   child: Column(
+                  //     crossAxisAlignment: CrossAxisAlignment.start,
+                  //     children: [
+                  //       Row(
+                  //         crossAxisAlignment: CrossAxisAlignment.center,
+                  //         children: [
+                  //           const Icon(Icons.calendar_month).marginOnly(right: 8),
+                  //           Text(
+                  //             '22 Jun 2024',
+                  //             style: theme.textTheme.titleSmall,
+                  //           ),
+                  //         ],
+                  //       ),
+                  //       Text(
+                  //         'Authorization Code : N/A',
+                  //         style: theme.textTheme.titleSmall,
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
+                  // btn area
+                  Row(
+                    children: [
+                      PrimaryBtn(
+                        width: btnSize,
+                        height: height,
+                        textMaxSize: textMaxSize,
+                        textMinSize: textMinSize,
+                        onPressed: () {
+                          Get.back();
+                          PosController.to.isUpdateView = true;
+                          PosController.to.guestController.text =
+                              data.numberOfPeople.toString();
+                          PosController.to.tableController.text =
+                              data.table?.tableName ?? "";
+                          PosController.to.onchangePage(0);
+                        },
+                        // Add Items,Change Table,Guests
+                        text: 'Add Items'.toUpperCase(),
+                        textColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 10),
+                        color: theme.primaryColor,
+                      ),
+                      PrimaryBtn(
+                        onPressed: () {},
+                        width: btnSize,
+                        height: height,
+                        textMaxSize: textMaxSize,
+                        textMinSize: textMinSize,
+                        text: 'Repeat Items'.toUpperCase(),
+                        textColor: Colors.white,
+                        color: StaticColors.greenColor,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 10),
+                      ).marginOnly(left: 12),
+                      PrimaryBtn(
+                        onPressed: () {},
+                        width: btnSize,
+                        height: height,
+                        textMaxSize: textMaxSize,
+                        textMinSize: textMinSize,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 10),
+                        text: 'Transfer Items'.toUpperCase(),
+                        textColor: Colors.white,
+                        color: StaticColors.pinkColor,
+                      ).marginOnly(left: 12),
+                    ],
+                  ),
+                  // const Spacer(),
+                  Row(
+                    children: [
+                      PrimaryBtn(
+                        onPressed: () {
+                          Get.to(() => const SplitOrderView());
+                        },
+                        width: btnSize,
+                        height: height,
+                        textMaxSize: textMaxSize,
+                        textMinSize: textMinSize,
+                        text: 'Split Check'.toUpperCase(),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 10),
+                        textColor: Colors.white,
+                        color: theme.primaryColor,
+                      ).marginOnly(left: 12),
+                      PrimaryBtn(
+                        width: btnSize,
+                        height: height,
+                        textMaxSize: textMaxSize,
+                        textMinSize: textMinSize,
+                        onPressed: () {
+                          PopupDialog.customDialog(
+                              child: const DiscountDialog());
+                        },
+                        // width: double.infinity,
+                        text: 'Discount'.toUpperCase(),
+                        textColor: Colors.white,
+                        color: StaticColors.blueColor,
+                      ).marginOnly(left: 12),
+                    ],
+                  ),
+
+                  Row(
+                    children: [
+                      PrimaryBtn(
+                        width: btnSize,
+                        height: height,
+                        textMaxSize: textMaxSize,
+                        textMinSize: textMinSize,
+                        onPressed: () {},
+                        // width: double.infinity,
+                        text: 'Print Check'.toUpperCase(),
+
+                        textColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
+                        color: StaticColors.blueLightColor,
+                      ).marginOnly(left: 12, right: 12),
+                      PrimaryBtn(
+                        width: btnSize,
+                        height: height,
+                        textMaxSize: textMaxSize,
+                        textMinSize: textMinSize,
+                        onPressed: () {},
+                        // width: double.infinity,
+                        text: 'Print Items'.toUpperCase(),
+                        maxLines: 3,
+                        textColor: Colors.white,
+                        color: StaticColors.blueColor,
+                      ).marginOnly(right: 16),
+
+                      // PrimaryBtn(
+                      //   width: btnSize,
+                      //   height: btnSize,
+                      //   textMaxSize: textMaxSize,
+                      //   textMinSize: textMinSize,
+                      //   onPressed: () {
+                      //     OrdersController.to.printReceipt();
+                      //   },
+                      //   // width: double.infinity,
+                      //   text: 'Print Items for Kicken / Bar'.toUpperCase(),
+                      //   textColor: Colors.white,
+                      //   maxLines: 4,
+                      //   color: StaticColors.greenColor,
+                      // ).marginOnly(left: 12),
+                    ],
+                  )
+                ],
+              ).marginOnly(left: 25),
+
               // title area
-              _titleRow(theme, data),
+              _titleRow(theme, data).marginOnly(left: 25),
               Expanded(
                 child: SingleChildScrollView(
                   child: Row(
@@ -46,6 +209,7 @@ class OrderDetailsView extends GetView<DineInController> {
                   ),
                 ),
               ),
+              const SizedBox(height: 50),
             ],
           ),
         );
@@ -219,9 +383,6 @@ class OrderDetailsView extends GetView<DineInController> {
 
   // item details
   Widget _itemDetails(ThemeData theme, OrderModel? data) {
-    const double btnSize = 95;
-    const double textMaxSize = 30;
-    const double textMinSize = 11;
     return Container(
       // width: double.infinity,
       padding: const EdgeInsets.all(12.0),
@@ -232,152 +393,7 @@ class OrderDetailsView extends GetView<DineInController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // header
-          Row(
-            children: [
-              // left area
-              // Expanded(
-              //   child: Column(
-              //     crossAxisAlignment: CrossAxisAlignment.start,
-              //     children: [
-              //       Row(
-              //         crossAxisAlignment: CrossAxisAlignment.center,
-              //         children: [
-              //           const Icon(Icons.calendar_month).marginOnly(right: 8),
-              //           Text(
-              //             '22 Jun 2024',
-              //             style: theme.textTheme.titleSmall,
-              //           ),
-              //         ],
-              //       ),
-              //       Text(
-              //         'Authorization Code : N/A',
-              //         style: theme.textTheme.titleSmall,
-              //       ),
-              //     ],
-              //   ),
-              // ),
-              // btn area
-              Row(
-                children: [
-                  PrimaryBtn(
-                    width: btnSize,
-                    height: btnSize,
-                    textMaxSize: textMaxSize,
-                    textMinSize: textMinSize,
-                    onPressed: () {
-                      Get.back();
-                      PosController.to.isUpdateView = true;
-                      PosController.to.guestController.text =
-                          data!.numberOfPeople.toString();
-                      PosController.to.tableController.text =
-                          data.table?.tableName ?? "";
-                      PosController.to.onchangePage(0);
-                    },
-                    // Add Items,Change Table,Guests
-                    text: 'Add Items'.toUpperCase(),
-                    textColor: Colors.white,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
-                    color: theme.primaryColor,
-                  ),
-                  PrimaryBtn(
-                    onPressed: () {},
-                    width: btnSize,
-                    height: btnSize,
-                    textMaxSize: textMaxSize,
-                    textMinSize: textMinSize,
-                    text: 'Repeat Items'.toUpperCase(),
-                    textColor: Colors.white,
-                    color: StaticColors.greenColor,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
-                  ).marginOnly(left: 12),
-                  PrimaryBtn(
-                    onPressed: () {
-                      Get.to(() => const SplitOrderView());
-                    },
-                    width: btnSize,
-                    height: btnSize,
-                    textMaxSize: textMaxSize,
-                    textMinSize: textMinSize,
-                    text: 'Split Order'.toUpperCase(),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
-                    textColor: Colors.white,
-                    color: theme.primaryColor,
-                  ).marginOnly(left: 12),
-                  PrimaryBtn(
-                    onPressed: () {},
-                    width: btnSize,
-                    height: btnSize,
-                    textMaxSize: textMaxSize,
-                    textMinSize: textMinSize,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
-                    text: 'Transfer Items'.toUpperCase(),
-                    textColor: Colors.white,
-                    color: StaticColors.pinkColor,
-                  ).marginOnly(left: 12),
-                ],
-              ),
-              const Spacer(),
-              Row(
-                children: [
-                  PrimaryBtn(
-                    width: btnSize,
-                    height: btnSize,
-                    textMaxSize: textMaxSize,
-                    textMinSize: textMinSize,
-                    onPressed: () {},
-                    // width: double.infinity,
-                    text: 'Print Check'.toUpperCase(),
 
-                    textColor: Colors.white,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    color: StaticColors.blueLightColor,
-                  ).marginOnly(left: 12),
-                  PrimaryBtn(
-                    width: btnSize,
-                    height: btnSize,
-                    textMaxSize: textMaxSize,
-                    textMinSize: textMinSize,
-                    onPressed: () {},
-                    // width: double.infinity,
-                    text: 'Print Add-on Items'.toUpperCase(),
-                    maxLines: 3,
-                    textColor: Colors.white,
-                    color: StaticColors.blueColor,
-                  ).marginOnly(left: 12),
-                  PrimaryBtn(
-                    width: btnSize,
-                    height: btnSize,
-                    textMaxSize: textMaxSize,
-                    textMinSize: textMinSize,
-                    onPressed: () {
-                      OrdersController.to.printReceipt();
-                    },
-                    // width: double.infinity,
-                    text: 'Print Items for Kicken / Bar'.toUpperCase(),
-                    textColor: Colors.white,
-                    maxLines: 4,
-                    color: StaticColors.greenColor,
-                  ).marginOnly(left: 12),
-                  PrimaryBtn(
-                    width: btnSize,
-                    height: btnSize,
-                    textMaxSize: textMaxSize,
-                    textMinSize: textMinSize,
-                    onPressed: () {},
-                    // width: double.infinity,
-                    text: 'Discount\nItems'.toUpperCase(),
-                    textColor: Colors.white,
-                    color: StaticColors.blueColor,
-                  ).marginOnly(left: 12),
-                ],
-              )
-            ],
-          ),
           const SizedBox(height: 16),
 
           SizedBox(
@@ -489,10 +505,12 @@ class OrderDetailsView extends GetView<DineInController> {
           const SizedBox(height: 16),
           _row(theme,
               title: "Subtotal :",
+              fontSize: 16,
               value: data.subTotal.toStringAsFixed(2),
               fontWeight: FontWeight.w500),
           _row(theme,
               title: "GST 5% :",
+              fontSize: 16,
               value: data.totalGst.toStringAsFixed(2),
               fontWeight: FontWeight.w500),
           _row(theme,

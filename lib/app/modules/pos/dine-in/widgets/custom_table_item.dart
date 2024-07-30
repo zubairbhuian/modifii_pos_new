@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_base/app/utils/static_colors.dart';
 import 'package:flutter_base/app/widgets/custom_inkwell.dart';
@@ -59,7 +58,7 @@ class _CustomTableItemState extends State<CustomTableItem> {
             SizedBox(
               width: 30,
               child: Text(
-                widget.isHeader == true ? "SL" : widget.sl,
+                widget.isHeader == true ? "No" : widget.sl,
                 style: widget.isHeader == true
                     ? theme.textTheme.labelMedium
                     : theme.textTheme.bodyLarge,
@@ -139,7 +138,7 @@ class _CustomTableItemState extends State<CustomTableItem> {
               child: SizedBox(
                 // width: 100,
                 child: Text(
-                  widget.isHeader == true ? "Totel Price" : widget.totalPrice,
+                  widget.isHeader == true ? "Total Price" : widget.totalPrice,
                   style: widget.isHeader == true
                       ? theme.textTheme.labelMedium
                       : theme.textTheme.bodyLarge,

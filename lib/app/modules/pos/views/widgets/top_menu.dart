@@ -12,16 +12,17 @@ class TopMenu extends GetView<PosController> {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    const double btnSize = 90;
+    const double width = 90;
+    const double height = 90;
     const double txtMaxSize = 40;
-    const double txtMinSize = 13;
+    const double txtMinSize = 11;
     return ColoredBox(
       color: theme.scaffoldBackgroundColor,
       child: Row(
         children: [
           PrimaryBtn(
-            width: btnSize,
-            height: btnSize,
+            // width: width,
+            // height: height,
             onPressed: () {
               PosController.to.onchangePage(0);
             },
@@ -33,8 +34,8 @@ class TopMenu extends GetView<PosController> {
           ),
           const SizedBox(width: 10),
           PrimaryBtn(
-            width: btnSize,
-            height: btnSize,
+            // width: btnSize,
+            // height: btnSize,
             onPressed: () {
               // TablesController.to.updateIsShowOrderDetails(false);
               PosController.to.onchangePage(1);
@@ -47,49 +48,49 @@ class TopMenu extends GetView<PosController> {
           ),
           const SizedBox(width: 10),
           PrimaryBtn(
-            width: btnSize,
-            height: btnSize,
+            // width: btnSize,
+            // height: btnSize,
             onPressed: () {
               DineInController.to.getTableCategories();
               PosController.to.onchangePage(2);
             },
             padding: EdgeInsets.zero,
-            color: StaticColors.purpleColor,
+            color: StaticColors.blueColor,
             textColor: Colors.white,
             text: 'DINE-IN',
-            textMaxSize: txtMaxSize,
-            textMinSize: txtMinSize,
+            // textMaxSize: txtMaxSize,
+            // textMinSize: txtMinSize,
           ),
           const SizedBox(width: 10),
           PrimaryBtn(
-            width: btnSize,
-            height: btnSize,
+            // width: btnSize,
+            // height: btnSize,
             onPressed: () {
               PosController.to.onchangePage(3);
             },
             padding: EdgeInsets.zero,
-            color: StaticColors.blueColor,
+            color: StaticColors.greenColor,
             textColor: Colors.white,
             text: 'TAKEOUT',
-            textMaxSize: txtMaxSize,
-            textMinSize: txtMinSize,
+            // textMaxSize: txtMaxSize,
+            // textMinSize: txtMinSize,
           ),
           const SizedBox(width: 10),
           const Spacer(),
           PrimaryBtn(
-            width: btnSize,
-            height: btnSize,
+            // width: btnSize,
+            // height: btnSize,
             onPressed: () {},
             color: StaticColors.blueColor,
             textColor: Colors.white,
             text: 'Dine-in\nSummary'.toUpperCase(),
-            textMaxSize: txtMaxSize,
-            textMinSize: txtMinSize,
+            // textMaxSize: txtMaxSize,
+            // textMinSize: txtMinSize,
           ),
           const SizedBox(width: 10),
           PrimaryBtn(
-            width: btnSize,
-            height: btnSize,
+            // width: btnSize,
+            // height: btnSize,
             onPressed: () {
               // controller.getCategory(type: 'drinks');
             },
@@ -97,34 +98,35 @@ class TopMenu extends GetView<PosController> {
             color: StaticColors.blueColor,
             textColor: Colors.white,
             text: 'Dine-in \nCash Out'.toUpperCase(),
-            textMaxSize: txtMaxSize,
-            textMinSize: txtMinSize,
+            // textMaxSize: txtMaxSize,
+            // textMinSize: txtMinSize,
           ),
           const SizedBox(width: 10),
           PrimaryBtn(
-            width: btnSize,
-            height: btnSize,
+            // width: btnSize,
+            // height: btnSize,
             onPressed: () {
               // controller.getCategory(type: 'drinks');
             },
             color: StaticColors.greenColor,
             textColor: Colors.white,
             text: 'Take out \nSummary'.toUpperCase(),
-            textMaxSize: txtMaxSize,
-            textMinSize: txtMinSize,
+            // textMaxSize: txtMaxSize,
+            // textMinSize: txtMinSize,
           ),
           const SizedBox(width: 10),
           PrimaryBtn(
-            width: btnSize,
-            height: btnSize,
+            // width: btnSize,
+            // height: btnSize,
             onPressed: () {
               // controller.getCategory(type: 'drinks');
             },
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 16),
             color: StaticColors.greenColor,
             textColor: Colors.white,
             text: 'Take out \nCash Out'.toUpperCase(),
-            textMaxSize: txtMaxSize,
-            textMinSize: txtMinSize,
+            // textMaxSize: txtMaxSize,
+            // textMinSize: txtMinSize,
           ),
         ],
       ),
