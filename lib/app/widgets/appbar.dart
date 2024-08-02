@@ -1,4 +1,6 @@
 import 'package:flutter_base/app/modules/clockIn/controllers/clock_in_controller.dart';
+import 'package:flutter_base/app/modules/pos/controllers/pos_controller.dart';
+import 'package:flutter_base/app/modules/pos/dine-in/views/order_details_view.dart';
 import 'package:flutter_base/app/services/controller/base_controller.dart';
 import 'package:flutter_base/app/services/controller/config_controller.dart';
 import 'package:flutter_base/app/utils/static_colors.dart';
@@ -39,7 +41,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 // Specify the desired height of the AppBar
   @override
   Size get preferredSize =>
-      Size.fromHeight(isPrimary == true ? preferredHeight ?? 90 : 60);
+      Size.fromHeight(isPrimary == true ? preferredHeight ?? 65 : 60);
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +52,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       centerTitle: centerTitle,
       leadingWidth: 80,
+
       backgroundColor: backgroundColor ?? theme.canvasColor,
       // foregroundColor: kTextColor,
       // titleTextStyle: kTitleLarge.copyWith(color: const Color(0xff2F2F2F)),
@@ -90,43 +93,48 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     ClockInController clockInController = ClockInController.to;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              if (isLeading)
-                // CustomInkWell(
-                //   onTap: () => Get.back(),
-                //   child: const Icon(
-                //     FontAwesomeIcons.arrowLeft,
-                //     size: 28,
-                //   ),
-                // ).marginOnly(right: 20),
-                CustomInkWell(
-                  onTap: Scaffold.of(context).openDrawer,
-                  child: const Icon(
-                    FontAwesomeIcons.burger,
-                    size: 28,
-                  ),
-                ).marginOnly(right: 20),
-              if (hasHomeButton)
-                CustomInkWell(
-                  onTap: () {},
-                  child: SvgPicture.asset(
-                    width: 200,
-                    'assets/images/splash/yogo_logo.svg',
-                    colorFilter: ColorFilter.mode(
-                      configController.isLightTheme
-                          ? Colors.black
-                          : Colors.white,
-                      BlendMode.srcIn,
+          GetBuilder<PosController>(builder: (c) {
+            return Row(
+              children: [
+                if (isLeading)
+                  CustomInkWell(
+                    onTap: () => Get.back(),
+                    child: const Icon(
+                      FontAwesomeIcons.arrowLeft,
+                      size: 28,
                     ),
-                  ),
-                ).marginOnly(right: 20),
-            ],
-          ),
+                  ).marginOnly(right: 20),
+                if (c.isUpdateView)
+                  CustomInkWell(
+                    onTap: () {
+                      Get.to(() => const OrderDetailsView());
+                    },
+                    child: const Icon(
+                      FontAwesomeIcons.arrowLeft,
+                      size: 28,
+                    ),
+                  ).marginOnly(right: 20),
+                if (hasHomeButton)
+                  CustomInkWell(
+                    onTap: () {},
+                    child: SvgPicture.asset(
+                      width: 200,
+                      'assets/icons/yogo.svg',
+                      colorFilter: ColorFilter.mode(
+                        configController.isLightTheme
+                            ? Colors.black
+                            : Colors.white,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                  ).marginOnly(right: 20),
+              ],
+            );
+          }),
           Row(
             children: [
               CustomInkWell(
@@ -148,7 +156,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   children: [
                     Obx(
                       () => SizedBox(
-                        height: 80,
+                        height: 65,
                         child: ListView.separated(
                           shrinkWrap: true,
                           scrollDirection: Axis.horizontal,
@@ -221,7 +229,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ),
               const SizedBox(width: 18),
-
               Visibility(
                 visible: hasLogoutBtn,
                 child: PrimaryBtn(
@@ -234,13 +241,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   color: StaticColors.redColor,
                 ),
               ),
-              // PrimaryBtn(
-              //   onPressed: () => Get.offAllNamed(AppPages.INITIAL),
-              //   width: 80,
-              //   text: 'Logout',
-              //   textColor: Colors.white,
-              //   color: Colors.redAccent,
-              // ),
             ],
           ),
 

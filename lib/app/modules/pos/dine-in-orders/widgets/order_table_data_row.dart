@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_base/app/modules/pos/dine-in/controllers/dine_in_controller.dart';
+import 'package:flutter_base/app/modules/pos/dine-in/views/order_details_view.dart';
+import 'package:flutter_base/app/widgets/popup_dialogs.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 
 import '../../../../utils/static_colors.dart';
 import '../../../../widgets/my_custom_text.dart';
@@ -10,7 +14,6 @@ class OrderTableDataRow extends StatelessWidget {
     required this.sl,
     required this.tableNo,
     required this.userName,
-    this.authCode = "",
     this.orderDateTime = "",
     required this.orderType,
     required this.orderStatus,
@@ -18,12 +21,15 @@ class OrderTableDataRow extends StatelessWidget {
     required this.paymetStatus,
     this.onOrderDetails,
     this.onPrint,
+    required this.orderId,
+    required this.id,
   });
 
   final int sl;
+  final String id;
+  final String orderId;
   final String tableNo;
   final String userName;
-  final String authCode;
   final String orderDateTime;
   final String orderType;
   final String orderStatus;
@@ -62,7 +68,7 @@ class OrderTableDataRow extends StatelessWidget {
           const SizedBox(width: 4.0),
           Expanded(
               child: MyCustomText(
-            authCode,
+            orderId,
             fontSize: contentFontSize,
           )),
           const SizedBox(width: 4.0),
@@ -103,22 +109,35 @@ class OrderTableDataRow extends StatelessWidget {
           Expanded(
             child: Row(
               children: [
-                IconButton(
-                  onPressed: onOrderDetails,
-                  icon: const Icon(
-                    FontAwesomeIcons.eye,
-                    size: 18,
-                    color: StaticColors.orangeColor,
+                Transform.scale(
+                  scale: 1.5,
+                  child: IconButton(
+                    onPressed: () async {
+                      PopupDialog.showLoadingDialog();
+                      var hasData = await DineInController.to.getOrderById(id);
+                      PopupDialog.closeLoadingDialog();
+                      if (hasData) {
+                        Get.to(() => const OrderDetailsView());
+                      }
+                    },
+                    icon: const Icon(
+                      FontAwesomeIcons.eye,
+                      size: 18,
+                      color: StaticColors.orangeColor,
+                    ),
                   ),
                 ),
-                const SizedBox(width: 4.0),
-                IconButton(
-                  // onPressed: onPrint,
-                  onPressed: () {},
-                  icon: const Icon(
-                    FontAwesomeIcons.print,
-                    size: 18,
-                    color: StaticColors.greenColor,
+                const SizedBox(width: 20.0),
+                Transform.scale(
+                  scale: 1.5,
+                  child: IconButton(
+                    // onPressed: onPrint,
+                    onPressed: () {},
+                    icon: const Icon(
+                      FontAwesomeIcons.print,
+                      size: 18,
+                      color: StaticColors.greenColor,
+                    ),
                   ),
                 ),
               ],

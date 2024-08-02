@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_base/app/modules/pos/controllers/tables_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in-orders/controllers/dine_in_order_controller.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
+import 'package:flutter_base/app/widgets/no_data_found.dart';
 import 'package:flutter_base/app/widgets/popup_dialogs.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_svg/svg.dart';
@@ -68,7 +69,7 @@ class TableOrdersList extends GetView<DineInOrderController> {
             children: [
               Expanded(
                   child: MyCustomText(
-                'SL',
+                'No',
                 fontSize: titleFontSize,
                 fontWeight: FontWeight.w600,
               )),
@@ -139,6 +140,13 @@ class TableOrdersList extends GetView<DineInOrderController> {
               controller.orderList.length,
               (index) {
                 var order = controller.orderList[index];
+                if (controller.orderList.isEmpty) {
+                  return Container(
+                    width: 200,
+                    color: Colors.red,
+                    height: 23,
+                  );
+                }
                 return OrderTableDataRow(
                   onOrderDetails: () {
                     // TablesController.to.updateIsShowOrderDetails(true);
@@ -150,10 +158,12 @@ class TableOrdersList extends GetView<DineInOrderController> {
                       child: _printReceipt(),
                     );
                   },
+                  id: order.id,
                   sl: index + 1,
                   tableNo: order.table?.tableName ?? "",
-                  userName:
-                      "${order.employee?.firstName} ${order.employee?.lastName}",
+
+                  userName: "${order.employee?.firstName}",
+                  orderId: "${order.orderId}",
                   orderDateTime: DateFormat('MMM d, yyyy h:mm a')
                       .format(order.createdAt ?? DateTime.now()),
 
@@ -398,18 +408,23 @@ class TableOrdersList extends GetView<DineInOrderController> {
   Widget _searchAndExportRow() {
     return Row(
       children: [
-        const Expanded(
+        Expanded(
           flex: 2,
           child: CustomTextField(
+              controller: controller.search,
               hintText: 'Search by Order ID, Order Status or Auth Code'),
         ),
         const SizedBox(width: 12.0),
         Expanded(
             child: PrimaryBtn(
           onPressed: () async {
-            PopupDialog.showLoadingDialog();
-            await controller.getOrder();
-            PopupDialog.closeLoadingDialog();
+            if (controller.search.text.isNotEmpty) {
+              PopupDialog.showLoadingDialog();
+              await controller.getOrder();
+              PopupDialog.closeLoadingDialog();
+            } else {
+              PopupDialog.showErrorMessage("Search field is empty");
+            }
           },
           text: 'Search',
           textColor: Colors.white,
@@ -419,7 +434,10 @@ class TableOrdersList extends GetView<DineInOrderController> {
         const SizedBox(width: 12.0),
         Expanded(
           child: PrimaryBtnWithChild(
-            onPressed: () {},
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            onPressed: () {
+              //TODO
+            },
             isOutline: true,
             borderColor: StaticColors.orangeColor,
             child: const Row(
@@ -487,6 +505,8 @@ class TableOrdersList extends GetView<DineInOrderController> {
                   ).then((date) {
                     controller.startDate.text =
                         DateFormat('MM/dd/yyyy').format(date!);
+                    controller.serverStartDate.text =
+                        DateFormat('yyyy-MM-dd').format(date);
                   });
                 },
               ),
@@ -510,6 +530,8 @@ class TableOrdersList extends GetView<DineInOrderController> {
                   ).then((date) {
                     controller.endDate.text =
                         DateFormat('MM/dd/yyyy').format(date!);
+                    controller.serverEndDate.text =
+                        DateFormat('yyyy-MM-dd').format(date);
                     // TablesController.to.updateEndDate(date);
                   });
                 },
@@ -522,6 +544,8 @@ class TableOrdersList extends GetView<DineInOrderController> {
                 onPressed: () {
                   controller.endDate.clear();
                   controller.startDate.clear();
+                  controller.serverEndDate.clear();
+                  controller.serverStartDate.clear();
                 },
                 text: 'Clear',
                 color: Colors.white,
@@ -533,9 +557,17 @@ class TableOrdersList extends GetView<DineInOrderController> {
               flex: 1,
               child: PrimaryBtn(
                 onPressed: () async {
-                  PopupDialog.showLoadingDialog();
-                  await controller.getOrder();
-                  PopupDialog.closeLoadingDialog();
+                  if (controller.serverStartDate.text.isNotEmpty &&
+                      controller.serverEndDate.text.isNotEmpty) {
+                    PopupDialog.showLoadingDialog();
+                    await controller.getOrder(
+                        endDate: controller.serverEndDate.text,
+                        startDate: controller.serverStartDate.text);
+                    PopupDialog.closeLoadingDialog();
+                  } else {
+                    PopupDialog.showErrorMessage(
+                        "StartDate and EndDate are required");
+                  }
                 },
                 text: 'Show Data',
                 textColor: Colors.white,
@@ -557,7 +589,9 @@ class TableOrdersList extends GetView<DineInOrderController> {
           return InkWell(
             onTap: () async {
               PopupDialog.showLoadingDialog();
-              await controller.getOrder();
+              await controller.getOrder(
+                  orderStatus:
+                      controller.orderStatusList[index].status.toUpperCase());
               PopupDialog.closeLoadingDialog();
             },
             child: Container(

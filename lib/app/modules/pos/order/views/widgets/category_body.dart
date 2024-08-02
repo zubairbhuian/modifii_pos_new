@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 class CategoryBody extends GetView<PosController> {
   const CategoryBody({super.key});
 
-  @override
+  @override 
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     return SingleChildScrollView(

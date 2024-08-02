@@ -76,11 +76,10 @@ class _CustomOrderDialogOptionsState extends State<CustomOrderDialogOptions> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  MyCustomText(
+                  const MyCustomText(
                     'Product Name',
-                    fontSize: 20,
+                    fontSize: 24,
                     fontWeight: FontWeight.w700,
-                    color: Theme.of(context).hintColor,
                   ),
                   const SizedBox(height: 4),
                   CustomTextField(
@@ -97,11 +96,10 @@ class _CustomOrderDialogOptionsState extends State<CustomOrderDialogOptions> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  MyCustomText(
+                  const MyCustomText(
                     'Price',
-                    fontSize: 20,
+                    fontSize: 24,
                     fontWeight: FontWeight.w700,
-                    color: Theme.of(context).hintColor,
                   ),
                   const SizedBox(height: 4),
                   CustomTextField(
@@ -112,8 +110,9 @@ class _CustomOrderDialogOptionsState extends State<CustomOrderDialogOptions> {
                       onCalculatTotalPrice(value);
                     },
                     inputFormatters: [
-                      LengthLimitingTextInputFormatter(4),
-                      FilteringTextInputFormatter.allow(RegExp('[0-9.]'))
+                      LengthLimitingTextInputFormatter(8),
+                      FilteringTextInputFormatter.allow(
+                          RegExp(r'^\d*\.?\d{0,2}$'))
                     ],
                   ),
                 ],
@@ -123,11 +122,10 @@ class _CustomOrderDialogOptionsState extends State<CustomOrderDialogOptions> {
         ),
         const SizedBox(height: 14),
         //description
-        MyCustomText(
+        const MyCustomText(
           'Description',
-          fontSize: 20,
+          fontSize: 24,
           fontWeight: FontWeight.w700,
-          color: Theme.of(context).hintColor,
         ),
         const SizedBox(height: 4),
         CustomTextField(
@@ -195,7 +193,7 @@ class _CustomOrderDialogOptionsState extends State<CustomOrderDialogOptions> {
                 alignment: Alignment.centerRight,
                 child: MyCustomText(
                   '\$${orderTotalPrice.toStringAsFixed(2)}',
-                  fontSize: 20,
+                  fontSize: 24,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -232,12 +230,13 @@ class _CustomOrderDialogOptionsState extends State<CustomOrderDialogOptions> {
               }
             },
             width: 200,
-            height: 70,
+            height: 80,
             // padding: const EdgeInsets.symmetric(horizontal: 200, vertical: 100),
             text: 'Add',
+
             textColor: Colors.white,
-            textMaxSize: 20,
-            textMinSize: 16,
+            textMaxSize: 40,
+            textMinSize: 30,
           ),
         ),
       ],

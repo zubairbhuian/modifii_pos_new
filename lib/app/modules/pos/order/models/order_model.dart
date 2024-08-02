@@ -20,6 +20,7 @@ class OrderModel {
     this.employee,
     this.table,
     this.id = "",
+    this.orderId,
     this.orderNote = "",
   }) : carts = carts ?? [];
 
@@ -44,7 +45,7 @@ class OrderModel {
   final Table? table;
   final Employee? employee;
   final DateTime? createdAt;
-  
+  final String? orderId;
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
     return OrderModel(
@@ -67,12 +68,12 @@ class OrderModel {
       totalDiscount: json["totalDiscount"] ?? 0,
       addOn: json["addOn"] ?? 0,
       id: json["id"] ?? "",
+      orderId: json["orderId"],
       createdAt: DateTime.tryParse(json["createdAt"] ?? ""),
       orderNote: json["orderNote"] ?? "",
       table: json["table"] == null ? null : Table.fromJson(json["table"]),
       employee:
           json["employee"] == null ? null : Employee.fromJson(json["employee"]),
-      
     );
   }
 
@@ -213,5 +214,3 @@ class Table {
         "tableName": tableName,
       };
 }
-
-

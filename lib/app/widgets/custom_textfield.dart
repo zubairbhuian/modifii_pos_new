@@ -37,6 +37,7 @@ class CustomTextField extends StatelessWidget {
   final int? maxLines;
   final double? marginBottom;
   final bool isFilled;
+  final double? borderRadius;
 
   const CustomTextField({
     super.key,
@@ -69,7 +70,9 @@ class CustomTextField extends StatelessWidget {
     this.errorStyle,
     this.marginBottom,
     this.hintStyle,
-    this.isFilled = false, this.focusNode,
+    this.borderRadius,
+    this.isFilled = false,
+    this.focusNode,
   });
 
   @override
@@ -134,24 +137,24 @@ class CustomTextField extends StatelessWidget {
             suffixIcon: suffixIcon,
             // ********** border ********
             border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(borderRadius ?? 4),
                 borderSide: BorderSide(color: theme.hintColor)),
             // ********** focusedBorder ********
             focusColor: theme.primaryColor,
             focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(borderRadius ?? 4),
                 borderSide: BorderSide(color: theme.hintColor)),
             // ********** enabledBorder ********
             enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(borderRadius ?? 4),
                 borderSide: BorderSide(color: theme.hintColor)),
             // ********** errorBorder ********
             errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(borderRadius ?? 4),
                 borderSide: const BorderSide(color: Colors.red)),
             // ********** errorBorder ********
             focusedErrorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(borderRadius ?? 4),
                 borderSide: const BorderSide(color: Colors.red)),
             // ********** hintText ********
             hintText: hintText,

@@ -1,10 +1,10 @@
-import 'package:flutter_base/app/modules/auth/bindings/auth_binding.dart';
-import 'package:flutter_base/app/modules/auth/views/auth_view.dart';
-import 'package:flutter_base/app/modules/auth/views/signin_view.dart';
-import 'package:flutter_base/app/modules/clockIn/bindings/clock_in_binding.dart';
-import 'package:flutter_base/app/modules/clockIn/views/clock_in_view.dart';
 import 'package:get/get.dart';
 
+import '../modules/auth/bindings/auth_binding.dart';
+import '../modules/auth/views/auth_view.dart';
+import '../modules/auth/views/signin_view.dart';
+import '../modules/clockIn/bindings/clock_in_binding.dart';
+import '../modules/clockIn/views/clock_in_view.dart';
 import '../modules/employee/bindings/employee_binding.dart';
 import '../modules/employee/views/employee_view.dart';
 import '../modules/entryPoint/bindings/entry_point_binding.dart';
@@ -15,6 +15,8 @@ import '../modules/product/bindings/product_binding.dart';
 import '../modules/product/views/product_view.dart';
 import '../modules/subCategory/bindings/sub_category_binding.dart';
 import '../modules/subCategory/views/sub_category_view.dart';
+import '../modules/test/bindings/test_binding.dart';
+import '../modules/test/views/test_view.dart';
 
 // ignore_for_file: constant_identifier_names
 
@@ -65,6 +67,11 @@ class AppPages {
       name: _Paths.SIGN_IN,
       page: () => const SigninView(),
       binding: AuthBinding(),
+    ),
+    GetPage(
+      name: _Paths.TEST,
+      page: () => const TestView(),
+      binding: TestBinding(),
     ),
   ];
 }

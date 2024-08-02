@@ -10,6 +10,7 @@ import 'package:flutter_base/app/modules/pos/order/models/product_model.dart';
 import 'package:flutter_base/app/modules/pos/order/models/variation_model.dart';
 import 'package:flutter_base/app/services/controller/base_controller.dart';
 import 'package:flutter_base/app/utils/logger.dart';
+import 'package:flutter_base/app/utils/my_func.dart';
 import 'package:flutter_base/app/utils/urls.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
@@ -24,6 +25,7 @@ class PosController extends GetxController {
   // for Focus
   final FocusNode tableFocusNode = FocusNode();
   final FocusNode guestFocusNode = FocusNode();
+  bool isUpdateView = false;
 
   void changeFocusToGuest() {
     tableFocusNode.unfocus();
@@ -300,8 +302,30 @@ class PosController extends GetxController {
       if (res.statusCode == 201) {
         clearCartList();
         PopupDialog.showSuccessDialog(res.data["message"]);
+        // Todo remove this
         myOrder.employeeId = '66a27bac841c686681819833';
       }
+    }
+  }
+
+  // ** Update order
+  onUpdateOrder(String id, {bool isDiscount = false}) async {
+    try {
+      var res = await BaseController.to.apiService
+          .makePatchRequest("${URLS.orders}/$id", myOrder.toJson());
+
+      if (res.statusCode == 200) {
+        if (!isDiscount) {
+          clearCartList();
+        }
+
+        PopupDialog.showSuccessDialog(res.data["message"]);
+
+        // Todo remove this
+        myOrder.employeeId = '66a27bac841c686681819833';
+      }
+    } catch (e) {
+      kLogger.e('Error from %%%% update order %%%% => $e');
     }
   }
 
@@ -343,6 +367,7 @@ class PosController extends GetxController {
   }
 
   calculateTotalPrice() {
+    // for cart list
     // for subtotal
     num totalPrice = 0;
     for (var item in myOrder.carts) {
@@ -369,12 +394,79 @@ class PosController extends GetxController {
     }
     myOrder.totalPst = pst;
     // for Total
-    myOrder.totalOrderAmount = myOrder.subTotal +
+    myOrder.totalOrderAmount = MyFunc.yogotRound(myOrder.subTotal +
         myOrder.totalGst +
         myOrder.totalPst +
-        myOrder.totalGratuity;
+        myOrder.totalGratuity);
     update();
   }
+
+  /// ==== Discount ======
+  List percentageDiscountList = [5, 10, 15, 20, 25, 30, 40];
+  List amountDiscountList = [
+    5,
+    10,
+    15,
+    20,
+    25,
+    30,
+    40,
+  ];
+  RxInt passwordLength = 6.obs;
+  List<String> numberList = [
+    "7",
+    "8",
+    "9",
+    "4",
+    "5",
+    "6",
+    "1",
+    "2",
+    "3",
+    "0",
+    "00",
+    "X",
+  ];
+  List<String> selectedItemList = [];
+  onChangeSelectedItemList(String index) {
+    if (selectedItemList.contains(index)) {
+      selectedItemList.remove(index);
+    } else {
+      selectedItemList.add(index);
+    }
+    update();
+  }
+
+  void applyDiscount(num amount, List<String> indices,
+      {bool isPercentage = true}) {
+    if (indices.isNotEmpty) {
+      for (var index in indices) {
+        if (int.parse(index) >= 0 && int.parse(index) < myOrder.carts.length) {
+          if (isPercentage) {
+            var discount = myOrder.carts[int.parse(index)].price * amount / 100;
+            if (discount <= myOrder.carts[int.parse(index)].price) {
+              myOrder.carts[int.parse(index)].discountAmount = discount;
+            } else {
+              PopupDialog.showErrorMessage(
+                  "Discount amount must be less than the Total amount");
+            }
+          } else {
+            if (amount <= myOrder.carts[int.parse(index)].price) {
+              myOrder.carts[int.parse(index)].discountAmount = amount;
+            } else {
+              PopupDialog.showErrorMessage(
+                  "Discount amount  must be less than the Total amount");
+            }
+          }
+        }
+      }
+      calculateTotalPrice();
+    } else {
+      PopupDialog.showErrorMessage("Select at least one item.");
+    }
+  }
+
+  ///
 
 // zubair ==== + +++++++
 // zubair ==== + +++++++ ^^^
@@ -396,6 +488,7 @@ class PosController extends GetxController {
     resetModifierSelections();
     guestController.clear();
     tableController.clear();
+    isUpdateView = false;
     update();
   }
 

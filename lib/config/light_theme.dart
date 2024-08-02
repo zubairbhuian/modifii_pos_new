@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_base/app/utils/static_colors.dart';
 import 'package:flutter_base/config/fonts.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -35,6 +36,65 @@ ThemeData lightTheme = ThemeData(
 
   // *****  brightness *****
   // brightness: Brightness.light,
+  // primarySwatch
+  primarySwatch: Colors.blue,
+  // checkboxTheme
+  checkboxTheme: CheckboxThemeData(
+    checkColor: const MaterialStatePropertyAll(Colors.white),
+    fillColor: MaterialStateProperty.resolveWith((states) {
+      if (states.contains(MaterialState.selected)) {
+        return StaticColors.blueColor;
+      }
+      return Colors.grey;
+    }),
+  ),
+  //  datePickerTheme
+  datePickerTheme: DatePickerThemeData(
+    backgroundColor: Colors.white,
+    dividerColor: Colors.white,
+    headerBackgroundColor: StaticColors.blueColor,
+    headerForegroundColor: Colors.white,
+    todayBackgroundColor:
+        const MaterialStatePropertyAll(StaticColors.orangeColor),
+    todayForegroundColor: const MaterialStatePropertyAll(Colors.white),
+    rangeSelectionBackgroundColor: StaticColors.blueColor.withOpacity(0.2),
+    rangeSelectionOverlayColor: const MaterialStatePropertyAll(Colors.green),
+    // day Color
+    dayForegroundColor: MaterialStateProperty.resolveWith((states) {
+      if (states.contains(MaterialState.selected)) {
+        return Colors.white;
+      }
+      return Colors.black;
+    }),
+    dayBackgroundColor: MaterialStateProperty.resolveWith((states) {
+      if (states.contains(MaterialState.selected)) {
+        return StaticColors.blueColor;
+      }
+      return Colors.transparent;
+    }),
+    // week day Style
+    weekdayStyle:
+        const TextStyle(fontWeight: FontWeight.w600, color: Colors.red),
+    yearStyle: const TextStyle(fontWeight: FontWeight.w600, color: Colors.red),
+    // custom
+    cancelButtonStyle: ButtonStyle(
+      foregroundColor: const MaterialStatePropertyAll(StaticColors.redColor),
+      surfaceTintColor:
+          MaterialStatePropertyAll(StaticColors.redColor.withOpacity(.1)),
+      overlayColor:
+          MaterialStatePropertyAll(StaticColors.redColor.withOpacity(.2)),
+    ),
+    confirmButtonStyle: ButtonStyle(
+      foregroundColor: const MaterialStatePropertyAll(StaticColors.blueColor),
+      surfaceTintColor:
+          MaterialStatePropertyAll(StaticColors.blueColor.withOpacity(.1)),
+      overlayColor:
+          MaterialStatePropertyAll(StaticColors.blueColor.withOpacity(.2)),
+    ),
+    yearForegroundColor: const MaterialStatePropertyAll(Colors.black),
+    surfaceTintColor: StaticColors.blueColor,
+  ),
+
   // ****** Font Family ******
   fontFamily: Fonts.primary,
   // ****** Card Theme ******

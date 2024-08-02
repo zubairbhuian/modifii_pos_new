@@ -15,15 +15,19 @@ class SearchAndCustomItemRow extends GetView<PosController> {
   Widget build(BuildContext context) {
     return Row(
       children: [
+        // const SizedBox(width: 12.0),
         Expanded(
             child: PrimaryBtn(
           onPressed: () {
             PopupDialog.customDialog(
-              child: const CustomOrderDialogOptions(productType: "Custom Food"),
+              child: const CustomOrderDialogOptions(
+                productType: "Custom Bar",
+                isLiquor: true,
+              ),
             );
           },
           color: StaticColors.blueColor,
-          text: 'Custom Food',
+          text: 'LIQUOR',
           textColor: Colors.white,
         )),
         const SizedBox(width: 12.0),
@@ -36,10 +40,11 @@ class SearchAndCustomItemRow extends GetView<PosController> {
             );
           },
           color: StaticColors.blueColor,
-          text: 'Custom Drink',
+          text: 'Drinks'.toUpperCase(),
           textColor: Colors.white,
         )),
-        const SizedBox(width: 36.0),
+
+        const SizedBox(width: 12.0),
         Expanded(
           flex: 2,
           child: CustomTextField(
@@ -52,18 +57,16 @@ class SearchAndCustomItemRow extends GetView<PosController> {
           ),
         ),
         const SizedBox(width: 36.0),
+
         Expanded(
             child: PrimaryBtn(
           onPressed: () {
             PopupDialog.customDialog(
-              child: const CustomOrderDialogOptions(
-                productType: "Custom Bar",
-                isLiquor: true,
-              ),
+              child: const CustomOrderDialogOptions(productType: "Custom Food"),
             );
           },
           color: StaticColors.blueColor,
-          text: 'Custom Bar',
+          text: 'Food'.toUpperCase(),
           textColor: Colors.white,
         )),
         const SizedBox(width: 12.0),
@@ -75,7 +78,7 @@ class SearchAndCustomItemRow extends GetView<PosController> {
             );
           },
           color: StaticColors.blueColor,
-          text: 'Discount',
+          text: 'Discount'.toUpperCase(),
           textColor: Colors.white,
         )),
       ],

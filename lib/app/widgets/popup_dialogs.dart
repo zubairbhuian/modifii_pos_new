@@ -1,6 +1,5 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_base/app/services/controller/config_controller.dart';
+import 'package:flutter_base/app/utils/static_colors.dart';
 import 'package:flutter_base/app/widgets/my_custom_text.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
@@ -13,9 +12,9 @@ class PopupDialog {
     var snackBar = SnackBar(
       dismissDirection: DismissDirection.up,
       behavior: SnackBarBehavior.floating,
-      width: 300,
-      backgroundColor: Theme.of(Get.context!).primaryColorLight,
-      content: Center(child: MyCustomText(message)),
+      width: 500,
+      backgroundColor: StaticColors.greenColor,
+      content: Center(child: MyCustomText(message, color: Colors.white)),
     );
     ScaffoldMessenger.of(Get.context!).showSnackBar(snackBar);
   }
@@ -24,7 +23,7 @@ class PopupDialog {
   static void showErrorMessage(String message) {
     // ThemeData theme = Theme.of(Get.context!);
     var snackBar = SnackBar(
-      width: 300,
+      width: 500,
       behavior: SnackBarBehavior.floating,
       dismissDirection: DismissDirection.up,
       backgroundColor: Colors.redAccent,
@@ -84,7 +83,7 @@ class PopupDialog {
         ThemeData theme = Theme.of(context);
         return Center(
           child: SizedBox(
-            // height: height ?? MediaQuery.sizeOf(context).height * 0.8,
+            height: height,
             width: width ?? MediaQuery.sizeOf(context).width * 0.7,
             child: Material(
               elevation: 3,

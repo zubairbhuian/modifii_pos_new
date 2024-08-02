@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
 import 'package:flutter_base/app/widgets/custom_inkwell.dart';
 import '../../../../../widgets/my_custom_text.dart';
@@ -56,11 +58,11 @@ class CartItem extends StatelessWidget {
                       fontSize: 16,
                     ),
                     const SizedBox(height: 4),
-                    _modifiers(serveFirst),
-                    _modifiers(togo),
-                    _modifiers(dontMake),
-                    _modifiers(rush),
-                    _modifiers('Heat: $heat'),
+                    _modifiers(theme, serveFirst),
+                    _modifiers(theme, togo),
+                    _modifiers(theme, dontMake),
+                    _modifiers(theme, rush),
+                    _modifiers(theme, heat, title: "HEATE: "),
                   ],
                 ),
               ),
@@ -134,24 +136,31 @@ class CartItem extends StatelessWidget {
               ),
             ],
           ),
-          _modifiers('note: $note', maxLines: 5, isItalic: true),
+          _modifiers(theme, note,
+              maxLines: 5, isItalic: true, title: "NOTE : "),
         ],
       ),
     );
   }
 
-  Visibility _modifiers(String value,
-      {int maxLines = 2, bool isItalic = false}) {
+  Widget _modifiers(ThemeData theme, String value,
+      {int maxLines = 2, bool isItalic = false, String? title}) {
     return Visibility(
       visible: value.contains(':') ? value.length > 6 : value != '',
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 8),
-        child: MyCustomText(
-          value.trim(),
-          fontSize: 14,
-          maxLines: maxLines,
-          fontStyle: isItalic ? FontStyle.italic : FontStyle.normal,
-        ),
+        child: Text.rich(
+            maxLines: maxLines,
+            style: theme.textTheme.labelMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                fontStyle: isItalic ? FontStyle.italic : FontStyle.normal),
+            TextSpan(text: title, children: [
+              TextSpan(
+                text: value.trim(),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                    fontStyle: isItalic ? FontStyle.italic : FontStyle.normal),
+              ),
+            ])),
       ),
     );
   }
