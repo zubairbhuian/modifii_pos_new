@@ -22,6 +22,7 @@ class PrimaryBtn extends StatelessWidget {
   final double textMaxSize;
   final double textMinSize;
   final int? maxLines;
+  final FontWeight? fontWeight;
 
   const PrimaryBtn(
       {super.key,
@@ -40,7 +41,8 @@ class PrimaryBtn extends StatelessWidget {
       this.isdisabled = false,
       this.textMaxSize = 18,
       this.textMinSize = 14,
-      this.maxLines});
+      this.maxLines,
+      this.fontWeight});
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +71,7 @@ class PrimaryBtn extends StatelessWidget {
             //   return theme.disabledColor.withOpacity(.6);
             // }
             return isdisabled
-                ? const Color.fromARGB(255, 231, 231, 231)
+                ? theme.scaffoldBackgroundColor
                 : color ?? theme.primaryColor;
           }),
           padding: MaterialStateProperty.all(
@@ -132,6 +134,7 @@ class PrimaryBtn extends StatelessWidget {
           textAlign: TextAlign.center,
           style: style ??
               TextStyle(
+                fontWeight: fontWeight,
                 color: isdisabled
                     ? theme.disabledColor
                     : textColor ?? theme.colorScheme.background,

@@ -84,6 +84,11 @@ class DineInController extends GetxController {
         // myOrder = OrderModel.fromJson(res.data["data"]);
         update();
         PosController.to.myOrder = OrderModel.fromJson(res.data["data"]);
+        PosController.to.selectedItemList = List.generate(
+            PosController.to.myOrder.carts.length, (index) => "$index");
+        kLogger.e(PosController.to.selectedItemList.length);
+        kLogger.e(PosController.to.selectedItemList);
+
         PosController.to.calculateTotalPrice();
         return true;
       } else if (res.statusCode == 404) {

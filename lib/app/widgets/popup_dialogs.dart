@@ -83,7 +83,7 @@ class PopupDialog {
         ThemeData theme = Theme.of(context);
         return Center(
           child: SizedBox(
-            // height: height ?? MediaQuery.sizeOf(context).height * 0.8,
+            height: height,
             width: width ?? MediaQuery.sizeOf(context).width * 0.7,
             child: Material(
               elevation: 3,

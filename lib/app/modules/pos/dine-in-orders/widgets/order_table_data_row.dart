@@ -109,29 +109,35 @@ class OrderTableDataRow extends StatelessWidget {
           Expanded(
             child: Row(
               children: [
-                IconButton(
-                  onPressed: () async {
-                    PopupDialog.showLoadingDialog();
-                    var hasData = await DineInController.to.getOrderById(id);
-                    PopupDialog.closeLoadingDialog();
-                    if (hasData) {
-                      Get.to(() => const OrderDetailsView());
-                    }
-                  },
-                  icon: const Icon(
-                    FontAwesomeIcons.eye,
-                    size: 18,
-                    color: StaticColors.orangeColor,
+                Transform.scale(
+                  scale: 1.5,
+                  child: IconButton(
+                    onPressed: () async {
+                      PopupDialog.showLoadingDialog();
+                      var hasData = await DineInController.to.getOrderById(id);
+                      PopupDialog.closeLoadingDialog();
+                      if (hasData) {
+                        Get.to(() => const OrderDetailsView());
+                      }
+                    },
+                    icon: const Icon(
+                      FontAwesomeIcons.eye,
+                      size: 18,
+                      color: StaticColors.orangeColor,
+                    ),
                   ),
                 ),
-                const SizedBox(width: 4.0),
-                IconButton(
-                  // onPressed: onPrint,
-                  onPressed: () {},
-                  icon: const Icon(
-                    FontAwesomeIcons.print,
-                    size: 18,
-                    color: StaticColors.greenColor,
+                const SizedBox(width: 20.0),
+                Transform.scale(
+                  scale: 1.5,
+                  child: IconButton(
+                    // onPressed: onPrint,
+                    onPressed: () {},
+                    icon: const Icon(
+                      FontAwesomeIcons.print,
+                      size: 18,
+                      color: StaticColors.greenColor,
+                    ),
                   ),
                 ),
               ],

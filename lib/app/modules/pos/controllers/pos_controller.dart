@@ -309,14 +309,18 @@ class PosController extends GetxController {
   }
 
   // ** Update order
-  onUpdateOrder(String id) async {
+  onUpdateOrder(String id, {bool isDiscount = false}) async {
     try {
       var res = await BaseController.to.apiService
           .makePatchRequest("${URLS.orders}/$id", myOrder.toJson());
 
       if (res.statusCode == 200) {
-        clearCartList();
+        if (!isDiscount) {
+          clearCartList();
+        }
+
         PopupDialog.showSuccessDialog(res.data["message"]);
+
         // Todo remove this
         myOrder.employeeId = '66a27bac841c686681819833';
       }
@@ -363,6 +367,7 @@ class PosController extends GetxController {
   }
 
   calculateTotalPrice() {
+    // for cart list
     // for subtotal
     num totalPrice = 0;
     for (var item in myOrder.carts) {
@@ -397,24 +402,57 @@ class PosController extends GetxController {
   }
 
   /// ==== Discount ======
-  List percentageDiscountList = [5, 10, 15, 20, 25, 30, 40, 50, 60];
-  List amountDiscountList = [5, 10, 15, 20, 25, 30, 40, 50, 60];
-  void applyDiscount(num amount, List<int> indices,
+  List percentageDiscountList = [5, 10, 15, 20, 25, 30, 40];
+  List amountDiscountList = [
+    5,
+    10,
+    15,
+    20,
+    25,
+    30,
+    40,
+  ];
+  RxInt passwordLength = 6.obs;
+  List<String> numberList = [
+    "7",
+    "8",
+    "9",
+    "4",
+    "5",
+    "6",
+    "1",
+    "2",
+    "3",
+    "0",
+    "00",
+    "X",
+  ];
+  List<String> selectedItemList = [];
+  onChangeSelectedItemList(String index) {
+    if (selectedItemList.contains(index)) {
+      selectedItemList.remove(index);
+    } else {
+      selectedItemList.add(index);
+    }
+    update();
+  }
+
+  void applyDiscount(num amount, List<String> indices,
       {bool isPercentage = true}) {
     if (indices.isNotEmpty) {
       for (var index in indices) {
-        if (index >= 0 && index < myOrder.carts.length) {
+        if (int.parse(index) >= 0 && int.parse(index) < myOrder.carts.length) {
           if (isPercentage) {
-            var discount = myOrder.carts[index].price * amount / 100;
-            if (discount <= myOrder.carts[index].price) {
-              myOrder.carts[index].discountAmount = discount;
+            var discount = myOrder.carts[int.parse(index)].price * amount / 100;
+            if (discount <= myOrder.carts[int.parse(index)].price) {
+              myOrder.carts[int.parse(index)].discountAmount = discount;
             } else {
               PopupDialog.showErrorMessage(
                   "Discount amount must be less than the Total amount");
             }
           } else {
-            if (amount <= myOrder.carts[index].price) {
-              myOrder.carts[index].discountAmount = amount;
+            if (amount <= myOrder.carts[int.parse(index)].price) {
+              myOrder.carts[int.parse(index)].discountAmount = amount;
             } else {
               PopupDialog.showErrorMessage(
                   "Discount amount  must be less than the Total amount");
@@ -424,8 +462,7 @@ class PosController extends GetxController {
       }
       calculateTotalPrice();
     } else {
-      PopupDialog.showErrorMessage(
-          "Select at least one item.");
+      PopupDialog.showErrorMessage("Select at least one item.");
     }
   }
 

@@ -12,12 +12,10 @@ import 'package:flutter_base/app/utils/my_func.dart';
 import 'package:flutter_base/app/utils/my_reg_exp.dart';
 import 'package:flutter_base/app/utils/static_colors.dart';
 import 'package:flutter_base/app/widgets/app_indecator.dart';
-import 'package:flutter_base/app/widgets/custom_alert_dialog.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
 import 'package:flutter_base/app/widgets/custom_textfield.dart';
 import 'package:flutter_base/app/widgets/my_custom_text.dart';
 import 'package:flutter_base/app/widgets/popup_dialogs.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
 import '../../views/widgets/top_menu.dart';

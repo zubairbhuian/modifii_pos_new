@@ -8,12 +8,15 @@ import 'package:flutter_base/app/modules/pos/dine-in/widgets/table_dialog.dart';
 import 'package:flutter_base/app/modules/pos/order/models/order_model.dart';
 import 'package:flutter_base/app/routes/app_pages.dart';
 import 'package:flutter_base/app/services/controller/config_controller.dart';
+import 'package:flutter_base/app/utils/logger.dart';
 import 'package:flutter_base/app/utils/static_colors.dart';
 import 'package:flutter_base/app/widgets/appbar.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
 import 'package:flutter_base/app/widgets/my_custom_text.dart';
+// import 'package:flutter_base/app/widgets/my_custom_text.dart';
 import 'package:flutter_base/app/widgets/popup_dialogs.dart';
 import 'package:get/get.dart';
+import 'package:get/get_state_manager/get_state_manager.dart';
 
 import '../widgets/custom_table_item.dart';
 
@@ -136,6 +139,9 @@ class OrderDetailsView extends GetView<DineInController> {
                         textMinSize: textMinSize,
                         onPressed: () {
                           PopupDialog.customDialog(
+                              width: 700,
+                              // height: 700,
+
                               child: const DiscountDialog());
                         },
                         // width: double.infinity,
@@ -401,24 +407,36 @@ class OrderDetailsView extends GetView<DineInController> {
             child: Column(
               children: [
                 // header
-                const CustomTableItem(
-                  isHeader: true,
-                ),
+                GetBuilder<PosController>(builder: (c) {
+                  return const CustomTableItem(
+                    isHeader: true,
+                  );
+                }),
                 ...List.generate(data!.carts.length, (index) {
                   var item = data.carts[index];
                   var tax = (item.price - item.discountAmount) * .05;
                   var totalPrice =
                       (item.price - item.discountAmount) * item.quantity;
                   var discount = item.discountAmount;
-                  return CustomTableItem(
-                    sl: "${index + 1}",
-                    name: item.name,
-                    qty: "${item.quantity}",
-                    discount: discount.toStringAsFixed(2),
-                    tax: tax.toStringAsFixed(2),
-                    totalPrice: totalPrice.toStringAsFixed(2),
-                    price: "${item.price}",
-                  );
+                  return GetBuilder<PosController>(builder: (c) {
+                    return CustomTableItem(
+                      onTap: () {
+                        c.onChangeSelectedItemList("$index");
+                      },
+                      isSelected: c.selectedItemList.contains("$index"),
+                      onChanged: (value) {
+                        kLogger.e(c.onChangeSelectedItemList.toString());
+                        c.onChangeSelectedItemList(index.toString());
+                      },
+                      sl: "${index + 1}",
+                      name: item.name,
+                      qty: "${item.quantity}",
+                      discount: "\$ ${discount.toStringAsFixed(2)}",
+                      tax: "\$ ${tax.toStringAsFixed(2)}",
+                      totalPrice: "\$ ${totalPrice.toStringAsFixed(2)}",
+                      price: "\$ ${item.price}",
+                    );
+                  });
                 })
               ],
             ),
@@ -506,16 +524,16 @@ class OrderDetailsView extends GetView<DineInController> {
           _row(theme,
               title: "Subtotal :",
               fontSize: 16,
-              value: data.subTotal.toStringAsFixed(2),
+              value: "\$ ${data.subTotal.toStringAsFixed(2)}",
               fontWeight: FontWeight.w500),
           _row(theme,
               title: "GST 5% :",
               fontSize: 16,
-              value: data.totalGst.toStringAsFixed(2),
+              value: "\$ ${data.totalGst.toStringAsFixed(2)}",
               fontWeight: FontWeight.w500),
           _row(theme,
               title: "Total :",
-              value: data.totalOrderAmount.toStringAsFixed(2),
+              value: "\$ ${data.totalOrderAmount.toStringAsFixed(2)}",
               fontSize: 18),
         ],
       ),

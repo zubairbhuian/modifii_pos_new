@@ -69,7 +69,7 @@ class TableOrdersList extends GetView<DineInOrderController> {
             children: [
               Expanded(
                   child: MyCustomText(
-                'SL',
+                'No',
                 fontSize: titleFontSize,
                 fontWeight: FontWeight.w600,
               )),
@@ -158,7 +158,7 @@ class TableOrdersList extends GetView<DineInOrderController> {
                       child: _printReceipt(),
                     );
                   },
-                  id:order.id,
+                  id: order.id,
                   sl: index + 1,
                   tableNo: order.table?.tableName ?? "",
 
@@ -436,7 +436,7 @@ class TableOrdersList extends GetView<DineInOrderController> {
           child: PrimaryBtnWithChild(
             padding: const EdgeInsets.symmetric(vertical: 20),
             onPressed: () {
-              //TODO 
+              //TODO
             },
             isOutline: true,
             borderColor: StaticColors.orangeColor,
