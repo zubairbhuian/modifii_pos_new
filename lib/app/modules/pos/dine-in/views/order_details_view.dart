@@ -140,8 +140,6 @@ class OrderDetailsView extends GetView<DineInController> {
                         onPressed: () {
                           PopupDialog.customDialog(
                               width: 700,
-                              // height: 700,
-
                               child: const DiscountDialog());
                         },
                         // width: double.infinity,
@@ -408,8 +406,12 @@ class OrderDetailsView extends GetView<DineInController> {
               children: [
                 // header
                 GetBuilder<PosController>(builder: (c) {
-                  return const CustomTableItem(
+                  return CustomTableItem(
+                    isSelected: c.selectedItemList.isNotEmpty,
                     isHeader: true,
+                    onChanged: (value) {
+                      c.toggleAllSelectedItem();
+                    },
                   );
                 }),
                 ...List.generate(data!.carts.length, (index) {

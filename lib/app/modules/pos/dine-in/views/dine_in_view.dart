@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_base/app/modules/pos/controllers/pos_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/controllers/dine_in_controller.dart';
 import 'package:flutter_base/app/modules/pos/views/widgets/top_menu.dart';
 import 'package:flutter_base/app/utils/static_colors.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
+import 'package:flutter_base/app/widgets/my_custom_text.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import '../widgets/table_availability_header.dart';
 import '../widgets/table_body.dart';
@@ -14,39 +17,83 @@ class DineInView extends GetView<DineInController> {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    return const Column(
+    return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        TopMenu(),
-        SizedBox(height: 16),
-        TableAvailabilityHeader(),
-        SizedBox(height: 12.0),
+        const TopMenu(),
+        const SizedBox(height: 16),
+        const TableAvailabilityHeader(),
+        const SizedBox(height: 12.0),
         Expanded(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
+              // ! dine-in
+              const Expanded(
                 flex: 3,
                 child: TableBody(
                   isScrollable: false,
                 ),
               ),
-              SizedBox(width: 30),
-              // Expanded(
-              // flex: 2,
-              //   child: Obx(() {
-              //     if (controller.currentTableNumber.value == -1) {
-              //       return const SizedBox.shrink();
-              //     }
-              //     return Visibility(
-              //       visible:true,
-              //       // Available table
-              //       replacement: AvailableTableOption(controller: controller),
-              //       // Booked table
-              //       child: BookedTableOption(controller: controller),
-              //     );
-              //   }),
-              // ),
+              const SizedBox(width: 30),
+              // ! takeout
+              Expanded(
+                flex: 2,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _title("Takeout".toUpperCase()),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: SizedBox(
+                          // width: 200,
+                          child: StaggeredGrid.count(
+                            crossAxisCount: 6,
+                            mainAxisSpacing: 8,
+                            crossAxisSpacing: 8,
+                            children: List.generate(20, (index) {
+                              return PrimaryBtnWithChild(
+                                onPressed: () {},
+                                color: StaticColors.greenColor,
+                                width: 150,
+                                padding: const EdgeInsets.all(20),
+                                alignment: Alignment.centerLeft,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '100000-p $index',
+                                      style: theme.textTheme.labelMedium
+                                          ?.copyWith(color: Colors.white),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      'Server',
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(color: Colors.white),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    Text(
+                                      'Haveli',
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(color: Colors.white),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               // cart area
             ],
           ),
@@ -54,162 +101,20 @@ class DineInView extends GetView<DineInController> {
       ],
     );
   }
-}
 
-//** buttons **
-Widget _buttons(ThemeData theme) {
-  const double btnSize = 130;
-  const double txtMaxSize = 35;
-  const double txtMinSize = 22;
-  return Expanded(
-    child: ColoredBox(
-      color: theme.scaffoldBackgroundColor,
-      child: Row(
-        children: [
-          // Obx(
-          //   () => Visibility(
-          //     visible: PosController.to.isShowPos.value,
-          //     replacement: const SizedBox(width: 16),
-          //     child: Padding(
-          //       padding: const EdgeInsets.only(left: 16.0, right: 10),
-          //       child: PrimaryBtn(
-          //         width: btnSize,
-          //         height: btnSize,
-          //         onPressed: () {
-          //           PosController.to.onchangePage(0);
-          //         },
-          //         color: StaticColors.greenColor,
-          //         textColor: Colors.white,
-          //         text: 'POS',
-          //         textMaxSize: txtMaxSize,
-          //         textMinSize: txtMinSize,
-          //       ),
-          //     ),
-          //   ),
-          // ),
-          PrimaryBtn(
-            width: btnSize,
-            height: btnSize,
-            onPressed: () {
-              PosController.to.onchangePage(0);
-              // controller.getCategory(type: 'drinks');
-            },
-            color: StaticColors.greenColor,
-            textColor: Colors.white,
-            text: 'ORDERS',
-            textMaxSize: txtMaxSize,
-            textMinSize: txtMinSize,
-          ).marginOnly(left: 16),
-          // PrimaryBtn(
-          //   width: btnSize,
-          //   height: btnSize,
-          //   onPressed: () {
-          //     PosController.to.onchangePage(0);
-          //   },
-          //   color: StaticColors.greenColor,
-          //   textColor: Colors.white,
-          //   text: 'POS',
-          //   textMaxSize: txtMaxSize,
-          //   textMinSize: txtMinSize,
-          // ),
-          const SizedBox(width: 10),
-          PrimaryBtn(
-            width: btnSize,
-            height: btnSize,
-            onPressed: () {
-              // TablesController.to.updateIsShowOrderDetails(false);
-              PosController.to.onchangePage(1);
-            },
-            color: StaticColors.yellowColor,
-            textColor: Colors.white,
-            text: 'DINE-IN\nORDERS',
-            textMaxSize: txtMaxSize,
-            textMinSize: txtMinSize,
-          ),
-          const SizedBox(width: 10),
-          PrimaryBtn(
-            width: btnSize,
-            height: btnSize,
-            onPressed: () {
-              DineInController.to.getTableCategories();
-              PosController.to.onchangePage(2);
-            },
-            padding: EdgeInsets.zero,
-            color: StaticColors.purpleColor,
-            textColor: Colors.white,
-            text: 'DINE-IN',
-            textMaxSize: txtMaxSize,
-            textMinSize: txtMinSize,
-          ),
-          const SizedBox(width: 10),
-          PrimaryBtn(
-            width: btnSize,
-            height: btnSize,
-            onPressed: () {
-              PosController.to.onchangePage(3);
-            },
-            padding: EdgeInsets.zero,
-            color: StaticColors.blueColor,
-            textColor: Colors.white,
-            text: 'TAKEOUT',
-            textMaxSize: txtMaxSize,
-            textMinSize: txtMinSize,
-          ),
-          const SizedBox(width: 10),
-          const Spacer(),
-          PrimaryBtn(
-            width: btnSize,
-            height: btnSize,
-            onPressed: () {},
-            color: StaticColors.blueColor,
-            textColor: Colors.white,
-            text: 'Dine-in\nSummery',
-            textMaxSize: txtMaxSize,
-            textMinSize: txtMinSize,
-          ),
-          const SizedBox(width: 10),
-          PrimaryBtn(
-            width: btnSize,
-            height: btnSize,
-            onPressed: () {
-              // controller.getCategory(type: 'drinks');
-            },
-            isdisabled: true,
-            color: StaticColors.blueColor,
-            textColor: Colors.white,
-            text: 'Dine-in \nCash Out',
-            textMaxSize: txtMaxSize,
-            textMinSize: txtMinSize,
-          ),
-          const SizedBox(width: 10),
-          PrimaryBtn(
-            width: btnSize,
-            height: btnSize,
-            onPressed: () {
-              // controller.getCategory(type: 'drinks');
-            },
-            color: StaticColors.greenColor,
-            textColor: Colors.white,
-            text: 'Take out \nSummery',
-            textMaxSize: txtMaxSize,
-            textMinSize: txtMinSize,
-          ),
-          const SizedBox(width: 10),
-          PrimaryBtn(
-            width: btnSize,
-            height: btnSize,
-            onPressed: () {
-              // controller.getCategory(type: 'drinks');
-            },
-            color: StaticColors.greenColor,
-            textColor: Colors.white,
-            text: 'Take out \nCash Out',
-            textMaxSize: txtMaxSize,
-            textMinSize: txtMinSize,
-          ),
-          const SizedBox(width: 16),
-        ],
+  Container _title(String title) {
+    return Container(
+      height: 30,
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+      color: StaticColors.blackLightColor,
+      child: MyCustomText(
+        title,
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+        color: Colors.white,
       ),
-    ),
-  );
+    );
+  }
 }

@@ -420,7 +420,7 @@ class TableOrdersList extends GetView<DineInOrderController> {
           onPressed: () async {
             if (controller.search.text.isNotEmpty) {
               PopupDialog.showLoadingDialog();
-              await controller.getOrder();
+              await controller.getAllOrders();
               PopupDialog.closeLoadingDialog();
             } else {
               PopupDialog.showErrorMessage("Search field is empty");
@@ -429,6 +429,47 @@ class TableOrdersList extends GetView<DineInOrderController> {
           text: 'Search',
           textColor: Colors.white,
         )),
+        const SizedBox(width: 12.0),
+        Expanded(child: Obx(() {
+          return Row(
+            children: [
+              PrimaryBtn(
+                onPressed: () async {
+                  controller.onChangeOrderType(true);
+                  PopupDialog.showLoadingDialog();
+                  await controller.getAllOrders();
+                  PopupDialog.closeLoadingDialog();
+                },
+                text: "Dine-in",
+                textColor: Colors.white,
+                color: StaticColors.purpleColor,
+                borderColor: controller.isdineInSelected.value
+                    ? StaticColors.orangeColor
+                    : Colors.transparent,
+                isOutline: true,
+                borderWidth: 2,
+              ),
+              const SizedBox(width: 12.0),
+              PrimaryBtn(
+                onPressed: () async {
+                  controller.onChangeOrderType(false);
+                  PopupDialog.showLoadingDialog();
+                  await controller.getAllOrders(
+                      orderType: "Takeout".toUpperCase());
+                  PopupDialog.closeLoadingDialog();
+                },
+                text: "Takeout",
+                textColor: Colors.white,
+                color: StaticColors.blueColor,
+                borderColor: !controller.isdineInSelected.value
+                    ? StaticColors.orangeColor
+                    : Colors.transparent,
+                isOutline: true,
+                borderWidth: 2,
+              ),
+            ],
+          );
+        })),
         const SizedBox(width: 12.0),
         const Expanded(child: SizedBox()),
         const SizedBox(width: 12.0),
@@ -560,7 +601,7 @@ class TableOrdersList extends GetView<DineInOrderController> {
                   if (controller.serverStartDate.text.isNotEmpty &&
                       controller.serverEndDate.text.isNotEmpty) {
                     PopupDialog.showLoadingDialog();
-                    await controller.getOrder(
+                    await controller.getAllOrders(
                         endDate: controller.serverEndDate.text,
                         startDate: controller.serverStartDate.text);
                     PopupDialog.closeLoadingDialog();
@@ -589,7 +630,7 @@ class TableOrdersList extends GetView<DineInOrderController> {
           return InkWell(
             onTap: () async {
               PopupDialog.showLoadingDialog();
-              await controller.getOrder(
+              await controller.getAllOrders(
                   orderStatus:
                       controller.orderStatusList[index].status.toUpperCase());
               PopupDialog.closeLoadingDialog();

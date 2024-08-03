@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_base/app/modules/pos/controllers/pos_controller.dart';
+import 'package:flutter_base/app/modules/pos/dine-in/widgets/dialogs/discount_dialog.dart';
 import 'package:flutter_base/app/modules/pos/order/views/widgets/custom_order_dialog_options.dart';
 import 'package:flutter_base/app/modules/pos/order/views/widgets/discount_dialog_options.dart';
 import 'package:flutter_base/app/utils/static_colors.dart';
@@ -73,9 +74,10 @@ class SearchAndCustomItemRow extends GetView<PosController> {
         Expanded(
             child: PrimaryBtn(
           onPressed: () {
-            PopupDialog.customDialog(
-              child: const DiscountDialogOptions(),
-            );
+            // PopupDialog.customDialog(
+            //   child: const DiscountDialogOptions(),
+            // );
+            PopupDialog.customDialog(width: 700, child: const DiscountDialog());
           },
           color: StaticColors.blueColor,
           text: 'Discount'.toUpperCase(),
