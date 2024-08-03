@@ -158,7 +158,7 @@ class TableBody extends GetView<DineInController> {
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
       color: StaticColors.blackLightColor,
       child: MyCustomText(
-        title,
+        title.toUpperCase(),
         fontSize: 20,
         fontWeight: FontWeight.w600,
         color: Colors.white,

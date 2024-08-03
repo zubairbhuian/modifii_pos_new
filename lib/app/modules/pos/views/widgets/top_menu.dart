@@ -3,6 +3,7 @@ import 'package:flutter_base/app/modules/pos/controllers/pos_controller.dart';
 import 'package:flutter_base/app/utils/static_colors.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
 import 'package:get/get.dart';
+import 'package:get/get_state_manager/get_state_manager.dart';
 
 class TopMenu extends GetView<PosController> {
   const TopMenu({super.key});
@@ -18,9 +19,10 @@ class TopMenu extends GetView<PosController> {
       color: theme.scaffoldBackgroundColor,
       child: Row(
         children: [
-          GetBuilder<PosController>(builder: (context) {
+          // todo make it obx
+          Obx(() {
             return Visibility(
-              visible: context.pageController.page == 0 ? false : true,
+              visible: controller.isShowPos.value,
               child: PrimaryBtn(
                 width: width,
                 height: height,
@@ -35,6 +37,7 @@ class TopMenu extends GetView<PosController> {
               ),
             );
           }),
+          // todo hide this
           const SizedBox(width: 10),
           PrimaryBtn(
             width: width,
@@ -53,7 +56,7 @@ class TopMenu extends GetView<PosController> {
             width: width,
             height: height,
             onPressed: () {
-              PosController.to.onchangePage(3);
+              PosController.to.onchangePage(2);
             },
             padding: EdgeInsets.zero,
             color: StaticColors.greenColor,

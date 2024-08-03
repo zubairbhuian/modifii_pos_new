@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_base/app/modules/pos/controllers/tables_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in-orders/controllers/dine_in_order_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in-orders/views/table_orders_list.dart';
 import 'package:flutter_base/app/modules/pos/views/widgets/top_menu.dart';
@@ -38,7 +37,7 @@ class DineInOrderView extends GetView<DineInOrderController> {
                     return PrimaryBtn(
                             onPressed: () async {
                               PopupDialog.showLoadingDialog();
-                              await controller.getOrder(page: "${index + 1}");
+                              await controller.getAllOrders(page: "${index + 1}");
                               PopupDialog.closeLoadingDialog();
                             },
                             width: 40,

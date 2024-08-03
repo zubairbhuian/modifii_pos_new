@@ -14,8 +14,6 @@ class DineInOrderController extends GetxController {
 
   TextEditingController startDate = TextEditingController();
 
-
-
   TextEditingController search = TextEditingController();
   TextEditingController endDate = TextEditingController();
   TextEditingController serverStartDate = TextEditingController();
@@ -39,8 +37,9 @@ class DineInOrderController extends GetxController {
 
   List<OrderModel> orderList = [];
   MetaModel? pagination;
-  getOrder({
+  getAllOrders({
     String? orderStatus,
+    String orderType = "DINE_IN",
     String? startDate,
     String? endDate,
     String? page,
@@ -49,6 +48,7 @@ class DineInOrderController extends GetxController {
   }) async {
     Map<String, dynamic>? queryParameters = {
       if (orderStatus != null) "orderStatus": orderStatus,
+      "orderType": orderType,
       if (startDate != null) "startDate": startDate,
       if (endDate != null) "endDate": endDate,
       if (page != null) "page": page,
@@ -72,12 +72,16 @@ class DineInOrderController extends GetxController {
     }
   }
 
-
+  // is dine-in selected
+  RxBool isdineInSelected = true.obs;
+  onChangeOrderType(bool value) {
+    isdineInSelected.value = value;
+  }
 
   @override
   void onInit() {
     getOrderStatus();
-    getOrder();
+    getAllOrders();
     super.onInit();
   }
 }

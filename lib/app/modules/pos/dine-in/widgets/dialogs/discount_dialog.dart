@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_base/app/modules/pos/controllers/pos_controller.dart';
-import 'package:flutter_base/app/utils/logger.dart';
 import 'package:flutter_base/app/utils/static_colors.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
 import 'package:flutter_base/app/widgets/custom_textfield.dart';
 import 'package:flutter_base/app/widgets/my_custom_text.dart';
-import 'package:flutter_base/app/widgets/popup_dialogs.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 
@@ -38,20 +36,42 @@ class _DiscountDialogState extends State<DiscountDialog> {
     if (myDiscoun.isNotEmpty) {
       setState(() {
         myDiscoun = myDiscoun.substring(0, myDiscoun.length - 1);
+        if (isPercentage) {
+          percentageDiscoun.text = myDiscoun;
+        } else {
+          amountDiscoun.text = myDiscoun;
+        }
       });
     }
   }
 
   addValueWithKeybord(String value, {bool isKeybord = false}) {
     setState(() {
-      if (isKeybord && myDiscoun.length < 8) {
-        amountDiscoun.clear();
+      //
+      if (isPercentage && isKeybord && myDiscoun.length < 3) {
         percentageDiscoun.clear();
         myDiscoun += value;
+        percentageDiscoun.text = myDiscoun;
+        if (myDiscoun.isNotEmpty) {
+          if (int.parse(myDiscoun) > 101) {
+            myDiscoun = "100";
+            percentageDiscoun.text = myDiscoun;
+          }
+        }
+      } else if (!isPercentage && isKeybord && myDiscoun.length < 7) {
+        amountDiscoun.clear();
+        myDiscoun += value;
+        amountDiscoun.text = myDiscoun;
       } else {
         if (isPercentage) {
           amountDiscoun.clear();
+
           myDiscoun = value;
+          // percentageDiscoun.text = myDiscoun;
+          if (int.parse(myDiscoun) > 101) {
+            myDiscoun = "100";
+            percentageDiscoun.text = myDiscoun;
+          }
         } else {
           percentageDiscoun.clear();
           myDiscoun = value;
@@ -153,7 +173,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                             padding: const EdgeInsets.symmetric(
                                 vertical: 27, horizontal: 22),
                             inputFormatters: [
-                              LengthLimitingTextInputFormatter(8),
+                              LengthLimitingTextInputFormatter(3),
                               FilteringTextInputFormatter.allow(
                                   RegExp(r'^\d*\.?\d{0,2}$'))
                             ],
@@ -316,12 +336,12 @@ class _DiscountDialogState extends State<DiscountDialog> {
                     PosController.to.selectedItemList,
                     isPercentage: isPercentage,
                   );
-                  PopupDialog.showLoadingDialog();
+                  Get.back();
+                  // PopupDialog.showLoadingDialog();
                   await PosController.to.onUpdateOrder(
                       PosController.to.myOrder.id,
                       isDiscount: true);
-                  PopupDialog.closeLoadingDialog();
-                  Get.back();
+                  // PopupDialog.closeLoadingDialog();
                 },
                 text: "Ok".toUpperCase(),
                 height: 70,
@@ -340,12 +360,10 @@ class _DiscountDialogState extends State<DiscountDialog> {
                     PosController.to.selectedItemList,
                     isPercentage: isPercentage,
                   );
-                  PopupDialog.showLoadingDialog();
+                  Get.back();
                   await PosController.to.onUpdateOrder(
                       PosController.to.myOrder.id,
                       isDiscount: true);
-                  PopupDialog.closeLoadingDialog();
-                  Get.back();
                 },
                 text: "Cancel Discount".toUpperCase(),
                 height: 70,
@@ -384,45 +402,54 @@ class _DiscountDialogState extends State<DiscountDialog> {
       crossAxisSpacing: 3,
       children: List.generate(
           PosController.to.numberList.length,
-          (index) => SizedBox(
-                width: 85,
-                height: 85,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (PosController.to.numberList[index] == "X") {
-                      removeDiscount();
-                    } else {
-                      addValueWithKeybord(
-                          isKeybord: true, PosController.to.numberList[index]);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    elevation: 0,
-                    // ****** style ******
-                    textStyle: theme.textTheme.titleLarge?.copyWith(
-                        color: Colors.red,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 36),
-                    backgroundColor: theme.canvasColor,
-                    foregroundColor: theme.dividerColor,
-                    padding: EdgeInsets.zero,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(0),
+          (index) => StaggeredGridTile.count(
+                crossAxisCellCount:
+                    PosController.to.numberList[index] == "X" ? 2 : 1,
+                mainAxisCellCount: .8,
+                child: SizedBox(
+                  width: 85,
+                  height: 85,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (PosController.to.numberList[index] == "X") {
+                        removeDiscount();
+                      } else {
+                        addValueWithKeybord(
+                            isKeybord: true,
+                            PosController.to.numberList[index]);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      // ****** style ******
+                      textStyle: theme.textTheme.titleLarge?.copyWith(
+                          color: Colors.red,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 36),
+                      backgroundColor: theme.canvasColor,
+                      foregroundColor: theme.dividerColor,
+                      padding: EdgeInsets.zero,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(0),
+                      ),
+                      // ****** Border color *******
+                      side: const BorderSide(
+                        color: Color(0xffEBEBEB),
+                        width: .5,
+                      ),
                     ),
-                    // ****** Border color *******
-                    side: const BorderSide(
-                      color: Color(0xffEBEBEB),
-                      width: .5,
-                    ),
-                  ),
-                  child: MyCustomText(
-                    PosController.to.numberList[index],
-                    fontWeight: FontWeight.bold,
-                    maxLines: 1,
-                    fontSize: 33,
-                    color: PosController.to.numberList[index] == "X"
-                        ? StaticColors.redColor
-                        : null,
+                    child: PosController.to.numberList[index] == "X"
+                        ? const Icon(
+                            Icons.arrow_back_outlined,
+                            color: Colors.red,
+                            size: 50,
+                          )
+                        : MyCustomText(
+                            PosController.to.numberList[index],
+                            fontWeight: FontWeight.bold,
+                            maxLines: 1,
+                            fontSize: 33,
+                          ),
                   ),
                 ),
               )),

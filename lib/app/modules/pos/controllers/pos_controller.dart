@@ -424,7 +424,6 @@ class PosController extends GetxController {
     "2",
     "3",
     "0",
-    "00",
     "X",
   ];
   List<String> selectedItemList = [];
@@ -433,6 +432,16 @@ class PosController extends GetxController {
       selectedItemList.remove(index);
     } else {
       selectedItemList.add(index);
+    }
+    update();
+  }
+
+  toggleAllSelectedItem() {
+    if (selectedItemList.isNotEmpty) {
+      selectedItemList.clear();
+    } else {
+      selectedItemList =
+          List.generate(myOrder.carts.length, (index) => "$index");
     }
     update();
   }
@@ -446,10 +455,12 @@ class PosController extends GetxController {
             var discount = myOrder.carts[int.parse(index)].price * amount / 100;
             if (discount <= myOrder.carts[int.parse(index)].price) {
               myOrder.carts[int.parse(index)].discountAmount = discount;
-            } else {
-              PopupDialog.showErrorMessage(
-                  "Discount amount must be less than the Total amount");
             }
+            // show popup for err
+            //  else {
+            //   PopupDialog.showErrorMessage(
+            //       "Discount amount must be less than the Total amount");
+            // }
           } else {
             if (amount <= myOrder.carts[int.parse(index)].price) {
               myOrder.carts[int.parse(index)].discountAmount = amount;

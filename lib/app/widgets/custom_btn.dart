@@ -13,6 +13,7 @@ class PrimaryBtn extends StatelessWidget {
   final double? borderRadius;
   final double? height;
   final double? width;
+  final double? borderWidth;
   final double? elevation;
   final String text;
   final TextStyle? style;
@@ -42,7 +43,7 @@ class PrimaryBtn extends StatelessWidget {
       this.textMaxSize = 18,
       this.textMinSize = 14,
       this.maxLines,
-      this.fontWeight});
+      this.fontWeight, this.borderWidth});
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +87,7 @@ class PrimaryBtn extends StatelessWidget {
             if (isOutline == true) {
               return BorderSide(
                 color: borderColor ?? theme.colorScheme.background,
-                width: 1.5,
+                width: borderWidth ?? 1.5,
               );
             }
             return null;
@@ -104,6 +105,7 @@ class PrimaryBtn extends StatelessWidget {
             return SystemMouseCursors.basic; // Default cursor
           }), // Remove hover color
         ),
+
         // style: ElevatedButton.styleFrom(
         //   elevation: 0,
         //   // textStyle: style ?? theme.textTheme.labelLarge,
