@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../../widgets/popup_dialogs.dart';
 import '../../controllers/pos_controller.dart';
 import '../../order/models/order_model.dart';
 
@@ -25,27 +26,37 @@ class SplitOrderController extends GetxController {
   }
 
   //select items
-  List<CartModel> selectedItems = [];
-  List<List<CartModel>> listOfSpitChecksByItems = [];
+  OrderModel selectedItems = OrderModel();
+  List<OrderModel> listOfSpitChecksByItems = [];
   updateSelectedItems(CartModel item) {
-    if (selectedItems.contains(item)) {
-      selectedItems.remove(item);
+    if (selectedItems.carts.contains(item)) {
+      selectedItems.carts.remove(item);
     } else {
-      selectedItems.add(item);
+      selectedItems.carts.add(item);
     }
+    calculateSelectedAmount(selectedItems.carts);
+
+    selectedItems = OrderModel(
+      carts: selectedItems.carts,
+      totalGst: selectedGST,
+      totalPst: selectedPST,
+      totalGratuity: selectedGratuity,
+      subTotal: selectedSubtotal,
+      totalOrderAmount: selectedTotal,
+    );
     update();
   }
 
   addToListOfSelectedItems() {
-    if (selectedItems.isNotEmpty) {
-      listOfSpitChecksByItems.add(List.from(selectedItems));
-      order.carts.removeWhere((item) => selectedItems.contains(item));
-      calculateAllAmount(items: order.carts);
-      selectedItems.clear();
+    if (selectedItems.carts.isNotEmpty) {
+      listOfSpitChecksByItems.add(selectedItems);
+      order.carts.removeWhere((item) => selectedItems.carts.contains(item));
+      calculateMainAmount(items: order.carts);
+      selectedItems = OrderModel();
       isSplitByAmount = false;
       update();
     } else {
-      //show snackbar
+      PopupDialog.showErrorMessage('Please select the items for split');
     }
   }
 
@@ -54,7 +65,7 @@ class SplitOrderController extends GetxController {
   num mainGratuity = 0;
   num mainSubtotal = 0;
   num mainTotal = 0;
-  calculateAllAmount({List<CartModel>? items}) {
+  calculateMainAmount({List<CartModel>? items}) {
     if (items == null) {
       mainGST = order.totalGst;
       mainPST = order.totalPst;
@@ -66,7 +77,12 @@ class SplitOrderController extends GetxController {
       mainSubtotal = items.fold(
           0.0, (subtotal, item) => subtotal + (item.price * item.quantity));
       mainGST = mainSubtotal * 0.05;
-      mainPST = mainSubtotal * 0.10;
+      num liquorAmount = items.fold(
+        0.0,
+        (subtotal, item) =>
+            item.isLiquor ? subtotal + (item.price * item.quantity) : subtotal,
+      );
+      mainPST = liquorAmount * 0.10;
       if (order.numberOfPeople >= 6) {
         mainGratuity = mainSubtotal * 0.18;
       }
@@ -74,8 +90,31 @@ class SplitOrderController extends GetxController {
     }
   }
 
+  num selectedGST = 0;
+  num selectedPST = 0;
+  num selectedGratuity = 0;
+  num selectedSubtotal = 0;
+  num selectedTotal = 0;
+  calculateSelectedAmount(List<CartModel> items) {
+    selectedSubtotal = items.fold(
+        0.0, (subtotal, item) => subtotal + (item.price * item.quantity));
+    selectedGST = selectedSubtotal * 0.05;
+    num liquorAmount = items.fold(
+      0.0,
+      (subtotal, item) =>
+          item.isLiquor ? subtotal + (item.price * item.quantity) : subtotal,
+    );
+    selectedPST = liquorAmount * 0.10;
+    if (order.numberOfPeople >= 6) {
+      selectedGratuity = selectedSubtotal * 0.18;
+    }
+    selectedTotal =
+        selectedSubtotal + selectedGST + selectedPST + selectedGratuity;
+  }
+
   void divideItems() {
-    List<CartModel> items = selectedItems.isEmpty ? order.carts : selectedItems;
+    List<CartModel> items =
+        selectedItems.carts.isEmpty ? order.carts : selectedItems.carts;
     List<CartModel> dividedItems = [];
 
     for (var item in items) {
@@ -89,10 +128,10 @@ class SplitOrderController extends GetxController {
       }
     }
 
-    if (selectedItems.isEmpty) {
+    if (selectedItems.carts.isEmpty) {
       order.carts = dividedItems;
     } else {
-      order.carts.removeWhere((item) => selectedItems.contains(item));
+      order.carts.removeWhere((item) => selectedItems.carts.contains(item));
       order.carts.addAll(dividedItems);
     }
 
@@ -101,8 +140,8 @@ class SplitOrderController extends GetxController {
 
   resetSplitChecks() {
     order.carts = List.from(mainOrder.carts);
-    calculateAllAmount();
-    selectedItems.clear();
+    calculateMainAmount();
+    selectedItems = OrderModel();
     listOfSpitChecksByItems.clear();
     splitCheckCount = 0;
     isSplitByAmount = null;
@@ -124,7 +163,7 @@ class SplitOrderController extends GetxController {
     noOfGuestTEC.text = PosController.to.myOrder.numberOfPeople.toString();
     totalAmountTEC.text =
         PosController.to.myOrder.totalOrderAmount.toStringAsFixed(2);
-    calculateAllAmount();
+    calculateMainAmount();
     super.onInit();
   }
 }

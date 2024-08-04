@@ -131,13 +131,12 @@ class SplitOrderView extends GetView<DineInController> {
                           itemCount: order.carts.length,
                           itemBuilder: (_, i) {
                             var item = order.carts[i];
-                            //TODO: item selection
                             return _itemRow(
                               theme,
                               onTap: () {
                                 c.updateSelectedItems(item);
                               },
-                              isSelected: c.selectedItems.contains(item),
+                              isSelected: c.selectedItems.carts.contains(item),
                               name: item.name,
                               quantity: item.quantity.toString(),
                               price: "\$${(item.price * item.quantity)}",
@@ -251,7 +250,7 @@ class SplitOrderView extends GetView<DineInController> {
                                       horizontal: 12),
                                   style: TextStyle(
                                       fontWeight: FontWeight.w700,
-                                      color: theme.primaryColorDark),
+                                      color: theme.colorScheme.background),
                                   borderColor: controller
                                               .paymentMathodActiveIndex.value ==
                                           index
@@ -306,14 +305,17 @@ class SplitOrderView extends GetView<DineInController> {
                               ),
 
                               ...List.generate(
-                                  c.listOfSpitChecksByItems[index].length, (j) {
-                                var item = c.listOfSpitChecksByItems[index][j];
+                                  c.listOfSpitChecksByItems[index].carts.length,
+                                  (j) {
+                                var item =
+                                    c.listOfSpitChecksByItems[index].carts[j];
                                 return _itemRow(
                                   theme,
                                   onTap: () {
                                     // c.updateSelectedItems(item);
                                   },
-                                  isSelected: c.selectedItems.contains(item),
+                                  isSelected:
+                                      c.selectedItems.carts.contains(item),
                                   name: item.name,
                                   quantity: item.quantity.toString(),
                                   price: "\$${(item.price * item.quantity)}",
@@ -324,10 +326,40 @@ class SplitOrderView extends GetView<DineInController> {
                                 color: theme.dividerColor.withOpacity(0.4),
                                 height: 16,
                               ),
+                              //price area
                               _priceRow(theme,
-                                  title: "Total Amount",
+                                  title: "Sub Total",
                                   value:
-                                      "\$${order.totalOrderAmount.toStringAsFixed(2)}"),
+                                      "\$${c.listOfSpitChecksByItems[index].subTotal.toStringAsFixed(2)}"),
+                              _priceRow(theme,
+                                  title: "GST 5%",
+                                  value:
+                                      "\$${c.listOfSpitChecksByItems[index].totalGst.toStringAsFixed(2)}"),
+                              if (c.listOfSpitChecksByItems[index].totalPst >
+                                  0.0)
+                                _priceRow(theme,
+                                    title: "PST 10%",
+                                    value:
+                                        "\$${c.listOfSpitChecksByItems[index].totalPst.toStringAsFixed(2)}"),
+                              if (c.listOfSpitChecksByItems[index]
+                                      .totalGratuity >
+                                  0.0)
+                                _priceRow(theme,
+                                    title: "Gratuity 18%",
+                                    value:
+                                        "\$${c.listOfSpitChecksByItems[index].totalGratuity.toStringAsFixed(2)}"),
+                              if (c.listOfSpitChecksByItems[index]
+                                      .totalDiscount >
+                                  0.0)
+                                _priceRow(theme,
+                                    title: "Discount",
+                                    value:
+                                        "\$${c.listOfSpitChecksByItems[index].totalDiscount.toStringAsFixed(2)}"),
+                              _priceRow(theme,
+                                  title: "Total",
+                                  fontSize: 18,
+                                  value:
+                                      "\$${c.listOfSpitChecksByItems[index].totalOrderAmount.toStringAsFixed(2)}"),
                               Divider(
                                 color: theme.dividerColor.withOpacity(0.4),
                                 height: 16,
