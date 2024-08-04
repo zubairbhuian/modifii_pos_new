@@ -40,6 +40,7 @@ class SplitOrderController extends GetxController {
     if (selectedItems.isNotEmpty) {
       listOfSpitChecksByItems.add(List.from(selectedItems));
       order.carts.removeWhere((item) => selectedItems.contains(item));
+      calculateAllAmount(items: order.carts);
       selectedItems.clear();
       isSplitByAmount = false;
       update();
@@ -48,8 +49,59 @@ class SplitOrderController extends GetxController {
     }
   }
 
+  num mainGST = 0;
+  num mainPST = 0;
+  num mainGratuity = 0;
+  num mainSubtotal = 0;
+  num mainTotal = 0;
+  calculateAllAmount({List<CartModel>? items}) {
+    if (items == null) {
+      mainGST = order.totalGst;
+      mainPST = order.totalPst;
+      mainGratuity = order.totalGratuity;
+      mainTotal = order.totalOrderAmount;
+      mainSubtotal = order.carts.fold(
+          0.0, (subtotal, item) => subtotal + (item.price * item.quantity));
+    } else {
+      mainSubtotal = items.fold(
+          0.0, (subtotal, item) => subtotal + (item.price * item.quantity));
+      mainGST = mainSubtotal * 0.05;
+      mainPST = mainSubtotal * 0.10;
+      if (order.numberOfPeople >= 6) {
+        mainGratuity = mainSubtotal * 0.18;
+      }
+      mainTotal = mainSubtotal + mainGST + mainPST + mainGratuity;
+    }
+  }
+
+  void divideItems() {
+    List<CartModel> items = selectedItems.isEmpty ? order.carts : selectedItems;
+    List<CartModel> dividedItems = [];
+
+    for (var item in items) {
+      if (item.quantity > 1) {
+        for (int i = 0; i < item.quantity; i++) {
+          dividedItems
+              .add(CartModel(name: item.name, price: item.price, quantity: 1));
+        }
+      } else {
+        dividedItems.add(item);
+      }
+    }
+
+    if (selectedItems.isEmpty) {
+      order.carts = dividedItems;
+    } else {
+      order.carts.removeWhere((item) => selectedItems.contains(item));
+      order.carts.addAll(dividedItems);
+    }
+
+    update();
+  }
+
   resetSplitChecks() {
     order.carts = List.from(mainOrder.carts);
+    calculateAllAmount();
     selectedItems.clear();
     listOfSpitChecksByItems.clear();
     splitCheckCount = 0;
@@ -72,6 +124,7 @@ class SplitOrderController extends GetxController {
     noOfGuestTEC.text = PosController.to.myOrder.numberOfPeople.toString();
     totalAmountTEC.text =
         PosController.to.myOrder.totalOrderAmount.toStringAsFixed(2);
+    calculateAllAmount();
     super.onInit();
   }
 }

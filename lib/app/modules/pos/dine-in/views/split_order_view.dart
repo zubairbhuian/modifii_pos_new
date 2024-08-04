@@ -76,7 +76,9 @@ class SplitOrderView extends GetView<DineInController> {
         ),
         const SizedBox(width: 12),
         PrimaryBtn(
-          onPressed: () {},
+          onPressed: () {
+            SplitOrderController.to.divideItems();
+          },
           text: "Divide Item",
           color: StaticColors.orangeColor,
           textColor: Colors.white,
@@ -86,11 +88,6 @@ class SplitOrderView extends GetView<DineInController> {
   }
 
   Widget _splitBody(ThemeData theme, OrderModel order) {
-    num subTotal = (order.totalOrderAmount) -
-        (order.totalGst +
-            order.totalPst +
-            order.totalGratuity +
-            order.totalDiscount);
     return GetBuilder<SplitOrderController>(builder: (c) {
       return Container(
         padding: const EdgeInsets.all(16),
@@ -159,19 +156,18 @@ class SplitOrderView extends GetView<DineInController> {
                       // price area
                       _priceRow(theme,
                           title: "Sub Total",
-                          value: "\$${subTotal.toStringAsFixed(2)}"),
+                          value: "\$${c.mainSubtotal.toStringAsFixed(2)}"),
                       _priceRow(theme,
                           title: "GST 5%",
-                          value: "\$${order.totalGst.toStringAsFixed(2)}"),
+                          value: "\$${c.mainGST.toStringAsFixed(2)}"),
                       if (order.totalPst > 0.0)
                         _priceRow(theme,
                             title: "PST 10%",
-                            value: "\$${order.totalPst.toStringAsFixed(2)}"),
+                            value: "\$${c.mainPST.toStringAsFixed(2)}"),
                       if (order.totalGratuity > 0.0)
                         _priceRow(theme,
                             title: "Gratuity 18%",
-                            value:
-                                "\$${order.totalGratuity.toStringAsFixed(2)}"),
+                            value: "\$${c.mainGratuity.toStringAsFixed(2)}"),
                       if (order.totalDiscount > 0.0)
                         _priceRow(theme,
                             title: "Discount",
@@ -180,8 +176,7 @@ class SplitOrderView extends GetView<DineInController> {
                       _priceRow(theme,
                           title: "Total",
                           fontSize: 18,
-                          value:
-                              "\$${order.totalOrderAmount.toStringAsFixed(2)}"),
+                          value: "\$${c.mainTotal.toStringAsFixed(2)}"),
                     ],
                   )),
 
