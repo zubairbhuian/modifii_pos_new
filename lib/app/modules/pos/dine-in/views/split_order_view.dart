@@ -615,7 +615,7 @@ class SplitOrderView extends GetView<DineInController> {
       onTap: onTap,
       child: ColoredBox(
         color: isSelected
-            ? StaticColors.blueColor.withOpacity(.1)
+            ? StaticColors.blueColor.withOpacity(.18)
             : Colors.transparent,
         child: Padding(
           padding: const EdgeInsets.all(4.0),
