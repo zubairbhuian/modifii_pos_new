@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_base/app/modules/clockIn/controllers/clock_in_controller.dart';
 import 'package:flutter_base/app/modules/pos/controllers/pos_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/views/order_details_view.dart';
@@ -191,35 +192,56 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     PrimaryBtn(
                       onPressed: () {
                         PopupDialog.customDialog(
-                            child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const MyCustomText(
-                              'Do you want to clock out?',
-                              fontSize: 28,
-                              fontWeight: FontWeight.w700,
-                            ),
-                            const SizedBox(height: 28),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                PrimaryBtn(
-                                  onPressed: clockInController.clockOut,
-                                  text: 'Yes',
-                                  textColor: Colors.white,
-                                ),
-                                const SizedBox(width: 24),
-                                PrimaryBtn(
-                                  onPressed: Get.back,
-                                  text: 'Cancel',
-                                  color: StaticColors.blackLightColor,
-                                  textColor: Colors.white,
-                                ),
-                              ],
-                            )
-                          ],
-                        ));
+                            width: 500,
+                            // height: 500,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 22, vertical: 24),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Do you want to clock out?',
+                                    style: theme.textTheme.headlineMedium,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  // const MyCustomText(
+                                  //   'Do you want to clock out?',
+                                  //   fontSize: 26,
+                                  //   maxLines: 2,
+                                  //   fontWeight: FontWeight.w700,
+                                  // ),
+                                  const SizedBox(height: 28),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 22),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Expanded(
+                                          child: PrimaryBtn(
+                                            onPressed:
+                                                clockInController.clockOut,
+                                            text: 'Yes',
+                                            textColor: Colors.white,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 24),
+                                        Expanded(
+                                          child: PrimaryBtn(
+                                            onPressed: Get.back,
+                                            text: 'Cancel',
+                                            color: StaticColors.blackLightColor,
+                                            textColor: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ));
                       },
                       text: 'Clockout',
                       textColor: Colors.white,

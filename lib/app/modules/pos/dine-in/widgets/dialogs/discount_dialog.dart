@@ -340,7 +340,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                   // PopupDialog.showLoadingDialog();
                   await PosController.to.onUpdateOrder(
                       PosController.to.myOrder.id,
-                      isDiscount: true);
+                      isClearList: false);
                   // PopupDialog.closeLoadingDialog();
                 },
                 text: "Ok".toUpperCase(),
@@ -363,7 +363,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                   Get.back();
                   await PosController.to.onUpdateOrder(
                       PosController.to.myOrder.id,
-                      isDiscount: true);
+                      isClearList: true);
                 },
                 text: "Cancel Discount".toUpperCase(),
                 height: 70,

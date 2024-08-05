@@ -5,7 +5,6 @@ import 'package:flutter_base/app/services/controller/base_controller.dart';
 import 'package:flutter_base/app/utils/logger.dart';
 import 'package:flutter_base/app/utils/urls.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 
 import '../models/order_status_model.dart';
 
@@ -43,7 +42,7 @@ class DineInOrderController extends GetxController {
     String? startDate,
     String? endDate,
     String? page,
-    String? limit = "1",
+    String? limit = "10",
     String? search,
   }) async {
     Map<String, dynamic>? queryParameters = {

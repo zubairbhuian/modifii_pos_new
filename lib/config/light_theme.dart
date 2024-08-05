@@ -160,17 +160,17 @@ ThemeData lightTheme = ThemeData(
       headlineLarge: TextStyle(
           fontFamily: Fonts.primary,
           fontSize: 36,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
           color: Color(0xff0C1C2C)),
       headlineMedium: TextStyle(
           fontFamily: Fonts.primary,
           fontSize: 28,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
           color: Color(0xff0C1C2C)),
       headlineSmall: TextStyle(
           fontFamily: Fonts.primary,
           fontSize: 24,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
           color: Color(0xff0C1C2C)),
       //******  Display  ******
       displayLarge: TextStyle(
@@ -181,12 +181,12 @@ ThemeData lightTheme = ThemeData(
       displayMedium: TextStyle(
           fontFamily: Fonts.primary,
           fontSize: 55,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
           color: Color(0xff0C1C2C)),
       displaySmall: TextStyle(
           fontFamily: Fonts.primary,
           fontSize: 32,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
           color: Color(0xff0C1C2C)),
     ),
   ),

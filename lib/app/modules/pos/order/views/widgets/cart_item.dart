@@ -62,7 +62,7 @@ class CartItem extends StatelessWidget {
                     _modifiers(theme, togo),
                     _modifiers(theme, dontMake),
                     _modifiers(theme, rush),
-                    _modifiers(theme, heat, title: "HEATE: "),
+                    _modifiers(theme, heat, title: "HEAT: "),
                   ],
                 ),
               ),
