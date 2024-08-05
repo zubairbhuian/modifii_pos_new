@@ -234,14 +234,49 @@ class OrderView extends GetView<PosController> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              padding: const EdgeInsets.only(left: 12, right: 12, top: 10),
+              child: Row(
+                children: [
+                  Expanded(
+                      child: CustomTextField(
+                    // focusNode: controller.tableFocusNode,
+                    controller: controller.guestNameController,
+                    hintText: "Guests Name",
+                  )),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: CustomTextField(
+                      controller: controller.guestPhoneController,
+                      hintText: "Phone Number",
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        // NumberRangeInputFormatter(1, 25),
+                      ],
+                    ),
+                  ),
+                  // const SizedBox(width: 12),
+                  // PrimaryBtnWithChild(
+                  //     onPressed: () {},
+                  //     borderRadius: 4,
+                  //     padding: const EdgeInsets.symmetric(
+                  //         horizontal: 18, vertical: 20),
+                  //     child: const Icon(Icons.copy_all_rounded)),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(
+                  left: 12, right: 12, top: 8, bottom: 12),
               child: Row(
                 children: [
                   Expanded(
                       child: CustomTextField(
                     focusNode: controller.tableFocusNode,
                     controller: controller.tableController,
-                    hintText: "Select Table",
+                    hintText: "Table / Bar",
+                    prefixText:
+                        controller.currentTable != null ? "Table: " : null,
                     readOnly: true,
                     onTap: () {
                       DineInController.to.getTableCategories();
@@ -257,7 +292,10 @@ class OrderView extends GetView<PosController> {
                     child: CustomTextField(
                       controller: controller.guestController,
                       focusNode: controller.guestFocusNode,
-                      hintText: "Guest Number",
+                      hintText: "No. of Guests ",
+                      prefixText: controller.guestController.text.isNotEmpty
+                          ? "Guest: "
+                          : null,
                       keyboardType: TextInputType.number,
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(

@@ -145,33 +145,33 @@ ThemeData darkTheme = ThemeData(
       titleLarge: TextStyle(
           fontFamily: Fonts.primary,
           fontSize: 20,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w500,
           color: Color(0xffEDF2F7)),
       titleMedium: TextStyle(
           fontFamily: Fonts.primary,
           fontSize: 18,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w500,
           color: Color(0xffEDF2F7)),
       titleSmall: TextStyle(
           fontFamily: Fonts.primary,
           fontSize: 16,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w500,
           color: Color(0xffEDF2F7)),
       //******  HeadLine  ******
       headlineLarge: TextStyle(
           fontFamily: Fonts.primary,
           fontSize: 36,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
           color: Color(0xffEDF2F7)),
       headlineMedium: TextStyle(
           fontFamily: Fonts.primary,
           fontSize: 28,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
           color: Color(0xffEDF2F7)),
       headlineSmall: TextStyle(
           fontFamily: Fonts.primary,
           fontSize: 24,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
           color: Color(0xffEDF2F7)),
       //******  Display  ******
       displayLarge: TextStyle(

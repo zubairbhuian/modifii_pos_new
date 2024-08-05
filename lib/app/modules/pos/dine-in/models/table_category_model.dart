@@ -32,3 +32,5 @@ class TableCategoryModel {
         "tables": tables.map((x) => x.toJson()).toList(),
       };
 }
+
+

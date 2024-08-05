@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_base/app/modules/pos/controllers/tables_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in-orders/controllers/dine_in_order_controller.dart';
+import 'package:flutter_base/app/modules/pos/dine-in-orders/widgets/order_table_header.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
 import 'package:flutter_base/app/widgets/no_data_found.dart';
 import 'package:flutter_base/app/widgets/popup_dialogs.dart';
@@ -17,6 +18,7 @@ import '../../../../widgets/custom_textfield.dart';
 import '../../../../widgets/my_custom_text.dart';
 import '../../controllers/orders_controller.dart';
 import '../widgets/order_table_data_row.dart';
+import '../widgets/order_table_item.dart';
 
 class TableOrdersList extends GetView<DineInOrderController> {
   const TableOrdersList({super.key});
@@ -50,131 +52,18 @@ class TableOrdersList extends GetView<DineInOrderController> {
   }
 
   Widget _orderTable(ThemeData theme, BuildContext context) {
-    const double titleFontSize = 16;
-    // const double contentFontSize = 14;
     return Column(
       children: [
-        Container(
-          decoration: BoxDecoration(
-            border: Border.symmetric(
-              horizontal: BorderSide(
-                width: 2,
-                color: theme.colorScheme.background,
-              ),
-            ),
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          margin: const EdgeInsets.only(bottom: 28),
-          child: const Row(
-            children: [
-              Expanded(
-                  child: MyCustomText(
-                'No',
-                fontSize: titleFontSize,
-                fontWeight: FontWeight.w600,
-              )),
-              SizedBox(width: 4.0),
-              Expanded(
-                  child: MyCustomText(
-                'Table No.',
-                fontSize: titleFontSize,
-                fontWeight: FontWeight.w600,
-              )),
-              SizedBox(width: 4.0),
-              Expanded(
-                  flex: 1,
-                  child: MyCustomText(
-                    'User Name',
-                    fontSize: titleFontSize,
-                    fontWeight: FontWeight.w600,
-                  )),
-              SizedBox(width: 4.0),
-              Expanded(
-                  child: MyCustomText(
-                'Auth Code',
-                fontSize: titleFontSize,
-                fontWeight: FontWeight.w600,
-              )),
-              SizedBox(width: 4.0),
-              Expanded(
-                  flex: 2,
-                  child: MyCustomText(
-                    'Order Date',
-                    fontSize: titleFontSize,
-                    fontWeight: FontWeight.w600,
-                  )),
-              SizedBox(width: 4.0),
-              Expanded(
-                  child: MyCustomText(
-                'Order Type',
-                fontSize: titleFontSize,
-                fontWeight: FontWeight.w600,
-              )),
-              SizedBox(width: 4.0),
-              Expanded(
-                  child: MyCustomText(
-                'Order Status',
-                fontSize: titleFontSize,
-                fontWeight: FontWeight.w600,
-              )),
-              SizedBox(width: 4.0),
-              Expanded(
-                  child: MyCustomText(
-                'Total Amount',
-                fontSize: titleFontSize,
-                fontWeight: FontWeight.w600,
-              )),
-              SizedBox(width: 4.0),
-              Expanded(
-                  child: MyCustomText(
-                'Actions',
-                fontSize: titleFontSize,
-                fontWeight: FontWeight.w600,
-              )),
-            ],
-          ),
-        ),
+        const OrderTableHeader(),
         GetBuilder<DineInOrderController>(builder: (controller) {
           return Column(
             children: List.generate(
               controller.orderList.length,
               (index) {
                 var order = controller.orderList[index];
-                if (controller.orderList.isEmpty) {
-                  return Container(
-                    width: 200,
-                    color: Colors.red,
-                    height: 23,
-                  );
-                }
-                return OrderTableDataRow(
-                  onOrderDetails: () {
-                    // TablesController.to.updateIsShowOrderDetails(true);
-                  },
-                  onPrint: () {
-                    customAlertDialog(
-                      contentPadding: const EdgeInsets.all(12),
-                      context: context,
-                      child: _printReceipt(),
-                    );
-                  },
-                  id: order.id,
-                  sl: index + 1,
-                  tableNo: order.table?.tableName ?? "",
-
-                  userName: "${order.employee?.firstName}",
-                  orderId: "${order.orderId}",
-                  orderDateTime: DateFormat('MMM d, yyyy h:mm a')
-                      .format(order.createdAt ?? DateTime.now()),
-
-                  // authCode: order.authorizationCode ?? 'null',
-                  // orderId: order.id ?? 0,
-                  // orderDateTime:
-                  //     '${order..toString().split(' ').first} ${order.deliveryTime}',
-                  orderType: order.orderType,
-                  orderStatus: order.orderStatus,
-                  totalAmount: order.totalOrderAmount.toDouble(),
-                  paymetStatus: order.paymentStatus,
+                return OrderTableItem(
+                  order: order,
+                  no: "${index + 1}",
                 );
               },
             ),

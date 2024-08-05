@@ -74,7 +74,11 @@ class PopupDialog {
     );
   }
 
-  static customDialog({required Widget child, double? width, double? height}) {
+  static customDialog(
+      {required Widget child,
+      double? width,
+      double? height,
+      Widget topLavel = const SizedBox()}) {
     return showDialog<void>(
       // Context
       context: Get.context!,
@@ -100,20 +104,23 @@ class PopupDialog {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: InkWell(
-                      onTap: Get.back,
-                      splashFactory: NoSplash.splashFactory,
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            left: 8, right: 8, top: 8, bottom: 2),
-                        child: Icon(
-                          Icons.close,
-                          color: Theme.of(context).colorScheme.background,
-                          size: 18,
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        left: 12, right: 12, top: 8, bottom: 2),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        topLavel,
+                        InkWell(
+                          onTap: Get.back,
+                          splashFactory: NoSplash.splashFactory,
+                          child: Icon(
+                            Icons.close,
+                            color: Theme.of(context).colorScheme.background,
+                            size: 20,
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
                   Flexible(

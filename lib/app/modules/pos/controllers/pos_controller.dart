@@ -3,6 +3,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_base/app/modules/pos/dine-in-orders/controllers/dine_in_order_controller.dart';
+import 'package:flutter_base/app/modules/pos/dine-in/controllers/dine_in_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/models/table_model.dart';
 import 'package:flutter_base/app/modules/pos/order/models/order_model.dart';
 import 'package:flutter_base/app/modules/pos/order/models/order_place_model.dart';
@@ -22,6 +24,8 @@ class PosController extends GetxController {
   // for table number
   TextEditingController tableController = TextEditingController();
   TextEditingController guestController = TextEditingController();
+  TextEditingController guestNameController = TextEditingController();
+  TextEditingController guestPhoneController = TextEditingController();
   // for Focus
   final FocusNode tableFocusNode = FocusNode();
   final FocusNode guestFocusNode = FocusNode();
@@ -32,7 +36,9 @@ class PosController extends GetxController {
     FocusScope.of(Get.context!).requestFocus(guestFocusNode);
   }
 
+  TableModel? currentTable;
   void updateTableName(TableModel table) {
+    currentTable = table;
     tableController = TextEditingController(text: table.tableName);
     myOrder.tableId = table.id;
     changeFocusToGuest();
@@ -302,27 +308,22 @@ class PosController extends GetxController {
       if (res.statusCode == 201) {
         clearCartList();
         PopupDialog.showSuccessDialog(res.data["message"]);
-        // Todo remove this
-        myOrder.employeeId = '66a27bac841c686681819833';
+        DineInOrderController.to.getAllOrders();
       }
     }
   }
 
   // ** Update order
-  onUpdateOrder(String id, {bool isDiscount = false}) async {
+  onUpdateOrder(String id, {bool isClearList = true}) async {
     try {
       var res = await BaseController.to.apiService
           .makePatchRequest("${URLS.orders}/$id", myOrder.toJson());
-
+      DineInOrderController.to.getAllOrders();
       if (res.statusCode == 200) {
-        if (!isDiscount) {
+        if (isClearList) {
           clearCartList();
         }
-
         PopupDialog.showSuccessDialog(res.data["message"]);
-
-        // Todo remove this
-        myOrder.employeeId = '66a27bac841c686681819833';
       }
     } catch (e) {
       kLogger.e('Error from %%%% update order %%%% => $e');
@@ -370,11 +371,16 @@ class PosController extends GetxController {
     // for cart list
     // for subtotal
     num totalPrice = 0;
+    num totalDiscount = 0;
+
     for (var item in myOrder.carts) {
       num discountedPrice = item.price - item.discountAmount;
       totalPrice += discountedPrice * item.quantity;
+      totalDiscount += item.discountAmount;
     }
     myOrder.subTotal = totalPrice;
+    myOrder.totalDiscount = totalDiscount;
+
     // for gratuityAmount
     if (guestController.text.isNotEmpty) {
       if (int.parse(guestController.text) >= 6) {
@@ -499,7 +505,10 @@ class PosController extends GetxController {
     resetModifierSelections();
     guestController.clear();
     tableController.clear();
+    guestNameController.clear();
+    guestPhoneController.clear();
     isUpdateView = false;
+    currentTable = null;
     update();
   }
 
@@ -601,6 +610,16 @@ class PosController extends GetxController {
         myOrder.numberOfPeople = int.parse(guestController.text);
       }
     });
+    guestNameController.addListener(() {
+      if (guestNameController.text.isNotEmpty) {
+        myOrder.guestName = guestNameController.text;
+      }
+    });
+    guestPhoneController.addListener(() {
+      if (guestPhoneController.text.isNotEmpty) {
+        myOrder.guestPhoneNumber = guestPhoneController.text;
+      }
+    });
 
     super.onInit();
   }
@@ -625,15 +644,15 @@ class PosController extends GetxController {
   }
 }
 
-enum OrderType {
-  DINE_IN,
-  TAKE_OUT,
-  DELIVERY,
-}
+// enum OrderType {
+//   DINE_IN,
+//   TAKE_OUT,
+//   DELIVERY,
+// }
 
-enum OrderStatus { COMPLETED, CONFIRMED, DELIVERED, CANCELED }
+// enum OrderStatus { COMPLETED, CONFIRMED, DELIVERED, CANCELED }
 
-enum PaymentStatus {
-  PAID,
-  UNPAID,
-}
+// enum PaymentStatus {
+//   PAID,
+//   UNPAID,
+// }

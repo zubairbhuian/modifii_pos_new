@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_base/app/modules/pos/controllers/orders_controller.dart';
+import 'package:flutter_base/app/utils/logger.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
 import 'package:flutter_base/app/widgets/my_custom_text.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -46,14 +47,15 @@ void printersListDialog(List<Printer> value) {
 
                   pdf.addPage(
                     pw.Page(
-                        pageFormat: PdfPageFormat.a4,
+                        pageFormat: const PdfPageFormat(
+                            70 * PdfPageFormat.mm, double.infinity),
                         build: (_) {
                           return pw.Center(
                             child: _printReceipt(image),
                           );
                         }),
                   );
-
+                  kLogger.e(OrdersController.to.printerName.value);
                   await Printing.directPrintPdf(
                     printer:
                         Printer(url: OrdersController.to.printerName.value),
@@ -62,8 +64,8 @@ void printersListDialog(List<Printer> value) {
                     format: PdfPageFormat.undefined,
                   );
 
-                  Get.back();
-                  Get.back();
+                  // Get.back();
+                  // Get.back();
                 },
                 text: value[index].name,
                 textColor: Colors.white,
@@ -80,10 +82,6 @@ pw.Widget? _printReceipt(dynamic image) {
   return pw.Column(
     mainAxisSize: pw.MainAxisSize.min,
     children: [
-      // pw.SvgImage(
-      //   svg: 'assets/images/splash/login_logo.svg',
-      //   height: 100,
-      // ),
       pw.Image(image, height: 80),
       pw.SizedBox(height: 10),
       pw.Text(
@@ -101,166 +99,355 @@ pw.Widget? _printReceipt(dynamic image) {
           fontWeight: pw.FontWeight.bold,
         ),
       ),
-      pw.Text(
-        'Phone: 604-706-0109',
-        style: pw.TextStyle(
-          fontSize: 16,
-          fontWeight: pw.FontWeight.bold,
-          height: 3,
-        ),
-      ),
-      pw.Divider(color: PdfColor.fromHex('#303030')),
-      pw.SizedBox(height: 10.0),
-      pw.Row(
-        children: [
-          pw.Expanded(child: pw.Text('Order: 100089')),
-          pw.SizedBox(width: 10.0),
-          pw.Expanded(child: pw.Text('Jun.04,24;11:04am')),
-        ],
-      ),
-      pw.SizedBox(height: 6.0),
-      pw.Row(
-        children: [
-          pw.Expanded(child: pw.Text('Server: Haveli')),
-          pw.SizedBox(width: 10.0),
-          pw.Expanded(child: pw.Text('Station: 1')),
-        ],
-      ),
-      pw.SizedBox(height: 6.0),
-      pw.Row(
-        children: [
-          pw.Expanded(child: pw.Text('Table: 23')),
-          pw.SizedBox(width: 10.0),
-          pw.Expanded(child: pw.Text('Guests: 3')),
-        ],
-      ),
-      pw.SizedBox(height: 6.0),
-      pw.Row(
-        children: [
-          pw.Expanded(child: pw.Text('Server: Haveli')),
-          pw.SizedBox(width: 10.0),
-          pw.Expanded(child: pw.Text('Station: 1')),
-        ],
-      ),
-      pw.SizedBox(height: 6.0),
-      pw.Row(
-        children: [
-          pw.Expanded(child: pw.Text('Type: Dine-In')),
-          pw.SizedBox(width: 10.0),
-          pw.Expanded(child: pw.Text('')),
-        ],
-      ),
-      pw.SizedBox(height: 16.0),
-      pw.Row(
-        children: [
-          pw.Expanded(
-              flex: 1,
-              child: pw.Text('QTY', style: const pw.TextStyle(fontSize: 18))),
-          pw.SizedBox(width: 10.0),
-          pw.Expanded(
-              flex: 3,
-              child: pw.Text('Item', style: const pw.TextStyle(fontSize: 18))),
-          pw.SizedBox(width: 10.0),
-          pw.Expanded(
-              flex: 1,
-              child: pw.Text('AMT', style: const pw.TextStyle(fontSize: 18))),
-        ],
-      ),
-      pw.Divider(color: PdfColor.fromHex('#303030'), height: 25),
-      pw.Row(
-        children: [
-          pw.Expanded(
-              flex: 1,
-              child: pw.Text('4', style: const pw.TextStyle(fontSize: 18))),
-          pw.SizedBox(width: 10.0),
-          pw.Expanded(
-              flex: 3,
-              child: pw.Text('BHINDI DO PYAZA',
-                  style: const pw.TextStyle(fontSize: 18))),
-          pw.SizedBox(width: 10.0),
-          pw.Expanded(
-              flex: 1,
-              child:
-                  pw.Text('\$67.96', style: const pw.TextStyle(fontSize: 18))),
-        ],
-      ),
-      pw.Divider(color: PdfColor.fromHex('#303030'), height: 25),
-      pw.SizedBox(height: 10.0),
-      pw.Row(
-        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-        children: [
-          pw.Text('Sub total'),
-          pw.SizedBox(width: 10.0),
-          pw.Text('\$67.96'),
-        ],
-      ),
-      pw.SizedBox(height: 10.0),
-      pw.Row(
-        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-        children: [
-          pw.Text('GST 5%'),
-          pw.SizedBox(width: 10.0),
-          pw.Text('\$3.40'),
-        ],
-      ),
-      pw.SizedBox(height: 10.0),
-      pw.Row(
-        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-        children: [
-          pw.Text('Tip'),
-          pw.SizedBox(width: 10.0),
-          pw.Text('\$5.00'),
-        ],
-      ),
-      pw.SizedBox(height: 10.0),
-      pw.Row(
-        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-        children: [
-          pw.Text('Total (PAID)', style: const pw.TextStyle(fontSize: 20)),
-          pw.SizedBox(width: 10.0),
-          pw.Text('\$76.36', style: const pw.TextStyle(fontSize: 20)),
-        ],
-      ),
-      pw.Divider(color: PdfColor.fromHex('#303030'), height: 20),
-      pw.Text(
-        'Customer Copy',
-        style: pw.TextStyle(
-          fontSize: 14,
-          fontWeight: pw.FontWeight.bold,
-        ),
-      ),
-      pw.SizedBox(height: 4.0),
-      pw.Text(
-        'Visa Credit Card Sale',
-        style: pw.TextStyle(
-          fontSize: 14,
-          fontWeight: pw.FontWeight.bold,
-        ),
-      ),
-      pw.Divider(color: PdfColor.fromHex('#303030'), height: 20),
-      pw.Text(
-        'Thank you for visiting HAVELI BISTRO',
-        style: pw.TextStyle(
-          fontSize: 14,
-          fontWeight: pw.FontWeight.bold,
-        ),
-      ),
-      pw.Divider(color: PdfColor.fromHex('#303030'), height: 20),
-      pw.Text(
-        'Please review us on Google',
-        style: pw.TextStyle(
-          fontSize: 14,
-          fontWeight: pw.FontWeight.bold,
-        ),
-      ),
-      pw.Divider(color: PdfColor.fromHex('#303030'), height: 20),
-      pw.Text(
-        'GST NUMBER: GST 717783914 RT0001',
-        style: pw.TextStyle(
-          fontSize: 14,
-          fontWeight: pw.FontWeight.bold,
-        ),
-      ),
+      // pw.Text(
+      //   'Phone: 604-706-0109',
+      //   style: pw.TextStyle(
+      //     fontSize: 16,
+      //     fontWeight: pw.FontWeight.bold,
+      //     height: 3,
+      //   ),
+      // ),
+      // pw.Divider(color: PdfColor.fromHex('#303030')),
+      // pw.SizedBox(height: 10.0),
+      // pw.Row(
+      //   children: [
+      //     pw.Expanded(child: pw.Text('Order: 100089')),
+      //     pw.SizedBox(width: 10.0),
+      //     pw.Expanded(child: pw.Text('Jun.04,24;11:04am')),
+      //   ],
+      // ),
+      // pw.SizedBox(height: 6.0),
+      // pw.Row(
+      //   children: [
+      //     pw.Expanded(child: pw.Text('Server: Haveli')),
+      //     pw.SizedBox(width: 10.0),
+      //     pw.Expanded(child: pw.Text('Station: 1')),
+      //   ],
+      // ),
+      // pw.SizedBox(height: 6.0),
+      // pw.Row(
+      //   children: [
+      //     pw.Expanded(child: pw.Text('Table: 23')),
+      //     pw.SizedBox(width: 10.0),
+      //     pw.Expanded(child: pw.Text('Guests: 3')),
+      //   ],
+      // ),
+      // pw.SizedBox(height: 6.0),
+      // pw.Row(
+      //   children: [
+      //     pw.Expanded(child: pw.Text('Server: Haveli')),
+      //     pw.SizedBox(width: 10.0),
+      //     pw.Expanded(child: pw.Text('Station: 1')),
+      //   ],
+      // ),
+      // pw.SizedBox(height: 6.0),
+      // pw.Row(
+      //   children: [
+      //     pw.Expanded(child: pw.Text('Type: Dine-In')),
+      //     pw.SizedBox(width: 10.0),
+      //     pw.Expanded(child: pw.Text('')),
+      //   ],
+      // ),
+      // pw.SizedBox(height: 16.0),
+      // pw.Row(
+      //   children: [
+      //     pw.Expanded(
+      //         flex: 1,
+      //         child: pw.Text('QTY', style: const pw.TextStyle(fontSize: 18))),
+      //     pw.SizedBox(width: 10.0),
+      //     pw.Expanded(
+      //         flex: 3,
+      //         child: pw.Text('Item', style: const pw.TextStyle(fontSize: 18))),
+      //     pw.SizedBox(width: 10.0),
+      //     pw.Expanded(
+      //         flex: 1,
+      //         child: pw.Text('AMT', style: const pw.TextStyle(fontSize: 18))),
+      //   ],
+      // ),
+      // pw.Divider(color: PdfColor.fromHex('#303030'), height: 25),
+      // pw.Row(
+      //   children: [
+      //     pw.Expanded(
+      //         flex: 1,
+      //         child: pw.Text('4', style: const pw.TextStyle(fontSize: 18))),
+      //     pw.SizedBox(width: 10.0),
+      //     pw.Expanded(
+      //         flex: 3,
+      //         child: pw.Text('BHINDI DO PYAZA',
+      //             style: const pw.TextStyle(fontSize: 18))),
+      //     pw.SizedBox(width: 10.0),
+      //     pw.Expanded(
+      //         flex: 1,
+      //         child:
+      //             pw.Text('\$67.96', style: const pw.TextStyle(fontSize: 18))),
+      //   ],
+      // ),
+      // pw.Divider(color: PdfColor.fromHex('#303030'), height: 25),
+      // pw.SizedBox(height: 10.0),
+      // pw.Row(
+      //   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+      //   children: [
+      //     pw.Text('Sub total'),
+      //     pw.SizedBox(width: 10.0),
+      //     pw.Text('\$67.96'),
+      //   ],
+      // ),
+      // pw.SizedBox(height: 10.0),
+      // pw.Row(
+      //   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+      //   children: [
+      //     pw.Text('GST 5%'),
+      //     pw.SizedBox(width: 10.0),
+      //     pw.Text('\$3.40'),
+      //   ],
+      // ),
+      // pw.SizedBox(height: 10.0),
+      // pw.Row(
+      //   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+      //   children: [
+      //     pw.Text('Tip'),
+      //     pw.SizedBox(width: 10.0),
+      //     pw.Text('\$5.00'),
+      //   ],
+      // ),
+      // pw.SizedBox(height: 10.0),
+      // pw.Row(
+      //   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+      //   children: [
+      //     pw.Text('Total (PAID)', style: const pw.TextStyle(fontSize: 20)),
+      //     pw.SizedBox(width: 10.0),
+      //     pw.Text('\$76.36', style: const pw.TextStyle(fontSize: 20)),
+      //   ],
+      // ),
+      // pw.Divider(color: PdfColor.fromHex('#303030'), height: 20),
+      // pw.Text(
+      //   'Customer Copy',
+      //   style: pw.TextStyle(
+      //     fontSize: 14,
+      //     fontWeight: pw.FontWeight.bold,
+      //   ),
+      // ),
+      // pw.SizedBox(height: 4.0),
+      // pw.Text(
+      //   'Visa Credit Card Sale',
+      //   style: pw.TextStyle(
+      //     fontSize: 14,
+      //     fontWeight: pw.FontWeight.bold,
+      //   ),
+      // ),
+      // pw.Divider(color: PdfColor.fromHex('#303030'), height: 20),
+      // pw.Text(
+      //   'Thank you for visiting HAVELI BISTRO',
+      //   style: pw.TextStyle(
+      //     fontSize: 14,
+      //     fontWeight: pw.FontWeight.bold,
+      //   ),
+      // ),
+      // pw.Divider(color: PdfColor.fromHex('#303030'), height: 20),
+      // pw.Text(
+      //   'Please review us on Google',
+      //   style: pw.TextStyle(
+      //     fontSize: 14,
+      //     fontWeight: pw.FontWeight.bold,
+      //   ),
+      // ),
+      // pw.Divider(color: PdfColor.fromHex('#303030'), height: 20),
+      // pw.Text(
+      //   'GST NUMBER: GST 717783914 RT0001',
+      //   style: pw.TextStyle(
+      //     fontSize: 14,
+      //     fontWeight: pw.FontWeight.bold,
+      //   ),
+      // ),
     ],
   );
 }
+
+// pw.Widget? _printReceipt(dynamic image) {
+//   return pw.Column(
+//     mainAxisSize: pw.MainAxisSize.min,
+//     children: [
+//       // pw.SvgImage(
+//       //   svg: 'assets/images/splash/login_logo.svg',
+//       //   height: 100,
+//       // ),
+//       pw.Image(image, height: 80),
+//       pw.SizedBox(height: 10),
+//       pw.Text(
+//         '7488 King George Blvd.',
+//         style: pw.TextStyle(
+//           fontSize: 16,
+//           fontWeight: pw.FontWeight.bold,
+//           height: 2,
+//         ),
+//       ),
+//       pw.Text(
+//         'Unit 350, Surrey, B.C. V3W 0H9',
+//         style: pw.TextStyle(
+//           fontSize: 16,
+//           fontWeight: pw.FontWeight.bold,
+//         ),
+//       ),
+//       pw.Text(
+//         'Phone: 604-706-0109',
+//         style: pw.TextStyle(
+//           fontSize: 16,
+//           fontWeight: pw.FontWeight.bold,
+//           height: 3,
+//         ),
+//       ),
+//       pw.Divider(color: PdfColor.fromHex('#303030')),
+//       pw.SizedBox(height: 10.0),
+//       pw.Row(
+//         children: [
+//           pw.Expanded(child: pw.Text('Order: 100089')),
+//           pw.SizedBox(width: 10.0),
+//           pw.Expanded(child: pw.Text('Jun.04,24;11:04am')),
+//         ],
+//       ),
+//       pw.SizedBox(height: 6.0),
+//       pw.Row(
+//         children: [
+//           pw.Expanded(child: pw.Text('Server: Haveli')),
+//           pw.SizedBox(width: 10.0),
+//           pw.Expanded(child: pw.Text('Station: 1')),
+//         ],
+//       ),
+//       pw.SizedBox(height: 6.0),
+//       pw.Row(
+//         children: [
+//           pw.Expanded(child: pw.Text('Table: 23')),
+//           pw.SizedBox(width: 10.0),
+//           pw.Expanded(child: pw.Text('Guests: 3')),
+//         ],
+//       ),
+//       pw.SizedBox(height: 6.0),
+//       pw.Row(
+//         children: [
+//           pw.Expanded(child: pw.Text('Server: Haveli')),
+//           pw.SizedBox(width: 10.0),
+//           pw.Expanded(child: pw.Text('Station: 1')),
+//         ],
+//       ),
+//       pw.SizedBox(height: 6.0),
+//       pw.Row(
+//         children: [
+//           pw.Expanded(child: pw.Text('Type: Dine-In')),
+//           pw.SizedBox(width: 10.0),
+//           pw.Expanded(child: pw.Text('')),
+//         ],
+//       ),
+//       pw.SizedBox(height: 16.0),
+//       pw.Row(
+//         children: [
+//           pw.Expanded(
+//               flex: 1,
+//               child: pw.Text('QTY', style: const pw.TextStyle(fontSize: 18))),
+//           pw.SizedBox(width: 10.0),
+//           pw.Expanded(
+//               flex: 3,
+//               child: pw.Text('Item', style: const pw.TextStyle(fontSize: 18))),
+//           pw.SizedBox(width: 10.0),
+//           pw.Expanded(
+//               flex: 1,
+//               child: pw.Text('AMT', style: const pw.TextStyle(fontSize: 18))),
+//         ],
+//       ),
+//       pw.Divider(color: PdfColor.fromHex('#303030'), height: 25),
+//       pw.Row(
+//         children: [
+//           pw.Expanded(
+//               flex: 1,
+//               child: pw.Text('4', style: const pw.TextStyle(fontSize: 18))),
+//           pw.SizedBox(width: 10.0),
+//           pw.Expanded(
+//               flex: 3,
+//               child: pw.Text('BHINDI DO PYAZA',
+//                   style: const pw.TextStyle(fontSize: 18))),
+//           pw.SizedBox(width: 10.0),
+//           pw.Expanded(
+//               flex: 1,
+//               child:
+//                   pw.Text('\$67.96', style: const pw.TextStyle(fontSize: 18))),
+//         ],
+//       ),
+//       pw.Divider(color: PdfColor.fromHex('#303030'), height: 25),
+//       pw.SizedBox(height: 10.0),
+//       pw.Row(
+//         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+//         children: [
+//           pw.Text('Sub total'),
+//           pw.SizedBox(width: 10.0),
+//           pw.Text('\$67.96'),
+//         ],
+//       ),
+//       pw.SizedBox(height: 10.0),
+//       pw.Row(
+//         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+//         children: [
+//           pw.Text('GST 5%'),
+//           pw.SizedBox(width: 10.0),
+//           pw.Text('\$3.40'),
+//         ],
+//       ),
+//       pw.SizedBox(height: 10.0),
+//       pw.Row(
+//         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+//         children: [
+//           pw.Text('Tip'),
+//           pw.SizedBox(width: 10.0),
+//           pw.Text('\$5.00'),
+//         ],
+//       ),
+//       pw.SizedBox(height: 10.0),
+//       pw.Row(
+//         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+//         children: [
+//           pw.Text('Total (PAID)', style: const pw.TextStyle(fontSize: 20)),
+//           pw.SizedBox(width: 10.0),
+//           pw.Text('\$76.36', style: const pw.TextStyle(fontSize: 20)),
+//         ],
+//       ),
+//       pw.Divider(color: PdfColor.fromHex('#303030'), height: 20),
+//       pw.Text(
+//         'Customer Copy',
+//         style: pw.TextStyle(
+//           fontSize: 14,
+//           fontWeight: pw.FontWeight.bold,
+//         ),
+//       ),
+//       pw.SizedBox(height: 4.0),
+//       pw.Text(
+//         'Visa Credit Card Sale',
+//         style: pw.TextStyle(
+//           fontSize: 14,
+//           fontWeight: pw.FontWeight.bold,
+//         ),
+//       ),
+//       pw.Divider(color: PdfColor.fromHex('#303030'), height: 20),
+//       pw.Text(
+//         'Thank you for visiting HAVELI BISTRO',
+//         style: pw.TextStyle(
+//           fontSize: 14,
+//           fontWeight: pw.FontWeight.bold,
+//         ),
+//       ),
+//       pw.Divider(color: PdfColor.fromHex('#303030'), height: 20),
+//       pw.Text(
+//         'Please review us on Google',
+//         style: pw.TextStyle(
+//           fontSize: 14,
+//           fontWeight: pw.FontWeight.bold,
+//         ),
+//       ),
+//       pw.Divider(color: PdfColor.fromHex('#303030'), height: 20),
+//       pw.Text(
+//         'GST NUMBER: GST 717783914 RT0001',
+//         style: pw.TextStyle(
+//           fontSize: 14,
+//           fontWeight: pw.FontWeight.bold,
+//         ),
+//       ),
+//     ],
+//   );
+// }
