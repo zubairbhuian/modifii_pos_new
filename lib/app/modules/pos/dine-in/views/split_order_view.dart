@@ -44,7 +44,7 @@ class SplitOrderView extends GetView<DineInController> {
         const Icon(Icons.insert_page_break_sharp),
         const SizedBox(width: 12),
         Text(
-          'Split Order',
+          'Split Check',
           style: theme.textTheme.titleMedium,
         ),
         const SizedBox(width: 12),
@@ -79,10 +79,17 @@ class SplitOrderView extends GetView<DineInController> {
           onPressed: () {
             SplitOrderController.to.divideItems();
           },
-          text: "Divide Item",
+          text: "Breakdown Items",
           color: StaticColors.orangeColor,
           textColor: Colors.white,
-        )
+        ),
+        const SizedBox(width: 12),
+        PrimaryBtn(
+          onPressed: () {},
+          text: "Divide Items",
+          color: StaticColors.yellowColor,
+          textColor: Colors.white,
+        ),
       ],
     );
   }
@@ -112,7 +119,7 @@ class SplitOrderView extends GetView<DineInController> {
                         ),
                       ),
                       Text(
-                        'Type: ${order.orderType}',
+                        'Type: ${(order.orderType).replaceAll('_', '-')}',
                         style: theme.textTheme.titleSmall,
                       )
                     ],
@@ -291,17 +298,40 @@ class SplitOrderView extends GetView<DineInController> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               // header
-                              Text(
-                                'Order: #${order.orderId}-SC${index + 1}',
-                                style: theme.textTheme.titleSmall,
+                              Row(
+                                children: [
+                                  Text(
+                                    'Order: #${order.orderId}-SC${index + 1}',
+                                    style: theme.textTheme.titleSmall,
+                                  ),
+                                  const Spacer(),
+                                  InkWell(
+                                    onTap: () {
+                                      //TODO: close a split bill and return item to main check
+                                    },
+                                    child: const Icon(Icons.close),
+                                  ),
+                                ],
                               ),
                               Divider(
                                 color: theme.dividerColor.withOpacity(0.4),
                                 height: 16,
                               ),
-                              Text(
-                                'Dine in: Guest ${index + 1}',
-                                style: theme.textTheme.titleSmall,
+                              Row(
+                                children: [
+                                  Text(
+                                    '${order.orderType.replaceAll('_', '-')}: Guest ${c.listOfSpitChecksByItems[index].userName}',
+                                    style: theme.textTheme.titleSmall,
+                                  ),
+                                  const SizedBox(width: 12.0),
+                                  PrimaryBtn(
+                                    onPressed: () {
+                                      //TODO: update guest name
+                                    },
+                                    height: 32,
+                                    text: 'Update Name',
+                                  ),
+                                ],
                               ),
 
                               ...List.generate(

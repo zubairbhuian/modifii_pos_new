@@ -15,6 +15,7 @@ class CustomTextField extends StatelessWidget {
   final String? hintText;
   final Widget? label;
   final String? extraLabel;
+  final double? extraLabelFontSize;
   final TextStyle? labelStyle;
   final TextStyle? extraLabelStyle;
   final TextStyle? errorStyle;
@@ -65,6 +66,7 @@ class CustomTextField extends StatelessWidget {
     this.maxLines,
     this.suffixIconColor,
     this.extraLabel,
+    this.extraLabelFontSize,
     this.extraLabelStyle,
     this.labelStyle,
     this.errorStyle,
@@ -82,7 +84,8 @@ class CustomTextField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // ********** extraLabel ********
-        if (extraLabel != null) MyCustomText(extraLabel ?? ""),
+        if (extraLabel != null)
+          MyCustomText(extraLabel ?? "", fontSize: extraLabelFontSize),
         if (extraLabel != null)
           const SizedBox(
             height: 10,

@@ -162,7 +162,6 @@ class SplitOrderController extends GetxController {
       orderType: mainOrder.orderType,
       paymentStatus: mainOrder.paymentStatus,
     );
-    noOfGuestTEC.text = PosController.to.myOrder.numberOfPeople.toString();
     totalAmountTEC.text =
         PosController.to.myOrder.totalOrderAmount.toStringAsFixed(2);
     calculateMainAmount();

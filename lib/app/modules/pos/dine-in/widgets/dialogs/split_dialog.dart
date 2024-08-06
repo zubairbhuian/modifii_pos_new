@@ -13,7 +13,7 @@ class SplitDialogs {
     required VoidCallback onTap,
   }) {
     PopupDialog.customDialog(
-        width: 500,
+        width: 1000,
         child: Column(
           children: [
             Padding(
@@ -26,7 +26,10 @@ class SplitDialogs {
                       child: CustomTextField(
                     controller: guestController,
                     extraLabel: 'Number of Guest:',
+                    extraLabelFontSize: 32,
                     hintText: '',
+                    autofocus: true,
+                    style: const TextStyle(fontSize: 48),
                     padding: const EdgeInsets.symmetric(
                         vertical: 26, horizontal: 22),
                   )),
@@ -35,17 +38,23 @@ class SplitDialogs {
                       child: CustomTextField(
                     controller: amountController,
                     extraLabel: 'Total Amount:',
+                    extraLabelFontSize: 32,
                     hintText: '',
                     readOnly: true,
+                    style: const TextStyle(fontSize: 48),
                     padding: const EdgeInsets.symmetric(
                         vertical: 26, horizontal: 22),
                   )),
                   const SizedBox(width: 16),
                   PrimaryBtn(
                       onPressed: onTap,
-                      height: 66,
+                      height: 115,
+                      width: 120,
+                      padding: const EdgeInsets.all(4.0),
                       style: const TextStyle(
-                          fontWeight: FontWeight.w600, color: Colors.white),
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          fontSize: 200),
                       text: "Submit")
                 ],
               ),
