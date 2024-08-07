@@ -17,104 +17,29 @@ class DineInView extends GetView<DineInController> {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    return Column(
+    return const Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const TopMenu(),
-        const SizedBox(height: 16),
-        const TableAvailabilityHeader(),
-        const SizedBox(height: 12.0),
+        TopMenu(),
+        SizedBox(height: 16),
+        TableAvailabilityHeader(),
+        SizedBox(height: 12.0),
         Expanded(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ! dine-in
-              const Expanded(
+              Expanded(
                 flex: 3,
                 child: TableBody(
                   isScrollable: false,
                 ),
               ),
-              const SizedBox(width: 30),
-              // ! takeout
-              Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _title("Takeout".toUpperCase()),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: SizedBox(
-                          // width: 200,
-                          child: StaggeredGrid.count(
-                            crossAxisCount: 6,
-                            mainAxisSpacing: 8,
-                            crossAxisSpacing: 8,
-                            children: List.generate(20, (index) {
-                              return PrimaryBtnWithChild(
-                                onPressed: () {},
-                                color: StaticColors.greenColor,
-                                width: 150,
-                                padding: const EdgeInsets.all(20),
-                                alignment: Alignment.centerLeft,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '100000-p $index',
-                                      style: theme.textTheme.labelMedium
-                                          ?.copyWith(color: Colors.white),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Text(
-                                      'Server',
-                                      style: theme.textTheme.bodySmall
-                                          ?.copyWith(color: Colors.white),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    Text(
-                                      'Haveli',
-                                      style: theme.textTheme.bodySmall
-                                          ?.copyWith(color: Colors.white),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // cart area
+              SizedBox(width: 30),
             ],
           ),
         ),
       ],
-    );
-  }
-
-  Container _title(String title) {
-    return Container(
-      height: 30,
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
-      color: StaticColors.blackLightColor,
-      child: MyCustomText(
-        title,
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-      ),
     );
   }
 }

@@ -12,6 +12,7 @@ class Preferences {
   static const String IS_USER_SIGNIN = 'is_user_signin';
   static const String KEY_IS_ACTIVER_EXPERT = 'is_active_Expert';
   static const String KEY_IS_LIGHT = 'is_light';
+  static const String CURRENTER_PRINTER = 'currenterPrinter';
 
   ///  ====== init pref ============
   static Future<void> init() async {
@@ -31,6 +32,10 @@ class Preferences {
   /// ACCESS_TOKEN
   static String get accessToken => preferences.getString(ACCESS_TOKEN) ?? '';
   static set accessToken(String value) => preferences.setString(ACCESS_TOKEN, value);
+
+  /// currenterPrinter
+  static String get currenterPrinter => preferences.getString(CURRENTER_PRINTER) ?? '';
+  static set currenterPrinter(String value) => preferences.setString(CURRENTER_PRINTER, value);
 
   /// CLOCK_IN_ID
   static String get clockInId => preferences.getString(CLOCK_IN_ID) ?? '';

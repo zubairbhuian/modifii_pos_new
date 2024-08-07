@@ -8,7 +8,9 @@ class OrderModel {
     this.totalOrderAmount = 0,
     this.subTotal = 0,
     this.tableId = "",
+    this.tableName = "",
     this.employeeId = "",
+    this.employeeName = "",
     this.numberOfPeople = 1,
     this.paymentStatus = "",
     this.paymentMethod = "",
@@ -21,7 +23,7 @@ class OrderModel {
     this.employee,
     this.table,
     this.id = "",
-    this.orderId,
+    this.orderId="",
     this.orderNote = "",
     this.tip = 0,
     this.refund = false,
@@ -36,7 +38,9 @@ class OrderModel {
   num totalOrderAmount;
   num subTotal;
   String tableId;
+  String tableName;
   String employeeId;
+  String employeeName;
   int numberOfPeople;
   String paymentStatus;
   String paymentMethod;
@@ -50,7 +54,7 @@ class OrderModel {
   Table? table;
   Employee? employee;
   final DateTime? createdAt;
-  final String? orderId;
+  String orderId;
   final num tip;
   final bool refund;
   final bool recall;
@@ -109,6 +113,7 @@ class OrderModel {
         "addOn": addOn,
         "orderNote": orderNote,
         "subTotal": subTotal,
+        "guestPhoneNumber": guestPhoneNumber,
       };
 }
 

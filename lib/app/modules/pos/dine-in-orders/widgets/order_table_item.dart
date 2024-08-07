@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_base/app/modules/pos/controllers/orders_controller.dart';
-import 'package:flutter_base/app/modules/pos/dine-in-orders/widgets/printers_list_dialog.dart';
+import 'package:flutter_base/app/modules/pos/dine-in-orders/widgets/print/printers_list_dialog.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/controllers/dine_in_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/views/order_details_view.dart';
 import 'package:flutter_base/app/modules/pos/order/controllers/order_controller.dart';

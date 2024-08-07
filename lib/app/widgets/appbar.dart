@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_base/app/modules/clockIn/controllers/clock_in_controller.dart';
 import 'package:flutter_base/app/modules/pos/controllers/pos_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/views/order_details_view.dart';
+import 'package:flutter_base/app/modules/pos/order/controllers/order_controller.dart';
 import 'package:flutter_base/app/services/controller/base_controller.dart';
 import 'package:flutter_base/app/services/controller/config_controller.dart';
 import 'package:flutter_base/app/utils/static_colors.dart';
@@ -13,6 +14,8 @@ import 'package:flutter_base/app/widgets/popup_dialogs.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import '../modules/pos/controllers/orders_controller.dart';
+import '../modules/pos/dine-in-orders/widgets/print/printers_list_dialog.dart';
 import '../routes/app_pages.dart';
 import 'custom_inkwell.dart';
 
@@ -256,13 +259,23 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 child: PrimaryBtn(
                   onPressed: () async {
                     await ClockInController.to.clockOut();
-                    BaseController.to.logout();
+                    // BaseController.to.logout();
                   },
                   text: 'Logout',
                   textColor: Colors.white,
                   color: StaticColors.redColor,
                 ),
               ),
+              const SizedBox(width: 18),
+              PrimaryBtnWithChild(
+                  width: 48,
+                  height: 48,
+                  textColor: Colors.white,
+                  color: StaticColors.redColor,
+                  child: const Icon(Icons.settings),
+                  onPressed: () {
+                    OrdersController.to.printReceipt();
+                  })
             ],
           ),
 

@@ -4,19 +4,24 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_base/app/modules/pos/dine-in-orders/controllers/dine_in_order_controller.dart';
+import 'package:flutter_base/app/modules/pos/dine-in-orders/widgets/print/item_print_receipt.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/controllers/dine_in_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/models/table_model.dart';
 import 'package:flutter_base/app/modules/pos/order/models/order_model.dart';
 import 'package:flutter_base/app/modules/pos/order/models/order_place_model.dart';
 import 'package:flutter_base/app/modules/pos/order/models/product_model.dart';
 import 'package:flutter_base/app/modules/pos/order/models/variation_model.dart';
+import 'package:flutter_base/app/services/base/preferences.dart';
 import 'package:flutter_base/app/services/controller/base_controller.dart';
 import 'package:flutter_base/app/utils/logger.dart';
 import 'package:flutter_base/app/utils/my_func.dart';
+import 'package:flutter_base/app/utils/print_utils.dart';
 import 'package:flutter_base/app/utils/urls.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
+import 'package:printing/printing.dart';
 import '../../../widgets/popup_dialogs.dart';
+import '../dine-in-orders/widgets/print/order_print_receipt.dart';
 import '../order/models/main_category_model.dart';
 
 class PosController extends GetxController {
@@ -39,8 +44,12 @@ class PosController extends GetxController {
   TableModel? currentTable;
   void updateTableName(TableModel table) {
     currentTable = table;
+
     tableController = TextEditingController(text: table.tableName);
     myOrder.tableId = table.id;
+    myOrder.tableName = table.tableName;
+    // Todo : need to delete it
+    myOrder.employeeName = "Zubair";
     changeFocusToGuest();
     update();
   }
@@ -298,6 +307,7 @@ class PosController extends GetxController {
     } else if (myOrder.carts.isEmpty) {
       PopupDialog.showErrorMessage("Minimum one order is required");
     } else {
+      myOrder.orderId = MyFunc.generateRandomNumericId().toString();
       myOrder.orderType = orderType;
       myOrder.orderStatus = orderStatus;
       myOrder.paymentStatus = paymentStatus;
@@ -305,7 +315,19 @@ class PosController extends GetxController {
       var res = await BaseController.to.apiService
           .makePostRequest(URLS.placeOrder, myOrder.toJson());
       PopupDialog.closeLoadingDialog();
+      final image = await imageFromAssetBundle('assets/images/app_icon.png');
       if (res.statusCode == 201) {
+        final printerName = Preferences.currenterPrinter;
+        if (printerName.isNotEmpty) {
+          await PrintUtils().directPrint(
+              child: itemPrintReceipt(order: myOrder),
+              printerName: printerName);
+          await PrintUtils().directPrint(
+              child: orderPrintReceipt(image, order: myOrder),
+              printerName: printerName);
+        } else {
+          PopupDialog.showErrorMessage("You need to select printer first");
+        }
         clearCartList();
         PopupDialog.showSuccessDialog(res.data["message"]);
         DineInOrderController.to.getAllOrders();

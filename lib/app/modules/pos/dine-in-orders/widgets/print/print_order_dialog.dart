@@ -2,7 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_base/app/modules/pos/order/models/order_model.dart';
+import 'package:flutter_base/app/services/base/preferences.dart';
+import 'package:flutter_base/app/utils/my_func.dart';
+import 'package:flutter_base/app/utils/print_utils.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
+import 'package:flutter_base/app/widgets/popup_dialogs.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
@@ -26,27 +30,18 @@ class PrintOrderDialog extends StatelessWidget {
           children: [
             PrimaryBtn(
               onPressed: () async {
-                final pdf = pw.Document();
-                final image =
-                    await imageFromAssetBundle('assets/images/app_icon.png');
-                // Define the PDF page
-                pdf.addPage(
-                  pw.Page(
-                    pageFormat: const PdfPageFormat(
-                        70 * PdfPageFormat.mm, double.infinity),
-                    build: (pw.Context context) {
-                      return pw.Center(
-                        child: orderPrintReceipt(image, order: order),
-                      ); // Center
-                    },
-                  ),
-                );
-                // Directly print the PDF
-                await Printing.directPrintPdf(
-                  printer: const Printer(url: "XP-80C"),
-                  onLayout: (PdfPageFormat format) async => pdf.save(),
-                );
-                Get.back();
+                final printerName = Preferences.currenterPrinter;
+                if (printerName.isNotEmpty) {
+                  final image =
+                      await imageFromAssetBundle('assets/images/app_icon.png');
+                  await PrintUtils().directPrint(
+                      child: orderPrintReceipt(image, order: order),
+                      printerName: printerName);
+                  Get.back();
+                } else {
+                  PopupDialog.showErrorMessage(
+                      "You need to select printer first");
+                }
               },
               text: " Customer Copy",
               textColor: Colors.white,
@@ -54,28 +49,19 @@ class PrintOrderDialog extends StatelessWidget {
             const SizedBox(width: 6),
             PrimaryBtn(
               onPressed: () async {
-                final pdf = pw.Document();
-                final image =
-                    await imageFromAssetBundle('assets/images/app_icon.png');
-                // Define the PDF page
-                pdf.addPage(
-                  pw.Page(
-                    pageFormat: const PdfPageFormat(
-                        70 * PdfPageFormat.mm, double.infinity),
-                    build: (pw.Context context) {
-                      return pw.Center(
-                        child: orderPrintReceipt(image,
-                            isCustomerCopy: false, order: order),
-                      ); // Center
-                    },
-                  ),
-                );
-                // Directly print the PDF
-                await Printing.directPrintPdf(
-                  printer: const Printer(url: "XP-80C"),
-                  onLayout: (PdfPageFormat format) async => pdf.save(),
-                );
-                Get.back();
+                final printerName = Preferences.currenterPrinter;
+                if (printerName.isNotEmpty) {
+                  final image =
+                      await imageFromAssetBundle('assets/images/app_icon.png');
+                  await PrintUtils().directPrint(
+                      child: orderPrintReceipt(image,
+                          isCustomerCopy: false, order: order),
+                      printerName: printerName);
+                  Get.back();
+                } else {
+                  PopupDialog.showErrorMessage(
+                      "You need to select printer first");
+                }
               },
               text: " Merchant Copy",
               textColor: Colors.white,
@@ -248,7 +234,7 @@ class PrintOrderDialog extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             Text(
-              "\$${order.subTotal}",
+              "\$${order.subTotal.toStringAsFixed(2)}",
               style: theme.textTheme.labelLarge
                   ?.copyWith(fontWeight: FontWeight.w700),
               textAlign: TextAlign.center,
@@ -266,7 +252,7 @@ class PrintOrderDialog extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             Text(
-              "\$${order.totalGst}",
+              "\$${order.totalGst.toStringAsFixed(2)}",
               style: theme.textTheme.labelLarge
                   ?.copyWith(fontWeight: FontWeight.w700),
               textAlign: TextAlign.center,
@@ -286,7 +272,7 @@ class PrintOrderDialog extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               Text(
-                "\$${order.totalPst}",
+                "\$${order.totalPst.toStringAsFixed(2)}",
                 style: theme.textTheme.labelLarge
                     ?.copyWith(fontWeight: FontWeight.w700),
                 textAlign: TextAlign.center,
@@ -307,7 +293,7 @@ class PrintOrderDialog extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               Text(
-                "\$${order.totalGratuity}",
+                "\$${order.totalGratuity.toStringAsFixed(2)}",
                 style: theme.textTheme.labelLarge
                     ?.copyWith(fontWeight: FontWeight.w700),
                 textAlign: TextAlign.center,
@@ -328,7 +314,7 @@ class PrintOrderDialog extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               Text(
-                "\$${order.tip}",
+                "\$${order.tip.toStringAsFixed(2)}",
                 style: theme.textTheme.labelLarge
                     ?.copyWith(fontWeight: FontWeight.w700),
                 textAlign: TextAlign.center,
@@ -350,7 +336,7 @@ class PrintOrderDialog extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               Text(
-                "\$${order.totalDiscount}",
+                "\$${order.totalDiscount.toStringAsFixed(2)}",
                 style: theme.textTheme.labelLarge
                     ?.copyWith(fontWeight: FontWeight.w700),
                 textAlign: TextAlign.center,
@@ -369,7 +355,7 @@ class PrintOrderDialog extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             Text(
-              "\$${order.totalOrderAmount}",
+              "\$${MyFunc.yogotRound(order.totalOrderAmount).toStringAsFixed(2)}",
               style: theme.textTheme.labelLarge
                   ?.copyWith(fontWeight: FontWeight.w800),
               textAlign: TextAlign.center,

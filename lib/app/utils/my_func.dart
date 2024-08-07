@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_base/app/utils/static_colors.dart';
 
@@ -85,4 +87,11 @@ class MyFunc {
     num roundToNearest = 0.05;
     return (value / roundToNearest).ceil() * roundToNearest;
   }
+
+  static int generateRandomNumericId() {
+  Random random = Random();
+  int min = 100000;
+  int max = 999999;
+  return min + random.nextInt(max - min);
+}
 }

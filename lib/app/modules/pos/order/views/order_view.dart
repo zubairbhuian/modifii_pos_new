@@ -374,6 +374,23 @@ class OrderView extends GetView<PosController> {
                 value: "\$${controller.myOrder.totalPst.toStringAsFixed(2)}",
               ),
             ),
+            Visibility(
+              visible: controller.myOrder.tip > 0,
+              child: _row(
+                theme,
+                title: "Tip : ",
+                value: "\$${controller.myOrder.tip.toStringAsFixed(2)}",
+              ),
+            ),
+            Visibility(
+              visible: controller.myOrder.totalDiscount > 0,
+              child: _row(
+                theme,
+                title: "Discount : ",
+                value:
+                    "\$${controller.myOrder.totalDiscount.toStringAsFixed(2)}",
+              ),
+            ),
             const Divider(),
             _row(
               theme,
