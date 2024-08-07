@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_base/app/modules/pos/controllers/orders_controller.dart';
 import 'package:flutter_base/app/modules/pos/controllers/pos_controller.dart';
+import 'package:flutter_base/app/modules/pos/dine-in-orders/widgets/print/print_order_dialog.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/controllers/dine_in_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/views/split_order_view.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/widgets/dialogs/discount_dialog.dart';
@@ -71,6 +72,19 @@ class OrderDetailsView extends GetView<DineInController> {
                       PrimaryBtn(
                         width: btnSize,
                         height: height,
+                        onPressed: () {
+                          Get.back();
+                          PosController.to.onchangePage(0);
+                        },
+                        color: StaticColors.greenColor,
+                        textColor: Colors.white,
+                        text: 'pos'.toUpperCase(),
+                        textMaxSize: textMaxSize,
+                        textMinSize: textMinSize,
+                      ),
+                      PrimaryBtn(
+                        width: btnSize,
+                        height: height,
                         textMaxSize: textMaxSize,
                         textMinSize: textMinSize,
                         onPressed: () {
@@ -88,7 +102,7 @@ class OrderDetailsView extends GetView<DineInController> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 6, vertical: 10),
                         color: theme.primaryColor,
-                      ),
+                      ).marginOnly(left: 12),
                       PrimaryBtn(
                         onPressed: () {},
                         width: btnSize,
@@ -139,8 +153,7 @@ class OrderDetailsView extends GetView<DineInController> {
                         textMinSize: textMinSize,
                         onPressed: () {
                           PopupDialog.customDialog(
-                              width: 700,
-                              child: const DiscountDialog());
+                              width: 700, child: const DiscountDialog());
                         },
                         // width: double.infinity,
                         text: 'Discount'.toUpperCase(),
@@ -157,7 +170,17 @@ class OrderDetailsView extends GetView<DineInController> {
                         height: height,
                         textMaxSize: textMaxSize,
                         textMinSize: textMinSize,
-                        onPressed: () {},
+                        onPressed: () {
+                          PopupDialog.customDialog(
+                              width: 435,
+                              topLavel: Text(
+                                "Print Invoice",
+                                style: theme.textTheme.labelMedium,
+                              ),
+                              child: PrintOrderDialog(
+                                order: controller.myOrder,
+                              ));
+                        },
                         // width: double.infinity,
                         text: 'Print Check'.toUpperCase(),
 
@@ -296,21 +319,32 @@ class OrderDetailsView extends GetView<DineInController> {
                         style: theme.textTheme.bodyLarge,
                       ),
                     ),
-                    Row(
-                      children: [
-                        Text(
-                          'Unpaid',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: theme.disabledColor),
-                        ),
-                        Switch(
-                          value: false,
-                          onChanged: (value) {},
-                          splashRadius: 12,
-                        )
-                      ],
-                    ).marginOnly(left: 10)
+                    GetBuilder<PosController>(builder: (controller) {
+                      return Row(
+                        children: [
+                          Text(
+                            'Unpaid',
+                            style: theme.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: theme.disabledColor),
+                          ),
+                          Switch(
+                            value: controller.myOrder.paymentStatus == "UNPAID"
+                                ? false
+                                : true,
+                            onChanged: (value) async {
+                              controller.myOrder.paymentStatus == "PAID";
+
+                              PopupDialog.showLoadingDialog();
+                              await controller
+                                  .onUpdateOrder(controller.myOrder.orderId);
+                              PopupDialog.closeLoadingDialog();
+                            },
+                            splashRadius: 12,
+                          )
+                        ],
+                      ).marginOnly(left: 10);
+                    })
                   ],
                 ),
               )
@@ -533,6 +567,38 @@ class OrderDetailsView extends GetView<DineInController> {
               fontSize: 16,
               value: "\$ ${data.totalGst.toStringAsFixed(2)}",
               fontWeight: FontWeight.w500),
+          Visibility(
+            visible: data.totalGratuity > 0,
+            child: _row(
+              theme,
+              title: "Gratuity 18% : ",
+              value: "\$${data.totalGratuity.toStringAsFixed(2)}",
+            ),
+          ),
+          Visibility(
+            visible: data.totalPst > 0,
+            child: _row(
+              theme,
+              title: "PST 10% : ",
+              value: "\$${data.totalPst.toStringAsFixed(2)}",
+            ),
+          ),
+          Visibility(
+            visible: data.tip > 0,
+            child: _row(
+              theme,
+              title: "Tip : ",
+              value: "\$${data.tip.toStringAsFixed(2)}",
+            ),
+          ),
+          Visibility(
+            visible: data.totalDiscount > 0,
+            child: _row(
+              theme,
+              title: "Discount : ",
+              value: "\$${data.totalDiscount.toStringAsFixed(2)}",
+            ),
+          ),
           _row(theme,
               title: "Total :",
               value: "\$ ${data.totalOrderAmount.toStringAsFixed(2)}",

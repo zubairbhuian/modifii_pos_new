@@ -61,7 +61,21 @@ class TopMenu extends GetView<PosController> {
             padding: EdgeInsets.zero,
             color: StaticColors.greenColor,
             textColor: Colors.white,
-            text: 'Dine-in/\nTAKEOUT'.toUpperCase(),
+            text: 'Dine-in'.toUpperCase(),
+            textMaxSize: txtMaxSize,
+            textMinSize: txtMinSize,
+          ),
+          const SizedBox(width: 10),
+          PrimaryBtn(
+            width: width,
+            height: height,
+            onPressed: () {
+              PosController.to.onchangePage(3);
+            },
+            padding: EdgeInsets.zero,
+            color: StaticColors.greenColor,
+            textColor: Colors.white,
+            text: 'TAKEOUT'.toUpperCase(),
             textMaxSize: txtMaxSize,
             textMinSize: txtMinSize,
           ),

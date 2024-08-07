@@ -1,4 +1,5 @@
 import 'package:flutter_base/app/modules/pos/order/models/order_model.dart';
+import 'package:flutter_base/app/utils/my_func.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -61,7 +62,8 @@ pw.Widget orderPrintReceipt(dynamic image,
           pw.SizedBox(width: 6.0),
           pw.Expanded(
               child: pw.Text(
-            DateFormat("MMM.dd,yy;hh:mma").format(order.createdAt!),
+            DateFormat("MMM.dd,yy;hh:mma")
+                .format(order.createdAt ?? DateTime.now()),
             style: bodyStyle,
           )),
         ],
@@ -70,7 +72,8 @@ pw.Widget orderPrintReceipt(dynamic image,
       pw.Row(
         children: [
           pw.Expanded(
-              child: pw.Text('Server: ${order.employee?.firstName}',
+              child: pw.Text(
+                  'Server: ${order.employee?.firstName ?? order.employeeName}',
                   style: bodyStyle)),
           pw.SizedBox(width: 10.0),
           pw.Expanded(child: pw.Text('Station: 1', style: bodyStyle)),
@@ -125,7 +128,8 @@ pw.Widget orderPrintReceipt(dynamic image,
         children: [
           pw.Text('Sub total', style: titleSmallStyle),
           pw.SizedBox(width: 6),
-          pw.Text('\$${order.subTotal}', style: titleSmallStyle),
+          pw.Text('\$${order.subTotal.toStringAsFixed(2)}',
+              style: titleSmallStyle),
         ],
       ),
       // GST
@@ -134,7 +138,8 @@ pw.Widget orderPrintReceipt(dynamic image,
         children: [
           pw.Text('GST 5%', style: titleSmallStyle),
           pw.SizedBox(width: 10.0),
-          pw.Text('\$${order.totalGst}', style: titleSmallStyle),
+          pw.Text('\$${order.totalGst.toStringAsFixed(2)}',
+              style: titleSmallStyle),
         ],
       ),
       //PST
@@ -144,7 +149,8 @@ pw.Widget orderPrintReceipt(dynamic image,
           children: [
             pw.Text('PST 10%', style: titleSmallStyle),
             pw.SizedBox(width: 10.0),
-            pw.Text('\$${order.totalPst}', style: titleSmallStyle),
+            pw.Text('\$${order.totalPst.toStringAsFixed(2)}',
+                style: titleSmallStyle),
           ],
         ),
       // ****** Gratuity ******
@@ -154,7 +160,8 @@ pw.Widget orderPrintReceipt(dynamic image,
           children: [
             pw.Text('Gratuity 18%', style: titleSmallStyle),
             pw.SizedBox(width: 10.0),
-            pw.Text('\$${order.totalGratuity}', style: titleSmallStyle),
+            pw.Text('\$${order.totalGratuity.toStringAsFixed(2)}',
+                style: titleSmallStyle),
           ],
         ),
       // ****** Tip ******
@@ -164,7 +171,8 @@ pw.Widget orderPrintReceipt(dynamic image,
           children: [
             pw.Text('Tip', style: titleSmallStyle),
             pw.SizedBox(width: 10.0),
-            pw.Text('\$${order.tip}', style: titleSmallStyle),
+            pw.Text('\$${order.tip.toStringAsFixed(2)}',
+                style: titleSmallStyle),
           ],
         ),
       // ****** Discount ******
@@ -174,17 +182,10 @@ pw.Widget orderPrintReceipt(dynamic image,
           children: [
             pw.Text('Discount (-)', style: titleSmallStyle),
             pw.SizedBox(width: 10.0),
-            pw.Text('\$${order.totalDiscount}', style: titleSmallStyle),
+            pw.Text('\$${order.totalDiscount.toStringAsFixed(2)}',
+                style: titleSmallStyle),
           ],
         ),
-      pw.Row(
-        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-        children: [
-          pw.Text('Tip', style: titleSmallStyle),
-          pw.SizedBox(width: 10.0),
-          pw.Text('\$5.00', style: titleSmallStyle),
-        ],
-      ),
       pw.Row(
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [
@@ -194,7 +195,8 @@ pw.Widget orderPrintReceipt(dynamic image,
                 fontWeight: pw.FontWeight.bold,
               )),
           pw.SizedBox(width: 10.0),
-          pw.Text('\$${order.totalOrderAmount}',
+          pw.Text(
+              '\$${MyFunc.yogotRound(order.totalOrderAmount).toStringAsFixed(2)}',
               style: pw.TextStyle(
                 fontSize: 11,
                 fontWeight: pw.FontWeight.bold,
