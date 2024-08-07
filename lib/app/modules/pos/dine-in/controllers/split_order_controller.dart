@@ -14,6 +14,8 @@ class SplitOrderController extends GetxController {
   //split by amount
   TextEditingController noOfGuestTEC = TextEditingController();
   TextEditingController totalAmountTEC = TextEditingController();
+  int guestCounter = 0; //default guest name.
+
   int splitCheckCount = 0;
   updateSplitCheckCount(int value) {
     splitCheckCount = value;
@@ -31,8 +33,10 @@ class SplitOrderController extends GetxController {
   updateSelectedItems(CartModel item) {
     if (selectedItems.carts.contains(item)) {
       selectedItems.carts.remove(item);
+      guestCounter--;
     } else {
       selectedItems.carts.add(item);
+      guestCounter++;
     }
     calculateSelectedAmount(selectedItems.carts);
 
@@ -43,6 +47,7 @@ class SplitOrderController extends GetxController {
       totalGratuity: selectedGratuity,
       subTotal: selectedSubtotal,
       totalOrderAmount: selectedTotal,
+      userName: 'Guest $guestCounter',
     );
     update();
   }
@@ -60,6 +65,15 @@ class SplitOrderController extends GetxController {
     }
   }
 
+  TextEditingController guestNameTEC = TextEditingController();
+  void updateGuestName(int index) {
+    listOfSpitChecksByItems[index].userName = guestNameTEC.text.trim();
+    update();
+    Get.back();
+    guestNameTEC.clear();
+  }
+
+  //amount calculations
   num mainGST = 0;
   num mainPST = 0;
   num mainGratuity = 0;
@@ -145,6 +159,7 @@ class SplitOrderController extends GetxController {
     listOfSpitChecksByItems.clear();
     splitCheckCount = 0;
     isSplitByAmount = null;
+    guestCounter = 0;
     update();
   }
 

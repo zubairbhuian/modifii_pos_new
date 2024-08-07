@@ -320,13 +320,16 @@ class SplitOrderView extends GetView<DineInController> {
                               Row(
                                 children: [
                                   Text(
-                                    '${order.orderType.replaceAll('_', '-')}: Guest ${c.listOfSpitChecksByItems[index].userName}',
+                                    '${order.orderType.replaceAll('_', '-')}: ${c.listOfSpitChecksByItems[index].userName}',
                                     style: theme.textTheme.titleSmall,
                                   ),
                                   const SizedBox(width: 12.0),
                                   PrimaryBtn(
                                     onPressed: () {
-                                      //TODO: update guest name
+                                      SplitDialogs.guestName(
+                                        guestController: c.guestNameTEC,
+                                        onTap: () => c.updateGuestName(index),
+                                      );
                                     },
                                     height: 32,
                                     text: 'Update Name',
