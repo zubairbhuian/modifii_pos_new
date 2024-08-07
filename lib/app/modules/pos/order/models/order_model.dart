@@ -1,13 +1,16 @@
 class OrderModel {
   OrderModel({
     List<CartModel>? carts,
-    this.userName = "",
+    this.guestName = "",
+    this.guestPhoneNumber = "",
     this.orderType = "",
     this.orderStatus = "",
     this.totalOrderAmount = 0,
     this.subTotal = 0,
     this.tableId = "",
+    this.tableName = "",
     this.employeeId = "",
+    this.employeeName = "",
     this.numberOfPeople = 1,
     this.paymentStatus = "",
     this.paymentMethod = "",
@@ -20,18 +23,24 @@ class OrderModel {
     this.employee,
     this.table,
     this.id = "",
-    this.orderId,
+    this.orderId="",
     this.orderNote = "",
+    this.tip = 0,
+    this.refund = false,
+    this.recall = false,
   }) : carts = carts ?? [];
 
   List<CartModel> carts;
-  String userName;
+  String guestName;
+  String guestPhoneNumber;
   String orderType;
   String orderStatus;
   num totalOrderAmount;
   num subTotal;
   String tableId;
+  String tableName;
   String employeeId;
+  String employeeName;
   int numberOfPeople;
   String paymentStatus;
   String paymentMethod;
@@ -41,11 +50,14 @@ class OrderModel {
   num totalDiscount;
   num addOn;
   String orderNote;
-  final String id;
-  final Table? table;
-  final Employee? employee;
+  String id;
+  Table? table;
+  Employee? employee;
   final DateTime? createdAt;
-  final String? orderId;
+  String orderId;
+  final num tip;
+  final bool refund;
+  final bool recall;
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
     return OrderModel(
@@ -53,7 +65,8 @@ class OrderModel {
           ? []
           : List<CartModel>.from(
               json["carts"]!.map((x) => CartModel.fromJson(x))),
-      userName: json["userName"] ?? "",
+      guestName: json["guestName"] ?? "",
+      guestPhoneNumber: json["guestPhoneNumber"] ?? "",
       orderType: json["orderType"] ?? "",
       orderStatus: json["orderStatus"] ?? "",
       totalOrderAmount: json["totalOrderAmount"] ?? 0,
@@ -69,6 +82,11 @@ class OrderModel {
       addOn: json["addOn"] ?? 0,
       id: json["id"] ?? "",
       orderId: json["orderId"],
+      subTotal: json["subTotal"],
+      //todo need to uocomment tip
+      // tip: json["tip"] ?? 0,
+      refund: json["refund"] ?? false,
+      recall: json["recall"] ?? false,
       createdAt: DateTime.tryParse(json["createdAt"] ?? ""),
       orderNote: json["orderNote"] ?? "",
       table: json["table"] == null ? null : Table.fromJson(json["table"]),
@@ -79,7 +97,7 @@ class OrderModel {
 
   Map<String, dynamic> toJson() => {
         "carts": carts.map((x) => x.toJson()).toList(),
-        "userName": userName,
+        "guestName": guestName,
         "orderType": orderType,
         "orderStatus": orderStatus,
         "totalOrderAmount": totalOrderAmount,
@@ -94,6 +112,8 @@ class OrderModel {
         "totalDiscount": totalDiscount,
         "addOn": addOn,
         "orderNote": orderNote,
+        "subTotal": subTotal,
+        "guestPhoneNumber": guestPhoneNumber,
       };
 }
 

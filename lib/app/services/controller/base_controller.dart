@@ -21,7 +21,7 @@ class BaseController extends GetxController {
   set token(String token) => Preferences.accessToken = token;
 
   void logout() {
-    Preferences.clear();
+    // Preferences.clear();
   }
 
   void playTapSound() {

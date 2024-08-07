@@ -4,7 +4,7 @@ import '../../../utils/logger.dart';
 import '../../../utils/urls.dart';
 import 'package:printing/printing.dart';
 import '../order/models/dine_in_order_model.dart';
-import '../dine-in-orders/widgets/printers_list_dialog.dart';
+import '../dine-in-orders/widgets/print/printers_list_dialog.dart';
 
 class OrdersController extends GetxController {
   static OrdersController get to => Get.find();

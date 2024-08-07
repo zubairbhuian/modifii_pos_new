@@ -38,6 +38,7 @@ class CustomTextField extends StatelessWidget {
   final double? marginBottom;
   final bool isFilled;
   final double? borderRadius;
+  final String? prefixText;
 
   const CustomTextField({
     super.key,
@@ -73,6 +74,7 @@ class CustomTextField extends StatelessWidget {
     this.borderRadius,
     this.isFilled = false,
     this.focusNode,
+    this.prefixText
   });
 
   @override
@@ -133,6 +135,7 @@ class CustomTextField extends StatelessWidget {
                 const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             // ********** prefixIcon ********
             prefixIcon: prefixIcon,
+            prefixText: prefixText,
             // ********** suffixIcon ********
             suffixIcon: suffixIcon,
             // ********** border ********

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_base/app/modules/pos/controllers/tables_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in-orders/controllers/dine_in_order_controller.dart';
+import 'package:flutter_base/app/modules/pos/dine-in-orders/widgets/order_table_header.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
 import 'package:flutter_base/app/widgets/no_data_found.dart';
 import 'package:flutter_base/app/widgets/popup_dialogs.dart';
@@ -17,6 +18,7 @@ import '../../../../widgets/custom_textfield.dart';
 import '../../../../widgets/my_custom_text.dart';
 import '../../controllers/orders_controller.dart';
 import '../widgets/order_table_data_row.dart';
+import '../widgets/order_table_item.dart';
 
 class TableOrdersList extends GetView<DineInOrderController> {
   const TableOrdersList({super.key});
@@ -50,358 +52,24 @@ class TableOrdersList extends GetView<DineInOrderController> {
   }
 
   Widget _orderTable(ThemeData theme, BuildContext context) {
-    const double titleFontSize = 16;
-    // const double contentFontSize = 14;
     return Column(
       children: [
-        Container(
-          decoration: BoxDecoration(
-            border: Border.symmetric(
-              horizontal: BorderSide(
-                width: 2,
-                color: theme.colorScheme.background,
-              ),
-            ),
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          margin: const EdgeInsets.only(bottom: 28),
-          child: const Row(
-            children: [
-              Expanded(
-                  child: MyCustomText(
-                'No',
-                fontSize: titleFontSize,
-                fontWeight: FontWeight.w600,
-              )),
-              SizedBox(width: 4.0),
-              Expanded(
-                  child: MyCustomText(
-                'Table No.',
-                fontSize: titleFontSize,
-                fontWeight: FontWeight.w600,
-              )),
-              SizedBox(width: 4.0),
-              Expanded(
-                  flex: 1,
-                  child: MyCustomText(
-                    'User Name',
-                    fontSize: titleFontSize,
-                    fontWeight: FontWeight.w600,
-                  )),
-              SizedBox(width: 4.0),
-              Expanded(
-                  child: MyCustomText(
-                'Auth Code',
-                fontSize: titleFontSize,
-                fontWeight: FontWeight.w600,
-              )),
-              SizedBox(width: 4.0),
-              Expanded(
-                  flex: 2,
-                  child: MyCustomText(
-                    'Order Date',
-                    fontSize: titleFontSize,
-                    fontWeight: FontWeight.w600,
-                  )),
-              SizedBox(width: 4.0),
-              Expanded(
-                  child: MyCustomText(
-                'Order Type',
-                fontSize: titleFontSize,
-                fontWeight: FontWeight.w600,
-              )),
-              SizedBox(width: 4.0),
-              Expanded(
-                  child: MyCustomText(
-                'Order Status',
-                fontSize: titleFontSize,
-                fontWeight: FontWeight.w600,
-              )),
-              SizedBox(width: 4.0),
-              Expanded(
-                  child: MyCustomText(
-                'Total Amount',
-                fontSize: titleFontSize,
-                fontWeight: FontWeight.w600,
-              )),
-              SizedBox(width: 4.0),
-              Expanded(
-                  child: MyCustomText(
-                'Actions',
-                fontSize: titleFontSize,
-                fontWeight: FontWeight.w600,
-              )),
-            ],
-          ),
-        ),
+        const OrderTableHeader(),
         GetBuilder<DineInOrderController>(builder: (controller) {
           return Column(
             children: List.generate(
               controller.orderList.length,
               (index) {
                 var order = controller.orderList[index];
-                if (controller.orderList.isEmpty) {
-                  return Container(
-                    width: 200,
-                    color: Colors.red,
-                    height: 23,
-                  );
-                }
-                return OrderTableDataRow(
-                  onOrderDetails: () {
-                    // TablesController.to.updateIsShowOrderDetails(true);
-                  },
-                  onPrint: () {
-                    customAlertDialog(
-                      contentPadding: const EdgeInsets.all(12),
-                      context: context,
-                      child: _printReceipt(),
-                    );
-                  },
-                  id: order.id,
-                  sl: index + 1,
-                  tableNo: order.table?.tableName ?? "",
-
-                  userName: "${order.employee?.firstName}",
-                  orderId: "${order.orderId}",
-                  orderDateTime: DateFormat('MMM d, yyyy h:mm a')
-                      .format(order.createdAt ?? DateTime.now()),
-
-                  // authCode: order.authorizationCode ?? 'null',
-                  // orderId: order.id ?? 0,
-                  // orderDateTime:
-                  //     '${order..toString().split(' ').first} ${order.deliveryTime}',
-                  orderType: order.orderType,
-                  orderStatus: order.orderStatus,
-                  totalAmount: order.totalOrderAmount.toDouble(),
-                  paymetStatus: order.paymentStatus,
+                return OrderTableItem(
+                  order: order,
+                  no: "${index + 1}",
                 );
               },
             ),
           );
         }),
       ],
-    );
-  }
-
-  Widget _printReceipt() {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const MyCustomText(
-                'Print Invoice',
-                fontWeight: FontWeight.w600,
-              ),
-              IconButton(
-                  onPressed: Get.back,
-                  icon: const Icon(
-                    FontAwesomeIcons.xmark,
-                    size: 14,
-                  ))
-            ],
-          ),
-          GetBuilder<OrdersController>(builder: (c) {
-            return Row(
-              children: [
-                const Expanded(
-                  child: SizedBox(),
-                  // child: PrimaryBtn(
-                  //     onPressed: () {},
-                  //     text: 'Customer Copy',
-                  //     textColor: Colors.white),
-                ),
-                const SizedBox(width: 6.0),
-                const Expanded(
-                  child: SizedBox(),
-                  // child: PrimaryBtn(
-                  //     onPressed: () {},
-                  //     text: 'Marchent Copy',
-                  //     textColor: Colors.white),
-                ),
-                const SizedBox(width: 6.0),
-                Expanded(
-                  child: PrimaryBtn(
-                      onPressed: () async {
-                        c.printReceipt();
-                      },
-                      text: 'Print Both',
-                      textColor: Colors.white),
-                ),
-                const SizedBox(width: 6.0),
-              ],
-            );
-          }),
-          Divider(
-            color: Colors.grey.shade400,
-            height: 30,
-          ),
-          SvgPicture.asset(
-            'assets/images/splash/login_logo.svg',
-            height: 100,
-          ),
-          const MyCustomText(
-            '7488 King George Blvd.',
-            fontWeight: FontWeight.w600,
-            height: 2,
-          ),
-          const MyCustomText(
-            'Unit 350, Surrey, B.C. V3W 0H9',
-            fontWeight: FontWeight.w600,
-          ),
-          const MyCustomText(
-            'Phone: 604-706-0109',
-            fontWeight: FontWeight.w600,
-            height: 3,
-          ),
-          const Divider(color: Colors.black54),
-          const SizedBox(height: 10.0),
-          const Row(
-            children: [
-              Expanded(child: MyCustomText('Order: 100089')),
-              SizedBox(width: 10.0),
-              Expanded(child: MyCustomText('Jun.04,24;11:04am')),
-            ],
-          ),
-          const SizedBox(height: 6.0),
-          const Row(
-            children: [
-              Expanded(child: MyCustomText('Server: Haveli')),
-              SizedBox(width: 10.0),
-              Expanded(child: MyCustomText('Station: 1')),
-            ],
-          ),
-          const SizedBox(height: 6.0),
-          const Row(
-            children: [
-              Expanded(child: MyCustomText('Table: 23')),
-              SizedBox(width: 10.0),
-              Expanded(child: MyCustomText('Guests: 3')),
-            ],
-          ),
-          const SizedBox(height: 6.0),
-          const Row(
-            children: [
-              Expanded(child: MyCustomText('Server: Haveli')),
-              SizedBox(width: 10.0),
-              Expanded(child: MyCustomText('Station: 1')),
-            ],
-          ),
-          const SizedBox(height: 6.0),
-          const Row(
-            children: [
-              Expanded(child: MyCustomText('Type: Dine-In')),
-              SizedBox(width: 10.0),
-              Expanded(child: MyCustomText('')),
-            ],
-          ),
-          const SizedBox(height: 16.0),
-          const Row(
-            children: [
-              Expanded(flex: 1, child: MyCustomText('QTY', fontSize: 18)),
-              SizedBox(width: 10.0),
-              Expanded(flex: 3, child: MyCustomText('Item', fontSize: 18)),
-              SizedBox(width: 10.0),
-              Expanded(flex: 1, child: MyCustomText('AMT', fontSize: 18)),
-            ],
-          ),
-          const Divider(color: Colors.black54, height: 25),
-          const Row(
-            children: [
-              Expanded(flex: 1, child: MyCustomText('4', fontSize: 18)),
-              SizedBox(width: 10.0),
-              Expanded(
-                  flex: 3,
-                  child: MyCustomText('BHINDI DO PYAZA', fontSize: 18)),
-              SizedBox(width: 10.0),
-              Expanded(flex: 1, child: MyCustomText('\$67.96', fontSize: 18)),
-            ],
-          ),
-          const Divider(color: Colors.black54, height: 25),
-          const SizedBox(height: 10.0),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              MyCustomText('Sub total'),
-              SizedBox(width: 10.0),
-              MyCustomText('\$67.96'),
-            ],
-          ),
-          const SizedBox(height: 10.0),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              MyCustomText('GST 5%'),
-              SizedBox(width: 10.0),
-              MyCustomText('\$3.40'),
-            ],
-          ),
-          const SizedBox(height: 10.0),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              MyCustomText('Tip'),
-              SizedBox(width: 10.0),
-              MyCustomText('\$5.00'),
-            ],
-          ),
-          const SizedBox(height: 10.0),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              MyCustomText('Total (PAID)', fontSize: 20),
-              SizedBox(width: 10.0),
-              MyCustomText('\$76.36', fontSize: 20),
-            ],
-          ),
-          const SizedBox(height: 14.0),
-          const Divider(
-            color: Colors.black54,
-            height: 20,
-          ),
-          const MyCustomText(
-            'Customer Copy',
-            fontWeight: FontWeight.w600,
-            fontSize: 14,
-          ),
-          const SizedBox(height: 4.0),
-          const MyCustomText(
-            'Visa Credit Card Sale',
-            fontWeight: FontWeight.w600,
-            fontSize: 14,
-          ),
-          const Divider(
-            color: Colors.black54,
-            height: 20,
-          ),
-          const MyCustomText(
-            'Thank you for visiting HAVELI BISTRO',
-            fontWeight: FontWeight.w600,
-            fontSize: 14,
-          ),
-          const Divider(
-            color: Colors.black54,
-            height: 20,
-          ),
-          const MyCustomText(
-            'Please review us on Google',
-            fontWeight: FontWeight.w600,
-            fontSize: 14,
-          ),
-          const Divider(
-            color: Colors.black54,
-            height: 20,
-          ),
-          const MyCustomText(
-            'GST NUMBER: GST 717783914 RT0001',
-            fontWeight: FontWeight.w600,
-            fontSize: 14,
-          ),
-        ],
-      ),
     );
   }
 
@@ -420,7 +88,7 @@ class TableOrdersList extends GetView<DineInOrderController> {
           onPressed: () async {
             if (controller.search.text.isNotEmpty) {
               PopupDialog.showLoadingDialog();
-              await controller.getOrder();
+              await controller.getAllOrders();
               PopupDialog.closeLoadingDialog();
             } else {
               PopupDialog.showErrorMessage("Search field is empty");
@@ -429,6 +97,47 @@ class TableOrdersList extends GetView<DineInOrderController> {
           text: 'Search',
           textColor: Colors.white,
         )),
+        const SizedBox(width: 12.0),
+        Expanded(child: Obx(() {
+          return Row(
+            children: [
+              PrimaryBtn(
+                onPressed: () async {
+                  controller.onChangeOrderType(true);
+                  PopupDialog.showLoadingDialog();
+                  await controller.getAllOrders();
+                  PopupDialog.closeLoadingDialog();
+                },
+                text: "Dine-in",
+                textColor: Colors.white,
+                color: StaticColors.purpleColor,
+                borderColor: controller.isdineInSelected.value
+                    ? StaticColors.orangeColor
+                    : Colors.transparent,
+                isOutline: true,
+                borderWidth: 2,
+              ),
+              const SizedBox(width: 12.0),
+              PrimaryBtn(
+                onPressed: () async {
+                  controller.onChangeOrderType(false);
+                  PopupDialog.showLoadingDialog();
+                  await controller.getAllOrders(
+                      orderType: "Takeout".toUpperCase());
+                  PopupDialog.closeLoadingDialog();
+                },
+                text: "Takeout",
+                textColor: Colors.white,
+                color: StaticColors.blueColor,
+                borderColor: !controller.isdineInSelected.value
+                    ? StaticColors.orangeColor
+                    : Colors.transparent,
+                isOutline: true,
+                borderWidth: 2,
+              ),
+            ],
+          );
+        })),
         const SizedBox(width: 12.0),
         const Expanded(child: SizedBox()),
         const SizedBox(width: 12.0),
@@ -560,7 +269,7 @@ class TableOrdersList extends GetView<DineInOrderController> {
                   if (controller.serverStartDate.text.isNotEmpty &&
                       controller.serverEndDate.text.isNotEmpty) {
                     PopupDialog.showLoadingDialog();
-                    await controller.getOrder(
+                    await controller.getAllOrders(
                         endDate: controller.serverEndDate.text,
                         startDate: controller.serverStartDate.text);
                     PopupDialog.closeLoadingDialog();
@@ -589,7 +298,7 @@ class TableOrdersList extends GetView<DineInOrderController> {
           return InkWell(
             onTap: () async {
               PopupDialog.showLoadingDialog();
-              await controller.getOrder(
+              await controller.getAllOrders(
                   orderStatus:
                       controller.orderStatusList[index].status.toUpperCase());
               PopupDialog.closeLoadingDialog();

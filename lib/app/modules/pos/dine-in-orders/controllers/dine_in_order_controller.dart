@@ -5,7 +5,6 @@ import 'package:flutter_base/app/services/controller/base_controller.dart';
 import 'package:flutter_base/app/utils/logger.dart';
 import 'package:flutter_base/app/utils/urls.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 
 import '../models/order_status_model.dart';
 
@@ -13,8 +12,6 @@ class DineInOrderController extends GetxController {
   static DineInOrderController get to => Get.find();
 
   TextEditingController startDate = TextEditingController();
-
-
 
   TextEditingController search = TextEditingController();
   TextEditingController endDate = TextEditingController();
@@ -39,16 +36,18 @@ class DineInOrderController extends GetxController {
 
   List<OrderModel> orderList = [];
   MetaModel? pagination;
-  getOrder({
+  getAllOrders({
     String? orderStatus,
+    String orderType = "DINE_IN",
     String? startDate,
     String? endDate,
     String? page,
-    String? limit = "1",
+    String? limit = "10",
     String? search,
   }) async {
     Map<String, dynamic>? queryParameters = {
       if (orderStatus != null) "orderStatus": orderStatus,
+      "orderType": orderType,
       if (startDate != null) "startDate": startDate,
       if (endDate != null) "endDate": endDate,
       if (page != null) "page": page,
@@ -72,12 +71,16 @@ class DineInOrderController extends GetxController {
     }
   }
 
-
+  // is dine-in selected
+  RxBool isdineInSelected = true.obs;
+  onChangeOrderType(bool value) {
+    isdineInSelected.value = value;
+  }
 
   @override
   void onInit() {
     getOrderStatus();
-    getOrder();
+    getAllOrders();
     super.onInit();
   }
 }
