@@ -15,15 +15,38 @@ class SplitOrderController extends GetxController {
   TextEditingController noOfGuestTEC = TextEditingController();
   TextEditingController totalAmountTEC = TextEditingController();
   int guestCounter = 0; //default guest name.
+  TextEditingController guestNameTEC = TextEditingController();
+  void updateGuestName(int index) {
+    bool isTrue = isSplitByAmount ?? false;
 
-  int splitCheckCount = 0;
-  updateSplitCheckCount(int value) {
-    splitCheckCount = value;
-    if (value > 0) {
+    if (isTrue) {
+      splitAmountChecks[index].userName = guestNameTEC.text.trim();
+    } else {
+      listOfSpitChecksByItems[index].userName = guestNameTEC.text.trim();
+    }
+    update();
+    Get.back();
+    guestNameTEC.clear();
+  }
+
+  List<OrderModel> splitAmountChecks = [];
+  void calculateSplitReceipts() {
+    final num amountPerGuest =
+        order.totalOrderAmount / int.parse(noOfGuestTEC.text);
+    splitAmountChecks = List.generate(int.parse(noOfGuestTEC.text), (index) {
+      return OrderModel(
+        orderId: '${order.orderId}-SC${index + 1}',
+        userName: 'Guest ${index + 1}',
+        totalOrderAmount: amountPerGuest,
+      );
+    });
+
+    if (splitAmountChecks.isNotEmpty) {
       isSplitByAmount = true;
     } else {
       isSplitByAmount = null;
     }
+    noOfGuestTEC.clear();
     update();
   }
 
@@ -63,14 +86,6 @@ class SplitOrderController extends GetxController {
     } else {
       PopupDialog.showErrorMessage('Please select the items for split');
     }
-  }
-
-  TextEditingController guestNameTEC = TextEditingController();
-  void updateGuestName(int index) {
-    listOfSpitChecksByItems[index].userName = guestNameTEC.text.trim();
-    update();
-    Get.back();
-    guestNameTEC.clear();
   }
 
   //amount calculations
@@ -157,9 +172,9 @@ class SplitOrderController extends GetxController {
     calculateMainAmount();
     selectedItems = OrderModel();
     listOfSpitChecksByItems.clear();
-    splitCheckCount = 0;
     isSplitByAmount = null;
     guestCounter = 0;
+    splitAmountChecks.clear();
     update();
   }
 

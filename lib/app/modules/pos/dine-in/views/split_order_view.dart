@@ -5,6 +5,7 @@ import 'package:flutter_base/app/modules/pos/dine-in/widgets/table_dialog.dart';
 import 'package:flutter_base/app/utils/static_colors.dart';
 import 'package:flutter_base/app/widgets/appbar.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
+import 'package:flutter_base/app/widgets/my_custom_text.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import '../../order/models/order_model.dart';
@@ -63,9 +64,12 @@ class SplitOrderView extends GetView<DineInController> {
               guestController: SplitOrderController.to.noOfGuestTEC,
               amountController: SplitOrderController.to.totalAmountTEC,
               onTap: () {
-                SplitOrderController.to.updateSplitCheckCount(
-                  int.parse(SplitOrderController.to.noOfGuestTEC.text),
-                );
+                //TODO: split amount
+
+                // SplitOrderController.to.updateSplitCheckCount(
+                //   int.parse(SplitOrderController.to.noOfGuestTEC.text),
+                // );
+                SplitOrderController.to.calculateSplitReceipts();
                 Get.back();
               },
             );
@@ -319,20 +323,22 @@ class SplitOrderView extends GetView<DineInController> {
                               ),
                               Row(
                                 children: [
-                                  Text(
-                                    '${order.orderType.replaceAll('_', '-')}: ${c.listOfSpitChecksByItems[index].userName}',
-                                    style: theme.textTheme.titleSmall,
-                                  ),
-                                  const SizedBox(width: 12.0),
-                                  PrimaryBtn(
-                                    onPressed: () {
-                                      SplitDialogs.guestName(
-                                        guestController: c.guestNameTEC,
-                                        onTap: () => c.updateGuestName(index),
-                                      );
-                                    },
-                                    height: 32,
-                                    text: 'Update Name',
+                                  MyCustomText(
+                                      '${order.orderType.replaceAll('_', '-')}:  ',
+                                      fontSize: 18),
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () {
+                                        SplitDialogs.guestName(
+                                          guestController: c.guestNameTEC,
+                                          onTap: () => c.updateGuestName(index),
+                                        );
+                                      },
+                                      child: MyCustomText(
+                                          c.listOfSpitChecksByItems[index]
+                                              .userName,
+                                          fontSize: 18),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -477,7 +483,9 @@ class SplitOrderView extends GetView<DineInController> {
                       crossAxisCount: 3,
                       mainAxisSpacing: 16,
                       crossAxisSpacing: 16,
-                      children: List.generate(c.splitCheckCount, (index) {
+                      children:
+                          List.generate(c.splitAmountChecks.length, (index) {
+                        var check = c.splitAmountChecks[index];
                         return Container(
                           color: theme.cardColor,
                           padding: const EdgeInsets.all(16),
@@ -486,16 +494,31 @@ class SplitOrderView extends GetView<DineInController> {
                             children: [
                               // header
                               Text(
-                                'Order: #${order.orderId}-SC${index + 1}',
+                                'Order: #${check.orderId}',
                                 style: theme.textTheme.titleSmall,
                               ),
                               Divider(
                                 color: theme.dividerColor.withOpacity(0.4),
                                 height: 16,
                               ),
-                              Text(
-                                'Dine in: Guest ${index + 1}',
-                                style: theme.textTheme.titleSmall,
+                              Row(
+                                children: [
+                                  MyCustomText(
+                                      '${order.orderType.replaceAll('_', '-')}:  ',
+                                      fontSize: 18),
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () {
+                                        SplitDialogs.guestName(
+                                          guestController: c.guestNameTEC,
+                                          onTap: () => c.updateGuestName(index),
+                                        );
+                                      },
+                                      child: MyCustomText(check.userName,
+                                          fontSize: 18),
+                                    ),
+                                  ),
+                                ],
                               ),
 
                               Divider(
@@ -513,7 +536,7 @@ class SplitOrderView extends GetView<DineInController> {
                               _priceRow(theme,
                                   title: "Split Amount",
                                   value:
-                                      "\$${((order.totalOrderAmount) / c.splitCheckCount).toStringAsFixed(2)}"),
+                                      "\$${check.totalOrderAmount.toStringAsFixed(2)}"),
                               Divider(
                                 color: theme.dividerColor.withOpacity(0.4),
                                 height: 16,
@@ -521,7 +544,7 @@ class SplitOrderView extends GetView<DineInController> {
                               _priceRow(theme,
                                   title: "Total Due",
                                   value:
-                                      "\$${((order.totalOrderAmount) / c.splitCheckCount).toStringAsFixed(2)}"),
+                                      "\$${check.totalOrderAmount.toStringAsFixed(2)}"),
                               const SizedBox(height: 8),
                               PrimaryBtn(
                                 onPressed: () {},
