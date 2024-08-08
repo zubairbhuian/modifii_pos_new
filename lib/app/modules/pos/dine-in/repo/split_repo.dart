@@ -12,7 +12,7 @@ class SplitRepo {
   }) async {
     try {
       final BaseModel res = await BaseController.to.apiService.makePatchRequest(
-        'URLS.splitAmount(orderId)',
+        URLS.splitAmount(orderId),
         splitAmount.toJson(),
       );
 

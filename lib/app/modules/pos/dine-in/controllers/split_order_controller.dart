@@ -216,16 +216,25 @@ class SplitOrderController extends GetxController {
   @override
   void onInit() {
     order = OrderModel(
+      id: mainOrder.id,
+      orderId: mainOrder.orderId,
       carts: List.from(mainOrder.carts),
       totalGst: mainOrder.totalGst,
       totalPst: mainOrder.totalPst,
       totalGratuity: mainOrder.totalGratuity,
       totalDiscount: mainOrder.totalDiscount,
       totalOrderAmount: mainOrder.totalOrderAmount,
-      orderId: mainOrder.orderId,
       numberOfPeople: mainOrder.numberOfPeople,
       orderType: mainOrder.orderType,
       paymentStatus: mainOrder.paymentStatus,
+      userName: mainOrder.userName,
+      table: mainOrder.table,
+      tableId: mainOrder.tableId,
+      paymentMethod: mainOrder.paymentMethod,
+      employeeId: mainOrder.employeeId,
+      employee: mainOrder.employee,
+      orderNote: mainOrder.orderNote,
+      orderStatus: mainOrder.orderStatus,
     );
     totalAmountTEC.text =
         PosController.to.myOrder.totalOrderAmount.toStringAsFixed(2);

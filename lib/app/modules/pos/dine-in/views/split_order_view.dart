@@ -612,7 +612,7 @@ class SplitOrderView extends GetView<DineInController> {
                                                   },
                                                 );
                                               },
-                                              text: data,
+                                              text: data.replaceAll('_', ' '),
                                               padding:
                                                   const EdgeInsets.symmetric(
                                                       horizontal: 12),
