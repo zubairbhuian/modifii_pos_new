@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import '../../../../widgets/popup_dialogs.dart';
 import '../../controllers/pos_controller.dart';
 import '../../order/models/order_model.dart';
+import '../models/split_amount_model.dart';
+import '../repo/split_repo.dart';
 
 class SplitOrderController extends GetxController {
   static SplitOrderController get to => Get.find();
@@ -20,7 +22,8 @@ class SplitOrderController extends GetxController {
     bool isTrue = isSplitByAmount ?? false;
 
     if (isTrue) {
-      splitAmountChecks[index].userName = guestNameTEC.text.trim();
+      splitAmountChecks.splitAmounts[index].guestName =
+          guestNameTEC.text.trim();
     } else {
       listOfSpitChecksByItems[index].userName = guestNameTEC.text.trim();
     }
@@ -29,19 +32,33 @@ class SplitOrderController extends GetxController {
     guestNameTEC.clear();
   }
 
-  List<OrderModel> splitAmountChecks = [];
+  TextEditingController tipAmountTEC = TextEditingController();
+  void updateTipAndPayMethod(int index, String payment) {
+    splitAmountChecks.splitAmounts[index].tipAmount =
+        num.tryParse(tipAmountTEC.text) ?? 0;
+    splitAmountChecks.splitAmounts[index].paymentMethod = payment;
+
+    paySplitAmount();
+    update();
+    Get.back();
+    tipAmountTEC.clear();
+  }
+
+  SplitAmountModel splitAmountChecks = SplitAmountModel(splitAmounts: []);
   void calculateSplitReceipts() {
     final num amountPerGuest =
         order.totalOrderAmount / int.parse(noOfGuestTEC.text);
-    splitAmountChecks = List.generate(int.parse(noOfGuestTEC.text), (index) {
-      return OrderModel(
-        orderId: '${order.orderId}-SC${index + 1}',
-        userName: 'Guest ${index + 1}',
-        totalOrderAmount: amountPerGuest,
+    splitAmountChecks.splitAmounts =
+        List.generate(int.parse(noOfGuestTEC.text), (index) {
+      return SplitAmount(
+        guestName: 'Guest ${index + 1}',
+        splitAmount: amountPerGuest,
+        tipAmount: 0,
+        paymentMethod: 'Unpaid',
       );
     });
 
-    if (splitAmountChecks.isNotEmpty) {
+    if (splitAmountChecks.splitAmounts.isNotEmpty) {
       isSplitByAmount = true;
     } else {
       isSplitByAmount = null;
@@ -174,7 +191,25 @@ class SplitOrderController extends GetxController {
     listOfSpitChecksByItems.clear();
     isSplitByAmount = null;
     guestCounter = 0;
-    splitAmountChecks.clear();
+    splitAmountChecks.splitAmounts.clear();
+    update();
+  }
+
+  //API call
+  bool isPostingSplitAmount = false;
+  void paySplitAmount() async {
+    isPostingSplitAmount = true;
+    update();
+    bool isSuccess = await SplitRepo.splitAmount(
+      orderId: order.id,
+      splitAmount: splitAmountChecks,
+    );
+
+    if (isSuccess) {
+      //
+    }
+
+    isPostingSplitAmount = false;
     update();
   }
 

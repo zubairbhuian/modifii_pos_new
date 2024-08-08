@@ -105,4 +105,47 @@ class SplitDialogs {
           ],
         ));
   }
+
+  static tipAmount({
+    required TextEditingController tipAmountController,
+    required VoidCallback onTap,
+  }) {
+    PopupDialog.customDialog(
+        width: 1000,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                      child: CustomTextField(
+                    controller: tipAmountController,
+                    extraLabel: 'Tip Amount:',
+                    extraLabelFontSize: 32,
+                    hintText: '(Optional)',
+                    autofocus: true,
+                    style: const TextStyle(fontSize: 48),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 26, horizontal: 22),
+                  )),
+                  const SizedBox(width: 16),
+                  PrimaryBtn(
+                      onPressed: onTap,
+                      height: 115,
+                      width: 120,
+                      padding: const EdgeInsets.all(4.0),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          fontSize: 200),
+                      text: "Submit")
+                ],
+              ),
+            )
+          ],
+        ));
+  }
 }

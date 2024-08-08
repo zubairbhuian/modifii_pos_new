@@ -25,4 +25,7 @@ class URLS {
   static String ordersList = '$baseURL/table/order/list';
   static String orderOfBookedTable(int tableId) =>
       '$baseURL/table/$tableId/current-order';
+
+  static String splitAmount(String orderId) =>
+      '$baseURL/orders/split-amount/$orderId';
 }

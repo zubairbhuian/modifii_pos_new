@@ -483,9 +483,9 @@ class SplitOrderView extends GetView<DineInController> {
                       crossAxisCount: 3,
                       mainAxisSpacing: 16,
                       crossAxisSpacing: 16,
-                      children:
-                          List.generate(c.splitAmountChecks.length, (index) {
-                        var check = c.splitAmountChecks[index];
+                      children: List.generate(
+                          c.splitAmountChecks.splitAmounts.length, (index) {
+                        var check = c.splitAmountChecks.splitAmounts[index];
                         return Container(
                           color: theme.cardColor,
                           padding: const EdgeInsets.all(16),
@@ -494,7 +494,7 @@ class SplitOrderView extends GetView<DineInController> {
                             children: [
                               // header
                               Text(
-                                'Order: #${check.orderId}',
+                                'Order: #${order.orderId}-SC${index + 1}',
                                 style: theme.textTheme.titleSmall,
                               ),
                               Divider(
@@ -514,13 +514,12 @@ class SplitOrderView extends GetView<DineInController> {
                                           onTap: () => c.updateGuestName(index),
                                         );
                                       },
-                                      child: MyCustomText(check.userName,
+                                      child: MyCustomText(check.guestName,
                                           fontSize: 18),
                                     ),
                                   ),
                                 ],
                               ),
-
                               Divider(
                                 color: theme.dividerColor.withOpacity(0.4),
                                 height: 16,
@@ -536,7 +535,7 @@ class SplitOrderView extends GetView<DineInController> {
                               _priceRow(theme,
                                   title: "Split Amount",
                                   value:
-                                      "\$${check.totalOrderAmount.toStringAsFixed(2)}"),
+                                      "\$${check.splitAmount.toStringAsFixed(2)}"),
                               Divider(
                                 color: theme.dividerColor.withOpacity(0.4),
                                 height: 16,
@@ -544,7 +543,7 @@ class SplitOrderView extends GetView<DineInController> {
                               _priceRow(theme,
                                   title: "Total Due",
                                   value:
-                                      "\$${check.totalOrderAmount.toStringAsFixed(2)}"),
+                                      "\$${check.splitAmount.toStringAsFixed(2)}"),
                               const SizedBox(height: 8),
                               PrimaryBtn(
                                 onPressed: () {},
@@ -555,17 +554,30 @@ class SplitOrderView extends GetView<DineInController> {
                               ),
                               const SizedBox(height: 8),
                               PrimaryBtn(
-                                onPressed: () {
-                                  controller.splitPaymentActiveIndex.value = -1;
-                                  controller.paymentMathodActiveIndex.value =
-                                      -1;
-                                  controller.isShowsplitPaymentbtn.value =
-                                      false;
-                                  controller.splitPaymentActiveIndex.value =
-                                      index;
-                                },
+                                onPressed: c
+                                            .splitAmountChecks
+                                            .splitAmounts[index]
+                                            .paymentMethod !=
+                                        'Unpaid'
+                                    ? () {
+                                        //paid already
+                                      }
+                                    : () {
+                                        controller
+                                            .splitPaymentActiveIndex.value = -1;
+                                        controller.paymentMathodActiveIndex
+                                            .value = -1;
+                                        controller.isShowsplitPaymentbtn.value =
+                                            false;
+                                        controller.splitPaymentActiveIndex
+                                            .value = index;
+                                      },
                                 width: double.infinity,
-                                text: 'PAY',
+                                text: c.splitAmountChecks.splitAmounts[index]
+                                            .paymentMethod !=
+                                        'Unpaid'
+                                    ? 'PAID (${c.splitAmountChecks.splitAmounts[index].paymentMethod})'
+                                    : 'PAY',
                                 textColor: Colors.white,
                                 color: StaticColors.greenColor,
                               ),
@@ -579,18 +591,26 @@ class SplitOrderView extends GetView<DineInController> {
                                       runSpacing: 12,
                                       children: List.generate(
                                         controller.paymentMathod.length,
-                                        (index) {
+                                        (j) {
                                           var data =
-                                              controller.paymentMathod[index];
+                                              controller.paymentMathod[j];
                                           return Obx(() {
                                             return PrimaryBtn(
                                               color:
                                                   theme.scaffoldBackgroundColor,
                                               onPressed: () {
-                                                controller
-                                                    .paymentMathodActiveIndex
-                                                    .value = index;
-                                                TableDialogs.makePayment();
+                                                //TODO: split amount payment
+                                                // controller
+                                                //     .paymentMathodActiveIndex
+                                                //     .value = index;
+                                                SplitDialogs.tipAmount(
+                                                  tipAmountController:
+                                                      c.tipAmountTEC,
+                                                  onTap: () {
+                                                    c.updateTipAndPayMethod(
+                                                        index, data);
+                                                  },
+                                                );
                                               },
                                               text: data,
                                               padding:
