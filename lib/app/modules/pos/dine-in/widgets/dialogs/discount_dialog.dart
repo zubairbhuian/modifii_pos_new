@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_base/app/modules/pos/controllers/pos_controller.dart';
+import 'package:flutter_base/app/utils/logger.dart';
 import 'package:flutter_base/app/utils/static_colors.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
 import 'package:flutter_base/app/widgets/custom_textfield.dart';
@@ -21,14 +23,27 @@ class _DiscountDialogState extends State<DiscountDialog> {
   String myDiscoun = "";
 
   bool isPercentage = true;
+  bool amountDiscounErr = false;
   onChangePercentage(bool value) {
     setState(() {
       isPercentage = value;
       if (value) {
+        myDiscoun = "";
+        percentageDiscoun.clear();
         amountDiscoun.clear();
       } else {
+        myDiscoun = "";
         percentageDiscoun.clear();
+        amountDiscoun.clear();
       }
+    });
+  }
+
+  cleareDiscount() {
+    setState(() {
+      myDiscoun = "";
+      percentageDiscoun.clear();
+      amountDiscoun.clear();
     });
   }
 
@@ -58,7 +73,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
             percentageDiscoun.text = myDiscoun;
           }
         }
-      } else if (!isPercentage && isKeybord && myDiscoun.length < 7) {
+      } else if (!isPercentage && isKeybord && myDiscoun.length < 4) {
         amountDiscoun.clear();
         myDiscoun += value;
         amountDiscoun.text = myDiscoun;
@@ -96,11 +111,18 @@ class _DiscountDialogState extends State<DiscountDialog> {
       children: [
         // ++++++ Percentage ++++++
         Center(
-          child: Text(
-            'Discount',
-            style: theme.textTheme.displaySmall
-                ?.copyWith(fontSize: 35, fontWeight: FontWeight.bold),
-          ),
+          child: GetBuilder<PosController>(builder: (context) {
+            return Text(
+              context.selectedItemList.length == 1
+                  ? 'Discount Item'
+                  : context.selectedItemList.length ==
+                          context.myOrder.carts.length
+                      ? 'Discount Check '
+                      : 'Discount Items',
+              style: theme.textTheme.displaySmall
+                  ?.copyWith(fontSize: 35, fontWeight: FontWeight.bold),
+            );
+          }),
         ).marginOnly(bottom: 25),
 
         Row(
@@ -132,9 +154,10 @@ class _DiscountDialogState extends State<DiscountDialog> {
                   ),
                   const SizedBox(height: 16),
                   GetBuilder<PosController>(builder: (controller) {
-                    return Wrap(
-                      runSpacing: 6,
-                      spacing: 6,
+                    return StaggeredGrid.count(
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 4,
+                      crossAxisSpacing: 4,
                       children: [
                         ...List.generate(
                             controller.percentageDiscountList.length, (index) {
@@ -142,21 +165,23 @@ class _DiscountDialogState extends State<DiscountDialog> {
                           return PrimaryBtn(
                             onPressed: () {
                               percentageDiscoun.clear();
+                              onChangePercentage(true);
                               addValueWithKeybord(item.toString());
                             },
                             text: "$item%",
-                            width: 85,
+                            width: 100,
                             height: 85,
-                            isdisabled: !isPercentage,
                             textColor: Colors.white,
+                            color: StaticColors.greenColor,
                             fontWeight: FontWeight.bold,
                             maxLines: 1,
                             textMaxSize: 26,
                             textMinSize: 25,
                           );
                         }),
-                        SizedBox(
-                          width: 175,
+                        StaggeredGridTile.count(
+                          crossAxisCellCount: 2,
+                          mainAxisCellCount: 1,
                           child: CustomTextField(
                             controller: percentageDiscoun,
                             onChange: addValueWithKeybord,
@@ -182,8 +207,17 @@ class _DiscountDialogState extends State<DiscountDialog> {
                       ],
                     );
                   }),
-
-                  const SizedBox(height: 30),
+                ],
+              ),
+            ),
+            const SizedBox(
+              width: 20,
+            ),
+            // for customKeybord
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
                   // ++++++ Amount ++++++
                   Row(
                     children: [
@@ -204,9 +238,10 @@ class _DiscountDialogState extends State<DiscountDialog> {
                   ),
                   const SizedBox(height: 16),
                   GetBuilder<PosController>(builder: (controller) {
-                    return Wrap(
-                      runSpacing: 6,
-                      spacing: 6,
+                    return StaggeredGrid.count(
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 4,
+                      crossAxisSpacing: 4,
                       children: [
                         ...List.generate(controller.amountDiscountList.length,
                             (index) {
@@ -214,21 +249,25 @@ class _DiscountDialogState extends State<DiscountDialog> {
                           return PrimaryBtn(
                             onPressed: () {
                               amountDiscoun.clear();
+                              onChangePercentage(false);
                               addValueWithKeybord(item.toString());
                             },
                             text: "\$$item",
-                            width: 85,
+                            width: 100,
                             height: 85,
-                            isdisabled: isPercentage,
+                            // isdisabled: isPercentage,
                             textColor: Colors.white,
+                            color: StaticColors.greenColor,
+
                             fontWeight: FontWeight.bold,
                             maxLines: 1,
                             textMaxSize: 26,
                             textMinSize: 25,
                           );
                         }),
-                        SizedBox(
-                          width: 175,
+                        StaggeredGridTile.count(
+                          crossAxisCellCount: 2,
+                          mainAxisCellCount: 1,
                           child: CustomTextField(
                             controller: amountDiscoun,
                             onChange: addValueWithKeybord,
@@ -245,7 +284,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
                             style: theme.textTheme.titleMedium?.copyWith(
                                 fontSize: 25, fontWeight: FontWeight.bold),
                             inputFormatters: [
-                              LengthLimitingTextInputFormatter(8),
+                              LengthLimitingTextInputFormatter(4),
                               FilteringTextInputFormatter.allow(
                                   RegExp(r'^\d*\.?\d{0,2}$'))
                             ],
@@ -257,57 +296,13 @@ class _DiscountDialogState extends State<DiscountDialog> {
                 ],
               ),
             ),
-
-            // for customKeybord
-            Expanded(
-              child: Column(
-                children: [
-                  const SizedBox(height: 55),
-                  _customKeybord(theme),
-                  const SizedBox(height: 24),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 30, vertical: 22),
-                    decoration: BoxDecoration(
-                        color: theme.scaffoldBackgroundColor,
-                        border: Border.all(width: .5, color: Colors.white)),
-                    child: MyCustomText(
-                      isPercentage ? "$myDiscoun%" : "\$$myDiscoun",
-                      fontWeight: FontWeight.w900,
-                      maxLines: 1,
-                      fontSize: 40,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    child: CustomTextField(
-                      // controller: amountDiscoun,
-                      hintText: "DISCOUNT PIN".toUpperCase(),
-                      hintStyle: theme.textTheme.titleMedium
-                          ?.copyWith(fontSize: 23, fontWeight: FontWeight.bold),
-                      style: theme.textTheme.titleMedium
-                          ?.copyWith(fontSize: 25, fontWeight: FontWeight.bold),
-                      borderRadius: 0,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 27, horizontal: 22),
-                      inputFormatters: [
-                        LengthLimitingTextInputFormatter(6),
-                        // FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}$'))
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-              ),
-            ),
           ],
         ),
-        const SizedBox(height: 15),
+        // ! DISCOUNT reason
+        // const SizedBox(height: 12),
         SizedBox(
           child: CustomTextField(
             maxLines: 1,
-            // controller: amountDiscoun,
             hintText: "DISCOUNT reason (character limit 40)".toUpperCase(),
             hintStyle: theme.textTheme.titleMedium
                 ?.copyWith(fontSize: 23, fontWeight: FontWeight.bold),
@@ -322,66 +317,138 @@ class _DiscountDialogState extends State<DiscountDialog> {
             ],
           ),
         ),
-
+        // ! Keybord area
+        const SizedBox(height: 20),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: _customKeybord(theme)),
+            const SizedBox(width: 20),
+            Expanded(
+                child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  child: CustomTextField(
+                    // controller: amountDiscoun,
+                    hintText: "DISCOUNT PIN".toUpperCase(),
+                    hintStyle: theme.textTheme.titleMedium
+                        ?.copyWith(fontSize: 23, fontWeight: FontWeight.bold),
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(fontSize: 25, fontWeight: FontWeight.bold),
+                    borderRadius: 0,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 27, horizontal: 22),
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(6),
+                      // FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}$'))
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  width: double.infinity,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 30, vertical: 22),
+                  decoration: BoxDecoration(
+                      color: theme.scaffoldBackgroundColor,
+                      border: Border.all(width: .5, color: Colors.white)),
+                  child: MyCustomText(
+                    isPercentage ? "$myDiscoun%" : "\$$myDiscoun",
+                    fontWeight: FontWeight.w900,
+                    maxLines: 1,
+                    fontSize: 40,
+                  ),
+                ),
+                Visibility(
+                    visible: amountDiscounErr,
+                    child: const Text(
+                      "Discount amount  must be less than the item amount",
+                      style:
+                          TextStyle(color: StaticColors.redColor, fontSize: 18),
+                    )),
+                const SizedBox(height: 16),
+                PrimaryBtn(
+                  color: StaticColors.blueColor,
+                  height: 80,
+                  textColor: Colors.white,
+                  width: 250,
+                  textMinSize: 26,
+                  textMaxSize: 44,
+                  fontWeight: FontWeight.w700,
+                  onPressed: () {
+                    cleareDiscount();
+                  },
+                  text: "Clear Discount",
+                ),
+                const SizedBox(height: 16),
+              ],
+            )),
+          ],
+        ),
         // btn row
         const SizedBox(height: 30),
-        Center(
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 50),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               PrimaryBtn(
                 onPressed: () async {
-                  PosController.to.applyDiscount(
-                    num.parse(myDiscoun),
-                    PosController.to.selectedItemList,
-                    isPercentage: isPercentage,
-                  );
-                  Get.back();
-                  // PopupDialog.showLoadingDialog();
-                  await PosController.to.onUpdateOrder(
-                      PosController.to.myOrder.id,
-                      isClearList: false);
+                  if (!isPercentage) {
+                    kLogger.e("message1");
+                    bool isPosible =
+                        PosController.to.checkDiscountPossibilities(
+                      num.parse(myDiscoun),
+                      PosController.to.selectedItemList,
+                    );
+                    kLogger.e(isPosible);
+                    if (isPosible) {
+                      PosController.to.applyDiscount(
+                        num.parse(myDiscoun),
+                        PosController.to.selectedItemList,
+                        isPercentage: isPercentage,
+                      );
+                      Get.back();
+                    } else {
+                      setState(() {
+                        amountDiscounErr = true;
+                      });
+                    }
+                  } else {
+                    PosController.to.applyDiscount(
+                      num.parse(myDiscoun),
+                      PosController.to.selectedItemList,
+                      isPercentage: isPercentage,
+                    );
+                    Get.back();
+
+                    // PopupDialog.showLoadingDialog();
+                    await PosController.to.onUpdateOrder(
+                        PosController.to.myOrder.id,
+                        isClearList: false);
+                  }
+
                   // PopupDialog.closeLoadingDialog();
                 },
                 text: "Ok".toUpperCase(),
                 height: 70,
-                width: 150,
+                width: 250,
                 textMinSize: 26,
                 textMaxSize: 44,
                 fontWeight: FontWeight.w700,
                 color: StaticColors.greenColor,
                 textColor: Colors.white,
               ),
-              const SizedBox(width: 30),
-              PrimaryBtn(
-                onPressed: () async {
-                  PosController.to.applyDiscount(
-                    num.parse("0"),
-                    PosController.to.selectedItemList,
-                    isPercentage: isPercentage,
-                  );
-                  Get.back();
-                  await PosController.to.onUpdateOrder(
-                      PosController.to.myOrder.id,
-                      isClearList: false);
-                },
-                text: "Cancel Discount".toUpperCase(),
-                height: 70,
-                width: 150,
-                textMinSize: 15,
-                textMaxSize: 30,
-                fontWeight: FontWeight.w700,
-                color: StaticColors.greenColor,
-                textColor: Colors.white,
-              ),
-              const SizedBox(width: 30),
+              const SizedBox(width: 20),
               PrimaryBtn(
                 onPressed: () async {
                   Get.back();
                 },
                 text: "Cancel".toUpperCase(),
                 height: 70,
-                width: 150,
+                width: 250,
                 textMinSize: 26,
                 textMaxSize: 44,
                 fontWeight: FontWeight.w700,
@@ -403,20 +470,43 @@ class _DiscountDialogState extends State<DiscountDialog> {
       children: List.generate(
           PosController.to.numberList.length,
           (index) => StaggeredGridTile.count(
-                crossAxisCellCount:
-                    PosController.to.numberList[index] == "X" ? 2 : 1,
+                crossAxisCellCount: 1,
                 mainAxisCellCount: .8,
                 child: SizedBox(
-                  width: 85,
+                  width: 100,
                   height: 85,
                   child: ElevatedButton(
                     onPressed: () {
                       if (PosController.to.numberList[index] == "X") {
                         removeDiscount();
-                      } else {
-                        addValueWithKeybord(
-                            isKeybord: true,
-                            PosController.to.numberList[index]);
+                      } else if (!isPercentage && myDiscoun.length <= 3) {
+                        if (isPercentage &&
+                            PosController.to.numberList[index] == ".") {
+                          // Todo : add a message
+                        } else if (PosController.to.numberList[index] == "." &&
+                            myDiscoun.contains(".")) {
+                          // Todo : add a message
+                        } else if (PosController.to.numberList[index] == "X") {
+                          removeDiscount();
+                        } else {
+                          addValueWithKeybord(
+                              isKeybord: true,
+                              PosController.to.numberList[index]);
+                        }
+                      } else if (isPercentage && myDiscoun.length <= 2) {
+                        if (isPercentage &&
+                            PosController.to.numberList[index] == ".") {
+                          // Todo : add a message
+                        } else if (PosController.to.numberList[index] == "." &&
+                            myDiscoun.contains(".")) {
+                          // Todo : add a message
+                        } else if (PosController.to.numberList[index] == "X") {
+                          removeDiscount();
+                        } else {
+                          addValueWithKeybord(
+                              isKeybord: true,
+                              PosController.to.numberList[index]);
+                        }
                       }
                     },
                     style: ElevatedButton.styleFrom(

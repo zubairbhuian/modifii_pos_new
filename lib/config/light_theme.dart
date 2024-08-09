@@ -48,6 +48,28 @@ ThemeData lightTheme = ThemeData(
       return Colors.grey;
     }),
   ),
+
+  //Switch
+  switchTheme: SwitchThemeData(
+    thumbColor: MaterialStateProperty.resolveWith((states) {
+      if (states.contains(MaterialState.selected)) {
+        return const Color(0xff0274ff);
+      }
+      return Colors.black;
+    }),
+    trackColor: MaterialStateProperty.resolveWith((states) {
+      if (states.contains(MaterialState.selected)) {
+        return Colors.white;
+      }
+      return Colors.white;
+    }),
+    overlayColor: MaterialStateProperty.resolveWith((states) {
+      if (states.contains(MaterialState.hovered)) {
+        return const Color(0xff0274ff).withOpacity(.1);
+      }
+      return Colors.transparent;
+    }),
+  ),
   //  datePickerTheme
   datePickerTheme: DatePickerThemeData(
     backgroundColor: Colors.white,

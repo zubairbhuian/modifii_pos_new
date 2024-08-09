@@ -23,7 +23,7 @@ class OrderModel {
     this.employee,
     this.table,
     this.id = "",
-    this.orderId="",
+    this.orderId = "",
     this.orderNote = "",
     this.tip = 0,
     this.refund = false,
@@ -83,6 +83,7 @@ class OrderModel {
       id: json["id"] ?? "",
       orderId: json["orderId"],
       subTotal: json["subTotal"],
+      tableName: json["tableName"] ?? "",
       //todo need to uocomment tip
       // tip: json["tip"] ?? 0,
       refund: json["refund"] ?? false,
@@ -114,11 +115,13 @@ class OrderModel {
         "orderNote": orderNote,
         "subTotal": subTotal,
         "guestPhoneNumber": guestPhoneNumber,
+        "orderId": orderId,
       };
 }
 
 class CartModel {
   CartModel({
+    required this.id,
     required this.name,
     required this.price,
     required this.quantity,
@@ -135,6 +138,7 @@ class CartModel {
     this.isCustomProduct = false,
   });
 
+  String id;
   String name;
   num price;
   int quantity;
@@ -152,6 +156,7 @@ class CartModel {
 
   factory CartModel.fromJson(Map<String, dynamic> json) {
     return CartModel(
+      id: json["id"] ?? "",
       name: json["name"] ?? "",
       price: json["price"] ?? 0,
       quantity: json["quantity"] ?? 0,
@@ -170,6 +175,7 @@ class CartModel {
   }
 
   Map<String, dynamic> toJson() => {
+        "id": id,
         "name": name,
         "price": price,
         "quantity": quantity,

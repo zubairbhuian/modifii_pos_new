@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_base/app/modules/pos/dine-in-orders/controllers/dine_in_order_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in-orders/widgets/print/item_print_receipt.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/controllers/dine_in_controller.dart';
+import 'package:flutter_base/app/modules/pos/dine-in/models/employee_model.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/models/table_model.dart';
 import 'package:flutter_base/app/modules/pos/order/models/order_model.dart';
 import 'package:flutter_base/app/modules/pos/order/models/order_place_model.dart';
@@ -31,6 +32,27 @@ class PosController extends GetxController {
   TextEditingController guestController = TextEditingController();
   TextEditingController guestNameController = TextEditingController();
   TextEditingController guestPhoneController = TextEditingController();
+  bool isTableReadOnly = false;
+  bool isGuestReadOnly = false;
+  bool isGuestNameReadOnly = false;
+  bool isGuestPhoneReadOnly = false;
+
+  onReadOnlyAllCartTextField() {
+    isTableReadOnly = true;
+    isGuestReadOnly = true;
+    isGuestNameReadOnly = true;
+    isGuestPhoneReadOnly = true;
+    update();
+  }
+
+  onEditableAllCartTextField() {
+    isTableReadOnly = false;
+    isGuestReadOnly = false;
+    isGuestNameReadOnly = false;
+    isGuestPhoneReadOnly = false;
+    update();
+  }
+
   // for Focus
   final FocusNode tableFocusNode = FocusNode();
   final FocusNode guestFocusNode = FocusNode();
@@ -301,7 +323,7 @@ class PosController extends GetxController {
       String orderStatus = "CONFIRMED",
       String paymentStatus = "UNPAID"}) async {
     if (guestController.text.isEmpty) {
-      PopupDialog.showErrorMessage("Guest required");
+      PopupDialog.showErrorMessage("Guest Number is required");
     } else if (tableController.text.isEmpty) {
       PopupDialog.showErrorMessage("Table required");
     } else if (myOrder.carts.isEmpty) {
@@ -311,6 +333,7 @@ class PosController extends GetxController {
       myOrder.orderType = orderType;
       myOrder.orderStatus = orderStatus;
       myOrder.paymentStatus = paymentStatus;
+      kLogger.e(myOrder.orderId);
       PopupDialog.showLoadingDialog();
       var res = await BaseController.to.apiService
           .makePostRequest(URLS.placeOrder, myOrder.toJson());
@@ -336,20 +359,54 @@ class PosController extends GetxController {
   }
 
   // ** Update order
-  onUpdateOrder(String id, {bool isClearList = true}) async {
+  Future<bool> onUpdateOrder(String id, {bool isClearList = false}) async {
     try {
       var res = await BaseController.to.apiService
           .makePatchRequest("${URLS.orders}/$id", myOrder.toJson());
-      DineInOrderController.to.getAllOrders();
+
       if (res.statusCode == 200) {
+        update();
         if (isClearList) {
           clearCartList();
         }
         PopupDialog.showSuccessDialog(res.data["message"]);
+        update();
+        return true;
       }
     } catch (e) {
       kLogger.e('Error from %%%% update order %%%% => $e');
     }
+    return false;
+  }
+
+  // ** update order items
+  Future<bool> onUpdateOrderItems(
+    String id, {
+    String? tableId,
+    String? orderStatus,
+    String? paymentStatus,
+    String? employeeId,
+  }) async {
+    Map<String, dynamic>? data = {
+      if (orderStatus != null) "orderStatus": orderStatus,
+      if (orderStatus != null) "orderStatus": orderStatus,
+      if (paymentStatus != null) "paymentStatus": paymentStatus,
+      if (employeeId != null) "employeeId": employeeId,
+    };
+    try {
+      var res = await BaseController.to.apiService
+          .makePatchRequest("${URLS.orders}/$id", data);
+
+      if (res.statusCode == 200) {
+        DineInOrderController.to.getAllOrders();
+        myOrder = OrderModel.fromJson(res.data["data"]);
+        update();
+        return true;
+      }
+    } catch (e) {
+      kLogger.e('Error from %%%% update order %%%% => $e');
+    }
+    return false;
   }
 
   //** Add cart item  **
@@ -442,16 +499,17 @@ class PosController extends GetxController {
   ];
   RxInt passwordLength = 6.obs;
   List<String> numberList = [
-    "7",
-    "8",
-    "9",
-    "4",
-    "5",
-    "6",
     "1",
     "2",
     "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
     "0",
+    ".",
     "X",
   ];
   List<String> selectedItemList = [];
@@ -472,6 +530,33 @@ class PosController extends GetxController {
           List.generate(myOrder.carts.length, (index) => "$index");
     }
     update();
+  }
+
+  removeAllSelectedItem() {
+    if (selectedItemList.isNotEmpty) {
+      // make list with cart id
+      var itemIdList =
+          selectedItemList.map((index) => int.parse(index)).toList();
+      // Extracting user IDs at the specified indices
+      List<String> userIds =
+          itemIdList.map((index) => myOrder.carts[index].id).toList();
+      print(userIds);
+    }
+    update();
+  }
+
+  bool checkDiscountPossibilities(
+    num amount,
+    List<String> indices,
+  ) {
+    for (var index in indices) {
+      if (int.parse(index) >= 0 && int.parse(index) < myOrder.carts.length) {
+        if (amount <= myOrder.carts[int.parse(index)].price) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   void applyDiscount(num amount, List<String> indices,
@@ -505,8 +590,29 @@ class PosController extends GetxController {
     }
   }
 
-  ///
+  deleteDiscount() {
+    for (var index = 0; index < myOrder.carts.length; index++) {
+      myOrder.carts[index].discountAmount = 0;
+    }
+    myOrder.totalDiscount = 0;
+    update();
+  }
 
+  /// ++++ Get all employee
+  List<EmployeeModel> employeeList = [];
+  getAllEmployee() async {
+    try {
+      var res =
+          await BaseController.to.apiService.makeGetRequest(URLS.employees);
+      if (res.statusCode == 200) {
+        employeeList.assignAll((res.data["data"] as List)
+            .map((e) => EmployeeModel.fromJson(e))
+            .toList());
+      }
+    } catch (e) {
+      kLogger.e('Error from %%%% Get all employee %%%% => $e');
+    }
+  }
 // zubair ==== + +++++++
 // zubair ==== + +++++++ ^^^
 
@@ -653,6 +759,7 @@ class PosController extends GetxController {
     await getCategoryList();
     await getProductList();
     PopupDialog.closeLoadingDialog();
+    await getAllEmployee();
     // TODO: implement onReady
     super.onReady();
   }

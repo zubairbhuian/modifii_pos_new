@@ -17,6 +17,7 @@ class DineInView extends GetView<DineInController> {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
+    DineInController.to.getTableCategories();
     return const Column(
       mainAxisSize: MainAxisSize.min,
       children: [

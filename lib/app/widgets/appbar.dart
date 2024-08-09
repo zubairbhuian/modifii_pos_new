@@ -29,6 +29,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool centerTitle;
   final Widget? title;
   final bool isPrimary;
+  final Function()? onLeading;
 
   const CustomAppBar({
     super.key,
@@ -40,6 +41,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.backgroundColor,
     this.hasButtonsRow = true,
     this.title,
+    this.onLeading,
     this.isPrimary = true,
   });
 // Specify the desired height of the AppBar
@@ -63,7 +65,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       // appbar leading
       leading: !isPrimary
           ? CustomInkWell(
-              onTap: () => Get.back(),
+              onTap: onLeading ?? () {},
               child: const Icon(
                 FontAwesomeIcons.arrowLeft,
                 size: 28,
@@ -112,16 +114,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       size: 28,
                     ),
                   ).marginOnly(right: 20),
-                if (c.isUpdateView)
-                  CustomInkWell(
-                    onTap: () {
-                      Get.to(() => const OrderDetailsView());
-                    },
-                    child: const Icon(
-                      FontAwesomeIcons.arrowLeft,
-                      size: 28,
-                    ),
-                  ).marginOnly(right: 20),
+                // if (c.isUpdateView)
+                //   CustomInkWell(
+                //     onTap: () {
+                //       Get.to(() => const OrderDetailsView());
+                //     },
+                //     child: const Icon(
+                //       FontAwesomeIcons.arrowLeft,
+                //       size: 28,
+                //     ),
+                //   ).marginOnly(right: 20),
                 if (hasHomeButton)
                   CustomInkWell(
                     onTap: () {},

@@ -7,7 +7,8 @@ class TableModel {
       required this.tableAvailability,
       required this.tableCapacity,
       this.currentOrderId,
-      this.employee});
+      this.employee,
+      this.currentOrder});
 
   final String id;
   final String tableName;
@@ -15,6 +16,7 @@ class TableModel {
   final int tableCapacity;
   final String? currentOrderId;
   final Employee? employee;
+  final OrderModel? currentOrder;
   factory TableModel.fromJson(Map<String, dynamic> json) {
     return TableModel(
       id: json["id"] ?? "",
@@ -24,6 +26,9 @@ class TableModel {
       currentOrderId: json["currentOrderId"],
       employee:
           json["employee"] == null ? null : Employee.fromJson(json["employee"]),
+      currentOrder: json["currentOrder"] == null
+          ? null
+          : OrderModel.fromJson(json["currentOrder"]),
     );
   }
 

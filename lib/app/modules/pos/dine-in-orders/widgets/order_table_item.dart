@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_base/app/modules/pos/controllers/orders_controller.dart';
+import 'package:flutter_base/app/modules/pos/controllers/pos_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in-orders/widgets/print/printers_list_dialog.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/controllers/dine_in_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/views/order_details_view.dart';
@@ -59,7 +60,7 @@ class OrderTableItem extends StatelessWidget {
           Expanded(
               child: Center(
             child: MyCustomText(
-              order.orderId ?? "",
+              order.orderId,
               fontSize: titleFontSize,
               fontWeight: fontWeight,
             ),
@@ -77,7 +78,7 @@ class OrderTableItem extends StatelessWidget {
           Expanded(
               child: Center(
             child: MyCustomText(
-              order.table?.tableName ?? "",
+              order.tableName,
               fontSize: titleFontSize,
               fontWeight: fontWeight,
             ),
@@ -96,7 +97,7 @@ class OrderTableItem extends StatelessWidget {
           Expanded(
               child: Center(
             child: MyCustomText(
-              order.orderType,
+              order.orderType.replaceAll("_", "-"),
               fontSize: titleFontSize,
               fontWeight: fontWeight,
             ),
@@ -194,13 +195,8 @@ class OrderTableItem extends StatelessWidget {
                       scale: 1,
                       child: IconButton(
                         onPressed: () async {
-                          PopupDialog.showLoadingDialog();
-                          var hasData =
-                              await DineInController.to.getOrderById(order.id);
-                          PopupDialog.closeLoadingDialog();
-                          if (hasData) {
-                            Get.to(() => const OrderDetailsView());
-                          }
+                          PosController.to.myOrder = order;
+                          Get.to(() => const OrderDetailsView());
                         },
                         icon: const Icon(
                           FontAwesomeIcons.eye,

@@ -6,6 +6,7 @@ import 'package:flutter_base/app/widgets/popup_dialogs.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../models/order_place_model.dart';
 import 'add_to_cart_dialog_options.dart';
@@ -26,6 +27,7 @@ class ProductBody extends GetView<PosController> {
           var item = controller.productList[index];
           return PrimaryBtn(
             onPressed: () {
+              var uuid = const Uuid();
               controller.orderTotalPrice = item.price.toDouble();
               controller.resetModifierSelections();
               controller.checkHasVariations(item.variations);
@@ -34,6 +36,7 @@ class ProductBody extends GetView<PosController> {
                     child: AddToCartDialogOptions(item: item));
               } else {
                 CartModel order = CartModel(
+                  id: uuid.v1(),
                   name: item.name,
                   description: item.description,
                   price: item.price,

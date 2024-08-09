@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_base/app/modules/pos/controllers/pos_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/controllers/dine_in_controller.dart';
+import 'package:flutter_base/app/modules/pos/order/models/order_model.dart';
 import 'package:flutter_base/app/services/controller/base_controller.dart';
 import 'package:flutter_base/app/utils/logger.dart';
 import 'package:flutter_base/app/utils/my_func.dart';
@@ -55,13 +56,17 @@ class TableBody extends GetView<DineInController> {
                           }
                           // if table is BOOKING
                         } else if (table.tableAvailability == "BOOKING") {
-                          PopupDialog.showLoadingDialog();
-                          bool hasData = await controller
-                              .getOrderById(table.currentOrderId ?? "");
-                          PopupDialog.closeLoadingDialog();
-                          if (hasData) {
+                          if (table.currentOrder != null) {
+                            PosController.to.myOrder = table.currentOrder!;
                             Get.to(() => const OrderDetailsView());
                           }
+                          // PopupDialog.showLoadingDialog();
+                          // bool hasData = await controller
+                          //     .getOrderById(table.currentOrderId ?? "");
+                          // PopupDialog.closeLoadingDialog();
+                          // if (hasData) {
+                          //   Get.to(() => const OrderDetailsView());
+                          // }
                         }
                       },
                       // for onDoubleTap

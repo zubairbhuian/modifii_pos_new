@@ -75,19 +75,19 @@ class DineInController extends GetxController {
     "Others",
     "Cash & Card"
   ];
-  OrderModel? myOrder;
+  OrderModel myOrder = OrderModel();
   Future<bool> getOrderById(String id) async {
     try {
       var res = await BaseController.to.apiService
           .makeGetRequest("${URLS.orders}/$id");
       if (res.statusCode == 200) {
-        // myOrder = OrderModel.fromJson(res.data["data"]);
+        myOrder = OrderModel.fromJson(res.data["data"]);
         update();
         PosController.to.myOrder = OrderModel.fromJson(res.data["data"]);
         PosController.to.selectedItemList = List.generate(
             PosController.to.myOrder.carts.length, (index) => "$index");
-        kLogger.e(PosController.to.selectedItemList.length);
-        kLogger.e(PosController.to.selectedItemList);
+        // kLogger.e(PosController.to.selectedItemList.length);
+        // kLogger.e(PosController.to.selectedItemList);
 
         PosController.to.calculateTotalPrice();
         return true;

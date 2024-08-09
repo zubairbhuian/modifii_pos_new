@@ -46,6 +46,27 @@ ThemeData darkTheme = ThemeData(
       return Colors.grey;
     }),
   ),
+
+  switchTheme: SwitchThemeData(
+    thumbColor: MaterialStateProperty.resolveWith((states) {
+      if (states.contains(MaterialState.selected)) {
+        return const Color(0xff0274ff);
+      }
+      return const Color.fromARGB(255, 0, 0, 0);
+    }),
+    trackColor: MaterialStateProperty.resolveWith((states) {
+      if (states.contains(MaterialState.selected)) {
+        return const Color.fromARGB(255, 66, 66, 66);
+      }
+      return Colors.white;
+    }),
+    overlayColor: MaterialStateProperty.resolveWith((states) {
+      if (states.contains(MaterialState.hovered)) {
+        return const Color.fromARGB(50, 223, 223, 223).withOpacity(.1);
+      }
+      return Colors.transparent;
+    }),
+  ),
   //  datePickerTheme
   datePickerTheme: DatePickerThemeData(
     backgroundColor: const Color(0xff2F2D31),

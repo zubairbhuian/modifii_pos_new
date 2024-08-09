@@ -7,6 +7,7 @@ import 'package:flutter_base/app/widgets/custom_textfield.dart';
 import 'package:flutter_base/app/widgets/my_custom_text.dart';
 import 'package:flutter_base/app/widgets/popup_dialogs.dart';
 import 'package:get/get.dart';
+import 'package:uuid/uuid.dart';
 
 class CustomOrderDialogOptions extends StatefulWidget {
   final String productType;
@@ -205,7 +206,9 @@ class _CustomOrderDialogOptionsState extends State<CustomOrderDialogOptions> {
         Center(
           child: PrimaryBtn(
             onPressed: () {
+              var uuid = const Uuid();
               CartModel item = CartModel(
+                 id: uuid.v1(),
                   isLiquor: widget.isLiquor ?? false,
                   isCustomProduct: true,
                   name: _nameController.text,

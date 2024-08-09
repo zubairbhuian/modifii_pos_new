@@ -6,6 +6,7 @@ class URLS {
   //** end popint **
   static String login = '$baseURL/auth/login';
   static String employeeLogin = '$baseURL/employees/login';
+  static String employees = '$baseURL/employees';
   static String clockIn = '$baseURL/clocks/clock-in';
   static String clockOut = '$baseURL/clocks/clock-out';
   static String categories = '$baseURL/categories';
