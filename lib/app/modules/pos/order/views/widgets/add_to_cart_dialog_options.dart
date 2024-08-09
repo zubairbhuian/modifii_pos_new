@@ -6,6 +6,7 @@ import 'package:flutter_base/app/utils/static_colors.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
 import 'package:flutter_base/app/widgets/my_custom_text.dart';
 import 'package:get/get.dart';
+import 'package:uuid/uuid.dart';
 import '../../models/order_place_model.dart';
 
 class AddToCartDialogOptions extends StatelessWidget {
@@ -21,7 +22,7 @@ class AddToCartDialogOptions extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(height: 14),
+          const SizedBox(height: 14),
           //item name & price
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -48,7 +49,7 @@ class AddToCartDialogOptions extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           MyCustomText(
-            item.description == '' ? 'N/A' : item.description ,
+            item.description == '' ? 'N/A' : item.description,
             fontSize: 14,
           ),
           const SizedBox(height: 24),
@@ -70,12 +71,14 @@ class AddToCartDialogOptions extends StatelessWidget {
                           c.setSelectedProductVariationValue(index);
                           // c.orderTotalPrice =
                           //     num.parse(variation.values[index].optionPrice);
-                          price = c.orderTotalPrice =variation.options[index].price;
+                          price = c.orderTotalPrice =
+                              variation.options[index].price;
                           c.orderQuantity = 1;
                           c.update();
                         },
                         label: variation.options[index].name,
-                        price: variation.options[index].price.toStringAsFixed(2),
+                        price:
+                            variation.options[index].price.toStringAsFixed(2),
                         isSelected: c.selectedProductVariationValue == index
                             ? true
                             : false,
@@ -163,22 +166,23 @@ class AddToCartDialogOptions extends StatelessWidget {
               alignment: Alignment.bottomCenter,
               child: PrimaryBtn(
                 onPressed: () {
+                  var uuid = const Uuid();
                   PosController.to.resetModifierSelections();
                   CartModel order = CartModel(
-                    name: item.name,
-                    description: item.description,
-                    price: price,
-                    quantity: c.orderQuantity,
-                    // isLiquor: int.parse(item.isLiquor.toString()),
-                    isLiquor: false,
-                    toGo: '',
-                    dontMake: '',
-                    rush: '',
-                    heat: '',
-                    serveFirst: '',
-                    kitchenNote: '',
-                    discountAmount: 0
-                  );
+                      id: uuid.v1(),
+                      name: item.name,
+                      description: item.description,
+                      price: price,
+                      quantity: c.orderQuantity,
+                      // isLiquor: int.parse(item.isLiquor.toString()),
+                      isLiquor: false,
+                      toGo: '',
+                      dontMake: '',
+                      rush: '',
+                      heat: '',
+                      serveFirst: '',
+                      kitchenNote: '',
+                      discountAmount: 0);
                   //** Add item **
                   c.onAddCartItem(order);
                   Get.back();

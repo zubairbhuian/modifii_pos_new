@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_base/app/modules/pos/controllers/pos_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/controllers/dine_in_controller.dart';
+import 'package:flutter_base/app/modules/pos/dine-in/views/order_details_view.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/widgets/table_body.dart';
 import 'package:flutter_base/app/modules/pos/order/views/widgets/search_custom_item_row.dart';
 import 'package:flutter_base/app/modules/pos/order/views/widgets/cart_item.dart';
 import 'package:flutter_base/app/modules/pos/order/views/widgets/category_body.dart';
 import 'package:flutter_base/app/modules/pos/order/views/widgets/product_body.dart';
-import 'package:flutter_base/app/utils/my_func.dart';
 import 'package:flutter_base/app/utils/my_reg_exp.dart';
 import 'package:flutter_base/app/utils/static_colors.dart';
 import 'package:flutter_base/app/widgets/app_indecator.dart';
@@ -239,6 +238,7 @@ class OrderView extends GetView<PosController> {
                 children: [
                   Expanded(
                       child: CustomTextField(
+                    readOnly: controller.isGuestNameReadOnly,
                     // focusNode: controller.tableFocusNode,
                     controller: controller.guestNameController,
                     hintText: "Guests Name",
@@ -246,6 +246,7 @@ class OrderView extends GetView<PosController> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: CustomTextField(
+                      readOnly: controller.isGuestPhoneReadOnly,
                       controller: controller.guestPhoneController,
                       hintText: "Phone Number",
                       keyboardType: TextInputType.number,
@@ -272,12 +273,13 @@ class OrderView extends GetView<PosController> {
                 children: [
                   Expanded(
                       child: CustomTextField(
+                    readOnly: controller.isTableReadOnly,
                     focusNode: controller.tableFocusNode,
                     controller: controller.tableController,
                     hintText: "Table / Bar",
-                    prefixText:
-                        controller.currentTable != null ? "Table: " : null,
-                    readOnly: true,
+                    prefixText: controller.tableController.text.isNotEmpty
+                        ? "Table: "
+                        : null,
                     onTap: () {
                       DineInController.to.getTableCategories();
                       PopupDialog.customDialog(
@@ -290,6 +292,7 @@ class OrderView extends GetView<PosController> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: CustomTextField(
+                      readOnly: controller.isGuestReadOnly,
                       controller: controller.guestController,
                       focusNode: controller.guestFocusNode,
                       hintText: "No. of Guests ",
@@ -402,13 +405,33 @@ class OrderView extends GetView<PosController> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               child: Row(
                 children: [
+                  if (controller.isUpdateView)
+                    Expanded(
+                        child: PrimaryBtn(
+                      onPressed: controller.clearCartList,
+                      height: 48,
+                      color: StaticColors.blueColor,
+                      textColor: Colors.white,
+                      text: 'Print items',
+                    )),
+                  if (controller.isUpdateView)
+                    const SizedBox(
+                      width: 16,
+                    ),
                   Expanded(
                     child: PrimaryBtn(
                       onPressed: () async {
                         if (controller.isUpdateView) {
                           PopupDialog.showLoadingDialog();
-                          await controller.onUpdateOrder(controller.myOrder.id);
+                          bool isUpdated = await controller
+                              .onUpdateOrder(controller.myOrder.id);
+
                           PopupDialog.closeLoadingDialog();
+                          if (isUpdated) {
+                            Get.to(() => const OrderDetailsView());
+                            PosController.to.isUpdateView = false;
+                            PosController.to.onEditableAllCartTextField();
+                          }
                         } else {
                           PopupDialog.showLoadingDialog();
                           await controller.onPlaseOrder();
@@ -423,16 +446,17 @@ class OrderView extends GetView<PosController> {
                           : 'Place Order',
                     ),
                   ),
-                  const SizedBox(width: 20),
-                  Expanded(
-                    child: PrimaryBtn(
-                      onPressed: controller.clearCartList,
-                      height: 48,
-                      color: theme.colorScheme.error,
-                      textColor: Colors.white,
-                      text: 'Cancel',
+                  if (!controller.isUpdateView) const SizedBox(width: 20),
+                  if (!controller.isUpdateView)
+                    Expanded(
+                      child: PrimaryBtn(
+                        onPressed: controller.clearCartList,
+                        height: 48,
+                        color: theme.colorScheme.error,
+                        textColor: Colors.white,
+                        text: 'Cancel',
+                      ),
                     ),
-                  ),
                 ],
               ),
             )

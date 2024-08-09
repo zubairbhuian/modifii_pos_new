@@ -43,7 +43,8 @@ class PrimaryBtn extends StatelessWidget {
       this.textMaxSize = 18,
       this.textMinSize = 14,
       this.maxLines,
-      this.fontWeight, this.borderWidth});
+      this.fontWeight,
+      this.borderWidth});
 
   @override
   Widget build(BuildContext context) {
@@ -72,8 +73,16 @@ class PrimaryBtn extends StatelessWidget {
             //   return theme.disabledColor.withOpacity(.6);
             // }
             return isdisabled
-                ? theme.scaffoldBackgroundColor
+                ? color?.withOpacity(.7)
                 : color ?? theme.primaryColor;
+          }),
+          foregroundColor: MaterialStateProperty.resolveWith<Color?>((states) {
+            // if (states.contains(MaterialState.)) {
+            //   return theme.disabledColor.withOpacity(.6);
+            // }
+            return isdisabled
+                ? textColor?.withOpacity(.8)
+                : textColor ?? Colors.white;
           }),
           padding: MaterialStateProperty.all(
             padding ?? const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
@@ -105,30 +114,6 @@ class PrimaryBtn extends StatelessWidget {
             return SystemMouseCursors.basic; // Default cursor
           }), // Remove hover color
         ),
-
-        // style: ElevatedButton.styleFrom(
-        //   elevation: 0,
-        //   // textStyle: style ?? theme.textTheme.labelLarge,
-        //   // disabledBackgroundColor: kDisabledColor,
-        //   // disabledForegroundColor: kDisabledTextColor,
-        //   surfaceTintColor: Colors.transparent,
-        //   backgroundColor: isdisabled
-        //       ? theme.disabledColor.withOpacity(.6)
-        //       : color ?? theme.scaffoldBackgroundColor,
-        //   // splashFactory: NoSplash.splashFactory,
-        //   padding: padding ??
-        //       const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-        //   shape: RoundedRectangleBorder(
-        //     borderRadius: BorderRadius.circular(borderRadius ?? 0),
-        //   ),
-        //   // ****** Border color *******
-        //   side: isOutline == true
-        //       ? BorderSide(
-        //           color: borderColor ?? theme.colorScheme.background,
-        //           width: 1.5,
-        //         )
-        //       : null,
-        // ),
         child: AutoSizeText(
           text,
           maxLines: maxLines ?? 2, maxFontSize: textMaxSize,
@@ -138,7 +123,7 @@ class PrimaryBtn extends StatelessWidget {
               TextStyle(
                 fontWeight: fontWeight,
                 color: isdisabled
-                    ? theme.disabledColor
+                    ? textColor ?? theme.colorScheme.background.withOpacity(.8)
                     : textColor ?? theme.colorScheme.background,
               ),
           // overflow: TextOverflow.ellipsis,
@@ -265,6 +250,7 @@ class PrimaryBtnWithChild extends StatelessWidget {
             ? ElevatedButton.styleFrom(
                 elevation: elevation ?? 1,
                 alignment: alignment,
+                enabledMouseCursor: MouseCursor.uncontrolled,
                 // textStyle: style ?? theme.textTheme.labelLarge,
                 // disabledBackgroundColor: kDisabledColor,
                 // disabledForegroundColor: kDisabledTextColor,
@@ -283,6 +269,7 @@ class PrimaryBtnWithChild extends StatelessWidget {
                 // ),
                 )
             : ElevatedButton.styleFrom(
+                enabledMouseCursor: SystemMouseCursors.noDrop,
                 elevation: 0,
                 // textStyle: style ?? theme.textTheme.labelLarge,
                 // disabledBackgroundColor: kDisabledColor,

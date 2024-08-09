@@ -1,6 +1,11 @@
+import 'package:dropdown_textfield/dropdown_textfield.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_base/app/modules/pos/controllers/orders_controller.dart';
 import 'package:flutter_base/app/modules/pos/controllers/pos_controller.dart';
+import 'package:flutter_base/app/modules/pos/dine-in-orders/controllers/dine_in_order_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in-orders/widgets/print/print_order_dialog.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/controllers/dine_in_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/views/split_order_view.dart';
@@ -10,14 +15,16 @@ import 'package:flutter_base/app/modules/pos/order/models/order_model.dart';
 import 'package:flutter_base/app/routes/app_pages.dart';
 import 'package:flutter_base/app/services/controller/config_controller.dart';
 import 'package:flutter_base/app/utils/logger.dart';
+import 'package:flutter_base/app/utils/my_func.dart';
 import 'package:flutter_base/app/utils/static_colors.dart';
 import 'package:flutter_base/app/widgets/appbar.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
+import 'package:flutter_base/app/widgets/custom_textfield.dart';
 import 'package:flutter_base/app/widgets/my_custom_text.dart';
 // import 'package:flutter_base/app/widgets/my_custom_text.dart';
 import 'package:flutter_base/app/widgets/popup_dialogs.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/get_state_manager.dart';
 
 import '../widgets/custom_table_item.dart';
 
@@ -27,13 +34,17 @@ class OrderDetailsView extends GetView<DineInController> {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    const double btnSize = 115;
+    const double btnSize = 120;
     const double height = 80;
     const double textMaxSize = 30;
     const double textMinSize = 11;
     return Scaffold(
-      appBar: const CustomAppBar(
+      appBar: CustomAppBar(
         isPrimary: false,
+        onLeading: () {
+          PosController.to.clearCartList();
+          Get.back();
+        },
       ),
       body: GetBuilder<PosController>(builder: (controller) {
         var data = controller.myOrder;
@@ -74,7 +85,10 @@ class OrderDetailsView extends GetView<DineInController> {
                         height: height,
                         onPressed: () {
                           Get.back();
+                          controller.isUpdateView = false;
+                          controller.clearCartList();
                           PosController.to.onchangePage(0);
+                          controller.update();
                         },
                         color: StaticColors.greenColor,
                         textColor: Colors.white,
@@ -82,56 +96,61 @@ class OrderDetailsView extends GetView<DineInController> {
                         textMaxSize: textMaxSize,
                         textMinSize: textMinSize,
                       ),
-                      PrimaryBtn(
-                        width: btnSize,
-                        height: height,
-                        textMaxSize: textMaxSize,
-                        textMinSize: textMinSize,
-                        onPressed: () {
-                          Get.back();
-                          PosController.to.isUpdateView = true;
-                          PosController.to.guestController.text =
-                              data.numberOfPeople.toString();
-                          PosController.to.tableController.text =
-                              data.table?.tableName ?? "";
-                          PosController.to.onchangePage(0);
-                        },
-                        // Add Items,Change Table,Guests
-                        text: 'Add Items'.toUpperCase(),
-                        textColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 10),
-                        color: theme.primaryColor,
-                      ).marginOnly(left: 12),
-                      PrimaryBtn(
-                        onPressed: () {},
-                        width: btnSize,
-                        height: height,
-                        textMaxSize: textMaxSize,
-                        textMinSize: textMinSize,
-                        text: 'Repeat Items'.toUpperCase(),
-                        textColor: Colors.white,
-                        color: StaticColors.greenColor,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 10),
-                      ).marginOnly(left: 12),
-                      PrimaryBtn(
-                        onPressed: () {},
-                        width: btnSize,
-                        height: height,
-                        textMaxSize: textMaxSize,
-                        textMinSize: textMinSize,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 10),
-                        text: 'Transfer Items'.toUpperCase(),
-                        textColor: Colors.white,
-                        color: StaticColors.pinkColor,
-                      ).marginOnly(left: 12),
-                    ],
-                  ),
-                  // const Spacer(),
-                  Row(
-                    children: [
+
+                      GetBuilder<PosController>(builder: (context) {
+                        return PrimaryBtnWithChild(
+                          width: btnSize,
+                          height: height,
+                          onPressed: () {},
+                          textColor: Colors.white,
+                          color: context.selectedItemList.isEmpty
+                              ? StaticColors.blueColor.withOpacity(.7)
+                              : StaticColors.blueColor,
+                          // width: double.infinity,
+                          child: const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(FontAwesomeIcons.print),
+                              SizedBox(height: 6),
+                              Text("Print Items"),
+                            ],
+                          ),
+                        ).marginOnly(left: 16);
+                      }),
+                      GetBuilder<PosController>(builder: (context) {
+                        return PrimaryBtnWithChild(
+                          width: btnSize,
+                          height: height,
+                          // isdisabled:
+                          //     context.selectedItemList.isEmpty ? true : false,
+                          // textMaxSize: textMaxSize,
+                          // textMinSize: textMinSize,
+                          onPressed: () {
+                            PopupDialog.customDialog(
+                                width: 435,
+                                topLavel: Text(
+                                  "Print Invoice",
+                                  style: theme.textTheme.labelMedium,
+                                ),
+                                child: PrintOrderDialog(
+                                  order: controller.myOrder,
+                                ));
+                          },
+                          // maxLines: 3,
+                          textColor: Colors.white,
+                          color: StaticColors.blueLightColor,
+                          // width: double.infinity,
+                          child: const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(FontAwesomeIcons.print),
+                              SizedBox(height: 6),
+                              Text("Print Check"),
+                            ],
+                          ),
+                        ).marginOnly(left: 16);
+                      }),
+
                       PrimaryBtn(
                         onPressed: () {
                           Get.to(() => const SplitOrderView());
@@ -146,94 +165,43 @@ class OrderDetailsView extends GetView<DineInController> {
                         textColor: Colors.white,
                         color: theme.primaryColor,
                       ).marginOnly(left: 12),
-                      PrimaryBtn(
-                        width: btnSize,
-                        height: height,
-                        textMaxSize: textMaxSize,
-                        textMinSize: textMinSize,
-                        onPressed: () {
-                          PopupDialog.customDialog(
-                              width: 700, child: const DiscountDialog());
-                        },
-                        // width: double.infinity,
-                        text: 'Discount'.toUpperCase(),
-                        textColor: Colors.white,
-                        color: StaticColors.blueColor,
-                      ).marginOnly(left: 12),
+                      GetBuilder<PosController>(builder: (context) {
+                        return PrimaryBtn(
+                          width: btnSize,
+                          height: height,
+                          isdisabled:
+                              context.selectedItemList.isEmpty ? true : false,
+                          textMaxSize: textMaxSize,
+                          textMinSize: textMinSize,
+                          onPressed: () {
+                            PopupDialog.customDialog(
+                                width: 700, child: const DiscountDialog());
+                          },
+                          // width: double.infinity,
+                          text: 'Discount'.toUpperCase(),
+                          textColor: Colors.white,
+                          color: StaticColors.blueColor,
+                        ).marginOnly(left: 12);
+                      }),
+                      // right side
                     ],
                   ),
-
-                  Row(
-                    children: [
-                      PrimaryBtn(
-                        width: btnSize,
-                        height: height,
-                        textMaxSize: textMaxSize,
-                        textMinSize: textMinSize,
-                        onPressed: () {
-                          PopupDialog.customDialog(
-                              width: 435,
-                              topLavel: Text(
-                                "Print Invoice",
-                                style: theme.textTheme.labelMedium,
-                              ),
-                              child: PrintOrderDialog(
-                                order: controller.myOrder,
-                              ));
-                        },
-                        // width: double.infinity,
-                        text: 'Print Check'.toUpperCase(),
-
-                        textColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 8),
-                        color: StaticColors.blueLightColor,
-                      ).marginOnly(left: 12, right: 12),
-                      PrimaryBtn(
-                        width: btnSize,
-                        height: height,
-                        textMaxSize: textMaxSize,
-                        textMinSize: textMinSize,
-                        onPressed: () {},
-                        // width: double.infinity,
-                        text: 'Print Items'.toUpperCase(),
-                        maxLines: 3,
-                        textColor: Colors.white,
-                        color: StaticColors.blueColor,
-                      ).marginOnly(right: 16),
-
-                      // PrimaryBtn(
-                      //   width: btnSize,
-                      //   height: btnSize,
-                      //   textMaxSize: textMaxSize,
-                      //   textMinSize: textMinSize,
-                      //   onPressed: () {
-                      //     OrdersController.to.printReceipt();
-                      //   },
-                      //   // width: double.infinity,
-                      //   text: 'Print Items for Kicken / Bar'.toUpperCase(),
-                      //   textColor: Colors.white,
-                      //   maxLines: 4,
-                      //   color: StaticColors.greenColor,
-                      // ).marginOnly(left: 12),
-                    ],
-                  )
                 ],
               ).marginOnly(left: 25),
 
               // title area
-              _titleRow(theme, data).marginOnly(left: 25),
+              GetBuilder<PosController>(builder: (context) {
+                return _titleRow(theme, context.myOrder).marginOnly(left: 25);
+              }),
               Expanded(
-                child: SingleChildScrollView(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // for order details
-                      Expanded(child: _itemDetails(theme, data)),
-                      // order setup
-                      SizedBox(width: 400, child: _orderSetup(theme)),
-                    ],
-                  ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // for order details
+                    Expanded(child: _itemDetails(theme, data)),
+                    // order setup
+                    SizedBox(width: 400, child: _orderSetup(theme)),
+                  ],
                 ),
               ),
               const SizedBox(height: 50),
@@ -245,33 +213,87 @@ class OrderDetailsView extends GetView<DineInController> {
   }
 
   // title row widgets
-  Widget _titleRow(ThemeData theme, OrderModel? data) {
+  Widget _titleRow(ThemeData theme, OrderModel data) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
           Text(
-            'Order: #${data?.orderId}',
+            'Order: #${data.orderId}',
             style: theme.textTheme.titleMedium,
           ).marginOnly(right: 16),
           Text(
-            'Items: ${data?.carts.length}',
+            'Items: ${data.carts.length}',
             style: theme.textTheme.titleMedium,
           ).marginOnly(right: 16),
           Text(
-            'Table: ${data?.table?.tableName}',
+            'Table: ${data.tableName}',
             style: theme.textTheme.titleMedium,
           ).marginOnly(right: 16),
           Text(
-            'Guests: ${data?.numberOfPeople}',
+            'Guests: ${data.numberOfPeople}',
             style: theme.textTheme.titleMedium,
           ).marginOnly(right: 16),
+          InkWell(
+            onTap: () {
+              PopupDialog.customDialog(
+                  width: 500,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Change Server',
+                        style: theme.textTheme.displaySmall,
+                      ),
+                      const SizedBox(height: 22),
+                      Text(
+                        'Select Server',
+                        style: theme.textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      GetBuilder<DineInOrderController>(builder: (context) {
+                        return CustomSearchTextField(
+                          dropDownItemCount: context.orderStatusList.length,
+                          hintText: data.employee?.firstName,
+                          dropDownList: List.generate(
+                              PosController.to.employeeList.length, (index) {
+                            var data = PosController.to.employeeList[index];
+                            return DropDownValueModel(
+                                name: data.firstName, value: data.id);
+                          }),
+                          onChanged: (value) async {
+                            PopupDialog.showLoadingDialog();
+                            bool isLoaded = await PosController.to
+                                .onUpdateOrderItems(PosController.to.myOrder.id,
+                                    employeeId: "${value.value}");
+                            PopupDialog.closeLoadingDialog();
+                            if (isLoaded) {
+                              Get.back();
+                            }
+
+                            // DineInOrderController.to.getAllOrders();
+                          },
+                        );
+                      }),
+                      const SizedBox(height: 35),
+                    ],
+                  ));
+            },
+            child: Row(
+              children: [
+                Text(
+                  'Server:${MyFunc.capitalizeEachWord(s: data.employee?.firstName)}',
+                  style: theme.textTheme.titleMedium,
+                ),
+                const Icon(
+                  Icons.edit_square,
+                  color: StaticColors.blueLightColor,
+                )
+              ],
+            ).marginOnly(right: 16),
+          ),
           Text(
-            'Server:${data?.employee?.firstName}',
-            style: theme.textTheme.titleMedium,
-          ).marginOnly(right: 16),
-          Text(
-            'Order Type: ${data?.orderType}'.replaceAll("_", " "),
+            'Order Type: ${data.orderType}'.replaceAll("_", " "),
             style: theme.textTheme.titleMedium,
           ).marginOnly(right: 16),
         ],
@@ -303,8 +325,26 @@ class OrderDetailsView extends GetView<DineInController> {
                 style: theme.textTheme.titleLarge,
               ),
               const SizedBox(height: 12),
-              // CustomDropdownTextField(data: const [], onChanged: (value) {}),
-              // const SizedBox(height: 16),
+              GetBuilder<DineInOrderController>(builder: (context) {
+                return CustomSearchTextField(
+                  dropDownItemCount: context.orderStatusList.length,
+                  hintText: PosController.to.myOrder.orderStatus,
+                  dropDownList: const [
+                    DropDownValueModel(name: "COMPLETED", value: "COMPLETED"),
+                    DropDownValueModel(name: "CANCELED", value: "CANCELED"),
+                    DropDownValueModel(name: "CONFIRMED", value: "CONFIRMED"),
+                  ],
+                  onChanged: (value) async {
+                    PopupDialog.showLoadingDialog();
+                    await PosController.to.onUpdateOrderItems(
+                        PosController.to.myOrder.id,
+                        orderStatus: "${value.name}".toUpperCase());
+                    PopupDialog.closeLoadingDialog();
+                    DineInOrderController.to.getAllOrders();
+                  },
+                );
+              }),
+              const SizedBox(height: 16),
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -319,26 +359,28 @@ class OrderDetailsView extends GetView<DineInController> {
                         style: theme.textTheme.bodyLarge,
                       ),
                     ),
-                    GetBuilder<PosController>(builder: (controller) {
+                    GetBuilder<PosController>(builder: (c) {
                       return Row(
                         children: [
                           Text(
-                            'Unpaid',
+                            c.myOrder.paymentStatus,
                             style: theme.textTheme.titleSmall?.copyWith(
                                 fontWeight: FontWeight.w700,
                                 color: theme.disabledColor),
                           ),
                           Switch(
-                            value: controller.myOrder.paymentStatus == "UNPAID"
+                            value: c.myOrder.paymentStatus == "UNPAID"
                                 ? false
                                 : true,
                             onChanged: (value) async {
-                              controller.myOrder.paymentStatus == "PAID";
-
-                              PopupDialog.showLoadingDialog();
-                              await controller
-                                  .onUpdateOrder(controller.myOrder.orderId);
-                              PopupDialog.closeLoadingDialog();
+                              if (c.myOrder.paymentStatus == "UNPAID") {
+                                PopupDialog.showLoadingDialog();
+                                await PosController.to.onUpdateOrderItems(
+                                    c.myOrder.id,
+                                    paymentStatus: "PAID");
+                                PopupDialog.closeLoadingDialog();
+                                DineInOrderController.to.getAllOrders();
+                              }
                             },
                             splashRadius: 12,
                           )
@@ -420,7 +462,11 @@ class OrderDetailsView extends GetView<DineInController> {
   }
 
   // item details
-  Widget _itemDetails(ThemeData theme, OrderModel? data) {
+  Widget _itemDetails(ThemeData theme, OrderModel data) {
+    const double btnSize = 180;
+    const double height = 60;
+    const double textMaxSize = 30;
+    const double textMinSize = 11;
     return Container(
       // width: double.infinity,
       padding: const EdgeInsets.all(12.0),
@@ -433,135 +479,63 @@ class OrderDetailsView extends GetView<DineInController> {
           // header
 
           const SizedBox(height: 16),
-
-          SizedBox(
-            // width: 1900,
-            child: Column(
-              children: [
-                // header
-                GetBuilder<PosController>(builder: (c) {
-                  return CustomTableItem(
-                    isSelected: c.selectedItemList.isNotEmpty,
-                    isHeader: true,
-                    onChanged: (value) {
-                      c.toggleAllSelectedItem();
-                    },
-                  );
-                }),
-                ...List.generate(data!.carts.length, (index) {
-                  var item = data.carts[index];
-                  var tax = (item.price - item.discountAmount) * .05;
-                  var totalPrice =
-                      (item.price - item.discountAmount) * item.quantity;
-                  var discount = item.discountAmount;
-                  return GetBuilder<PosController>(builder: (c) {
-                    return CustomTableItem(
-                      onTap: () {
-                        c.onChangeSelectedItemList("$index");
-                      },
-                      isSelected: c.selectedItemList.contains("$index"),
-                      onChanged: (value) {
-                        kLogger.e(c.onChangeSelectedItemList.toString());
-                        c.onChangeSelectedItemList(index.toString());
-                      },
-                      sl: "${index + 1}",
-                      name: item.name,
-                      qty: "${item.quantity}",
-                      discount: "\$ ${discount.toStringAsFixed(2)}",
-                      tax: "\$ ${tax.toStringAsFixed(2)}",
-                      totalPrice: "\$ ${totalPrice.toStringAsFixed(2)}",
-                      price: "\$ ${item.price}",
-                    );
-                  });
-                })
-              ],
+          // header
+          GetBuilder<PosController>(builder: (c) {
+            return CustomTableItem(
+              isSelected: c.selectedItemList.isNotEmpty,
+              isHeader: true,
+              onChanged: (value) {
+                c.toggleAllSelectedItem();
+              },
+            );
+          }),
+          Expanded(
+            child: SingleChildScrollView(
+              // width: 1900,
+              child: Column(
+                children: [
+                  Column(
+                    children: List.generate(data.carts.length, (index) {
+                      var item = data.carts[index];
+                      var tax = (item.price - item.discountAmount) * .05;
+                      var totalPrice =
+                          (item.price - item.discountAmount) * item.quantity;
+                      var discount = item.discountAmount;
+                      return GetBuilder<PosController>(builder: (c) {
+                        return CustomTableItem(
+                          onTap: () {
+                            c.onChangeSelectedItemList("$index");
+                          },
+                          isSelected: c.selectedItemList.contains("$index"),
+                          onChanged: (value) {
+                            kLogger.e(c.onChangeSelectedItemList.toString());
+                            c.onChangeSelectedItemList(index.toString());
+                          },
+                          sl: "${index + 1}",
+                          name: item.name,
+                          qty: "${item.quantity}",
+                          discount: "\$ ${discount.toStringAsFixed(2)}",
+                          tax: "\$ ${tax.toStringAsFixed(2)}",
+                          totalPrice: "\$ ${totalPrice.toStringAsFixed(2)}",
+                          price: "\$ ${item.price}",
+                        );
+                      });
+                    }),
+                  ),
+                ],
+              ),
             ),
           ),
 
-          SizedBox(
-            child: Column(
-              children: [
-                // header
-                Container(
-                  decoration: BoxDecoration(color: theme.disabledColor),
-                  child: const Row(),
-                )
-                // items
-              ],
-            ),
+          const Divider(
+            height: 20,
           ),
-
-          // btns area
-          const SizedBox(height: 24),
-          const Divider(),
-          // Row(
-          //   children: [
-          //     Expanded(
-          //       child: PrimaryBtn(
-          //         onPressed: () {
-          //           Get.back();
-          //           PosController.to.isUpdateView = true;
-          //           PosController.to.guestController.text =
-          //               data.numberOfPeople.toString();
-          //           PosController.to.tableController.text =
-          //               data.table?.tableName ?? "";
-          //           PosController.to.onchangePage(0);
-          //         },
-          //         // width: double.infinity,
-          //         text: 'Add Items,Change Table,Guests',
-          //         textColor: Colors.white,
-          //         padding:
-          //             const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          //         color: theme.primaryColor,
-          //       ),
-          //     ),
-          //     Expanded(
-          //       child: PrimaryBtn(
-          //         onPressed: () {},
-          //         // width: double.infinity,
-          //         text: 'Repeat Items',
-          //         textColor: Colors.white,
-          //         color: StaticColors.greenColor,
-          //       ).marginOnly(left: 12),
-          //     ),
-          //     Expanded(
-          //       child: PrimaryBtn(
-          //         onPressed: () {
-          //           Get.to(() => const SplitOrderView());
-          //         },
-          //         // width: double.infinity,
-          //         text: 'Split Order',
-          //         textColor: Colors.white,
-          //         color: theme.primaryColor,
-          //       ).marginOnly(left: 12),
-          //     ),
-          //     Expanded(
-          //       child: PrimaryBtn(
-          //         onPressed: () {},
-          //         // width: double.infinity,
-          //         text: 'Transfer Items',
-          //         textColor: Colors.white,
-          //         color: StaticColors.pinkColor,
-          //       ).marginOnly(left: 12),
-          //     ),
-          //     Expanded(
-          //       child: PrimaryBtn(
-          //         onPressed: () {},
-          //         // width: double.infinity,
-          //         text: 'Discount Check',
-          //         textColor: Colors.white,
-          //         color: StaticColors.blueColor,
-          //       ).marginOnly(left: 12),
-          //     ),
-          //   ],
-          // ),
-
-          const SizedBox(height: 16),
           _row(theme,
               title: "Subtotal :",
-              fontSize: 16,
+              fontSize: 17,
               value: "\$ ${data.subTotal.toStringAsFixed(2)}",
-              fontWeight: FontWeight.w500),
+              fontWeight: FontWeight.w800),
+          const SizedBox(height: 8),
           _row(theme,
               title: "GST 5% :",
               fontSize: 16,
@@ -570,6 +544,7 @@ class OrderDetailsView extends GetView<DineInController> {
           Visibility(
             visible: data.totalGratuity > 0,
             child: _row(
+              fontWeight: FontWeight.w500,
               theme,
               title: "Gratuity 18% : ",
               value: "\$${data.totalGratuity.toStringAsFixed(2)}",
@@ -578,6 +553,7 @@ class OrderDetailsView extends GetView<DineInController> {
           Visibility(
             visible: data.totalPst > 0,
             child: _row(
+              fontWeight: FontWeight.w500,
               theme,
               title: "PST 10% : ",
               value: "\$${data.totalPst.toStringAsFixed(2)}",
@@ -586,6 +562,7 @@ class OrderDetailsView extends GetView<DineInController> {
           Visibility(
             visible: data.tip > 0,
             child: _row(
+              fontWeight: FontWeight.w500,
               theme,
               title: "Tip : ",
               value: "\$${data.tip.toStringAsFixed(2)}",
@@ -594,15 +571,145 @@ class OrderDetailsView extends GetView<DineInController> {
           Visibility(
             visible: data.totalDiscount > 0,
             child: _row(
+              child: InkWell(
+                onTap: () {
+                  PopupDialog.customDialog(
+                      width: 500,
+                      child: Column(
+                        children: [
+                          Text(
+                            'Are you sure to delete this Discount?',
+                            style: theme.textTheme.displaySmall,
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 22),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              PrimaryBtn(
+                                onPressed: () async {
+                                  PosController.to.deleteDiscount();
+                                  Get.back();
+                                  await PosController.to.onUpdateOrder(
+                                      PosController.to.myOrder.id,
+                                      isClearList: false);
+                                },
+                                width: 120,
+                                height: 60,
+                                text: "Yes",
+                                textMaxSize: 35,
+                                textMinSize: 30,
+                                textColor: Colors.white,
+                                color: StaticColors.greenColor,
+                              ),
+                              const SizedBox(width: 16),
+                              PrimaryBtn(
+                                  width: 120,
+                                  height: 60,
+                                  textMaxSize: 35,
+                                  textMinSize: 30,
+                                  textColor: Colors.white,
+                                  color: StaticColors.redColor,
+                                  onPressed: () {
+                                    Get.back();
+                                  },
+                                  text: "No"),
+                            ],
+                          )
+                        ],
+                      ));
+                },
+                child: const Icon(
+                  Icons.delete,
+                  color: StaticColors.redColor,
+                ),
+              ),
+              fontWeight: FontWeight.w500,
               theme,
               title: "Discount : ",
               value: "\$${data.totalDiscount.toStringAsFixed(2)}",
             ),
           ),
+          const SizedBox(height: 12),
           _row(theme,
               title: "Total :",
               value: "\$ ${data.totalOrderAmount.toStringAsFixed(2)}",
-              fontSize: 18),
+              fontSize: 18,
+              fontWeight: FontWeight.w800),
+          const SizedBox(height: 30),
+          Row(
+            children: [
+              PrimaryBtn(
+                width: 200,
+                height: height,
+                textMaxSize: textMaxSize,
+                textMinSize: textMinSize,
+                onPressed: () {
+                  PosController.to.isUpdateView = true;
+                  PosController.to.guestController.text =
+                      data.numberOfPeople.toString();
+                  PosController.to.tableController.text = data.tableName;
+                  PosController.to.guestNameController.text = data.guestName;
+                  PosController.to.guestPhoneController.text =
+                      data.guestPhoneNumber;
+                  // unable to edit
+                  PosController.to.onReadOnlyAllCartTextField();
+                  // Get.to(() => const OrderDetailsView());
+                  Get.back();
+                  PosController.to.onchangePage(0);
+                },
+                // Add Items,Change Table,Guests
+                text: 'Add Items ,\nChange Table, Guests'.toUpperCase(),
+                textColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
+                color: theme.primaryColor,
+              ),
+              GetBuilder<PosController>(builder: (context) {
+                return PrimaryBtn(
+                  onPressed: () {},
+                  width: btnSize,
+                  height: height,
+                  isdisabled: context.selectedItemList.isEmpty ? true : false,
+                  textMaxSize: textMaxSize,
+                  textMinSize: textMinSize,
+                  text: 'Repeat Items'.toUpperCase(),
+                  textColor: Colors.white,
+                  color: StaticColors.greenColor,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
+                ).marginOnly(left: 12);
+              }),
+              PrimaryBtn(
+                onPressed: () {},
+                width: btnSize,
+                height: height,
+                textMaxSize: textMaxSize,
+                textMinSize: textMinSize,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
+                text: 'Transfer Items'.toUpperCase(),
+                textColor: Colors.white,
+                color: StaticColors.pinkColor,
+              ).marginOnly(left: 12),
+              GetBuilder<PosController>(builder: (context) {
+                return PrimaryBtn(
+                  width: btnSize,
+                  height: height,
+                  isdisabled: context.selectedItemList.isEmpty ? true : false,
+                  textMaxSize: textMaxSize,
+                  textMinSize: textMinSize,
+                  onPressed: () {
+                    context.removeAllSelectedItem();
+                  },
+                  // width: double.infinity,
+                  text: 'Remove Items'.toUpperCase(),
+                  textColor: Colors.white,
+                  color: StaticColors.pinkColor,
+                ).marginOnly(left: 12);
+              }),
+            ],
+          )
         ],
       ),
     );
@@ -610,19 +717,29 @@ class OrderDetailsView extends GetView<DineInController> {
 }
 
 // row
-Widget _row(ThemeData theme,
-    {double? fontSize,
-    FontWeight? fontWeight,
-    required String title,
-    required String value}) {
+Widget _row(
+  ThemeData theme, {
+  double? fontSize,
+  FontWeight? fontWeight,
+  Widget? child,
+  required String title,
+  required String value,
+}) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
-      Text(
-        title,
-        style: theme.textTheme.titleSmall?.copyWith(
-            fontSize: fontSize ?? 14,
-            fontWeight: fontWeight ?? FontWeight.w700),
+      Row(
+        children: [
+          Text(
+            title,
+            style: theme.textTheme.titleSmall?.copyWith(
+                fontSize: fontSize ?? 14,
+                fontWeight: fontWeight ?? FontWeight.w700),
+          ),
+          SizedBox(
+            child: child,
+          )
+        ],
       ),
       Text(
         value,

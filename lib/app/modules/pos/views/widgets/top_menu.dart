@@ -34,11 +34,10 @@ class TopMenu extends GetView<PosController> {
                 text: 'pos'.toUpperCase(),
                 textMaxSize: txtMaxSize,
                 textMinSize: txtMinSize,
-              ),
+              ).marginOnly(right: 10),
             );
           }),
           // todo hide this
-          const SizedBox(width: 10),
           PrimaryBtn(
             width: width,
             height: height,

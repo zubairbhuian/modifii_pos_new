@@ -89,9 +89,22 @@ class MyFunc {
   }
 
   static int generateRandomNumericId() {
-  Random random = Random();
-  int min = 100000;
-  int max = 999999;
-  return min + random.nextInt(max - min);
-}
+    Random random = Random();
+    int min = 100000;
+    int max = 999999;
+    return min + random.nextInt(max - min);
+  }
+
+  static String capitalize(String s) =>
+      s[0].toUpperCase() + s.substring(1).toLowerCase();
+  static String capitalizeEachWord({String? s}) {
+    if (s != null && s.isNotEmpty) {
+      return s
+          .split(' ')
+          .map(
+              (word) => word[0].toUpperCase() + word.substring(1).toLowerCase())
+          .join(' ');
+    }
+    return "";
+  }
 }

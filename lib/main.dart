@@ -88,7 +88,7 @@ class MyApp extends StatelessWidget {
           ConfigController.to.isLightTheme ? ThemeMode.light : ThemeMode.dark,
       theme: lightTheme,
       darkTheme: darkTheme,
-       
+
       initialBinding: BaseBinding(apiService: apiService),
       // initialRoute: AppPages.INITIAL,
       initialRoute: Routes.AUTH,
