@@ -658,6 +658,18 @@ class SplitOrderView extends GetView<DineInController> {
                                                             .splitAmount) {
                                                       return 'Minimum payment is \$${c.splitAmountChecks.splitAmounts[index].splitAmount}';
                                                     }
+                                                    if ((num.tryParse(c
+                                                                .splitPayAmountTEC
+                                                                .text) ??
+                                                            0) >
+                                                        (c
+                                                                .splitAmountChecks
+                                                                .splitAmounts[
+                                                                    index]
+                                                                .splitAmount *
+                                                            2)) {
+                                                      return 'Maximum accepted payment is \$${(c.splitAmountChecks.splitAmounts[index].splitAmount) * 2}';
+                                                    }
                                                     return null;
                                                   },
                                                   onTap: () {
