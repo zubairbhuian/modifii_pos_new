@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
+import 'package:flutter_base/app/widgets/my_custom_text.dart';
 import 'package:flutter_base/app/widgets/popup_dialogs.dart';
-
 import '../../../../../widgets/custom_textfield.dart';
 
 class SplitDialogs {
@@ -13,7 +14,7 @@ class SplitDialogs {
     required VoidCallback onTap,
   }) {
     PopupDialog.customDialog(
-        width: 1000,
+        width: 900,
         child: Column(
           children: [
             Padding(
@@ -25,13 +26,16 @@ class SplitDialogs {
                   Expanded(
                       child: CustomTextField(
                     controller: guestController,
-                    extraLabel: 'Number of Guest:',
+                    extraLabel: 'Number of Guests:',
                     extraLabelFontSize: 32,
                     hintText: '',
                     autofocus: true,
                     style: const TextStyle(fontSize: 48),
                     padding: const EdgeInsets.symmetric(
                         vertical: 26, horizontal: 22),
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
                   )),
                   const SizedBox(width: 16),
                   Expanded(
@@ -46,16 +50,18 @@ class SplitDialogs {
                         vertical: 26, horizontal: 22),
                   )),
                   const SizedBox(width: 16),
-                  PrimaryBtn(
-                      onPressed: onTap,
-                      height: 115,
-                      width: 120,
-                      padding: const EdgeInsets.all(4.0),
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                          fontSize: 200),
-                      text: "Submit")
+                  PrimaryBtnWithChild(
+                    onPressed: onTap,
+                    height: 115,
+                    width: 128,
+                    padding: const EdgeInsets.all(4.0),
+                    child: const FittedBox(
+                      child: MyCustomText(
+                        'Submit',
+                        fontSize: 100,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             )
@@ -68,7 +74,7 @@ class SplitDialogs {
     required VoidCallback onTap,
   }) {
     PopupDialog.customDialog(
-        width: 1000,
+        width: 700,
         child: Column(
           children: [
             Padding(
@@ -89,16 +95,18 @@ class SplitDialogs {
                         vertical: 26, horizontal: 22),
                   )),
                   const SizedBox(width: 16),
-                  PrimaryBtn(
-                      onPressed: onTap,
-                      height: 115,
-                      width: 120,
-                      padding: const EdgeInsets.all(4.0),
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                          fontSize: 200),
-                      text: "Submit")
+                  PrimaryBtnWithChild(
+                    onPressed: onTap,
+                    height: 115,
+                    width: 128,
+                    padding: const EdgeInsets.all(4.0),
+                    child: const FittedBox(
+                      child: MyCustomText(
+                        'Submit',
+                        fontSize: 100,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             )
@@ -106,44 +114,56 @@ class SplitDialogs {
         ));
   }
 
-  static tipAmount({
-    required TextEditingController tipAmountController,
+  static totalAmount({
+    required TextEditingController totalAmountController,
     required VoidCallback onTap,
   }) {
     PopupDialog.customDialog(
-        width: 1000,
+        width: 450,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Expanded(
-                      child: CustomTextField(
-                    controller: tipAmountController,
-                    extraLabel: 'Tip Amount:',
-                    extraLabelFontSize: 32,
-                    hintText: '(Optional)',
-                    autofocus: true,
-                    style: const TextStyle(fontSize: 48),
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 26, horizontal: 22),
-                  )),
-                  const SizedBox(width: 16),
-                  PrimaryBtn(
-                      onPressed: onTap,
-                      height: 115,
-                      width: 120,
-                      padding: const EdgeInsets.all(4.0),
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                          fontSize: 200),
-                      text: "Submit")
-                ],
-              ),
+            const MyCustomText(
+              'Total Amount',
+              fontSize: 32,
+              fontWeight: FontWeight.w600,
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                    child: CustomTextField(
+                  controller: totalAmountController,
+                  // extraLabel: 'Tip Amount:',
+                  extraLabelFontSize: 32,
+                  prefixIcon: const MyCustomText('  \$  ', fontSize: 36),
+                  // hintText: '(Optional)',
+                  autofocus: true,
+                  style: const TextStyle(fontSize: 48),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 26, horizontal: 22),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(
+                        RegExp(r'^\d*\.?\d{0,2}')),
+                  ],
+                )),
+                const SizedBox(width: 16),
+                PrimaryBtnWithChild(
+                  onPressed: onTap,
+                  height: 115,
+                  width: 128,
+                  padding: const EdgeInsets.all(4.0),
+                  child: const FittedBox(
+                    child: MyCustomText(
+                      'Submit',
+                      fontSize: 100,
+                    ),
+                  ),
+                ),
+              ],
             )
           ],
         ));

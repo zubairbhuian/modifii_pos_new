@@ -106,12 +106,13 @@ class PopupDialog {
                       onTap: Get.back,
                       splashFactory: NoSplash.splashFactory,
                       child: Padding(
-                        padding: const EdgeInsets.only(
-                            left: 8, right: 8, top: 8, bottom: 2),
+                        // padding: const EdgeInsets.only(
+                        //     left: 8, right: 8, top: 8, bottom: 2),
+                        padding: EdgeInsets.zero,
                         child: Icon(
                           Icons.close,
                           color: Theme.of(context).colorScheme.background,
-                          size: 18,
+                          size: 45,
                         ),
                       ),
                     ),

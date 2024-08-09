@@ -32,13 +32,13 @@ class SplitAmount {
   String guestName;
   num splitAmount;
   num tipAmount;
-  String paymentMethod;
+  String? paymentMethod;
 
   SplitAmount({
     required this.guestName,
     required this.splitAmount,
     required this.tipAmount,
-    required this.paymentMethod,
+    this.paymentMethod,
   });
 
   factory SplitAmount.fromJson(Map<String, dynamic> json) => SplitAmount(
@@ -48,10 +48,15 @@ class SplitAmount {
         paymentMethod: json["paymentMethod"],
       );
 
-  Map<String, dynamic> toJson() => {
-        "guestName": guestName,
-        "splitAmount": splitAmount,
-        "tipAmount": tipAmount,
-        "paymentMethod": paymentMethod,
-      };
+  Map<String, dynamic> toJson() {
+    final data = {
+      "guestName": guestName,
+      "splitAmount": splitAmount,
+      "tipAmount": tipAmount,
+    };
+    if (paymentMethod != null) {
+      data['paymentMethod'] = paymentMethod ?? '';
+    }
+    return data;
+  }
 }

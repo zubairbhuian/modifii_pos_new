@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_base/app/modules/pos/dine-in/controllers/dine_in_controller.dart';
 import 'package:get/get.dart';
 import '../../../../widgets/popup_dialogs.dart';
 import '../../controllers/pos_controller.dart';
@@ -32,29 +33,35 @@ class SplitOrderController extends GetxController {
     guestNameTEC.clear();
   }
 
-  TextEditingController tipAmountTEC = TextEditingController();
+  TextEditingController splitPayAmountTEC = TextEditingController();
   void updateTipAndPayMethod(int index, String payment) {
     splitAmountChecks.splitAmounts[index].tipAmount =
-        num.tryParse(tipAmountTEC.text) ?? 0;
+        (num.tryParse(splitPayAmountTEC.text) ?? 0) - splitAmountPerGuest;
     splitAmountChecks.splitAmounts[index].paymentMethod = payment;
 
     paySplitAmount();
+    DineInController.to.splitPaymentActiveIndex.value = -1;
     update();
     Get.back();
-    tipAmountTEC.clear();
+    splitPayAmountTEC.clear();
   }
 
   SplitAmountModel splitAmountChecks = SplitAmountModel(splitAmounts: []);
+  num splitAmountPerGuest = 0;
   void calculateSplitReceipts() {
-    final num amountPerGuest =
-        order.totalOrderAmount / int.parse(noOfGuestTEC.text);
+    //amount only upto 2 decimal points
+    splitAmountPerGuest =
+        ((order.totalOrderAmount / int.parse(noOfGuestTEC.text)) * 100)
+                .round() /
+            100;
+
     splitAmountChecks.splitAmounts =
         List.generate(int.parse(noOfGuestTEC.text), (index) {
       return SplitAmount(
         guestName: 'Guest ${index + 1}',
-        splitAmount: amountPerGuest,
+        splitAmount: splitAmountPerGuest,
         tipAmount: 0,
-        paymentMethod: 'Unpaid',
+        paymentMethod: null,
       );
     });
 

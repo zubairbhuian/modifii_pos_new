@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/controllers/split_order_controller.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/widgets/dialogs/split_dialog.dart';
 import 'package:flutter_base/app/modules/pos/dine-in/widgets/table_dialog.dart';
@@ -7,6 +8,7 @@ import 'package:flutter_base/app/widgets/appbar.dart';
 import 'package:flutter_base/app/widgets/custom_btn.dart';
 import 'package:flutter_base/app/widgets/my_custom_text.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import '../../order/models/order_model.dart';
 import '../controllers/dine_in_controller.dart';
@@ -445,10 +447,14 @@ class SplitOrderView extends GetView<DineInController> {
                                               color:
                                                   theme.scaffoldBackgroundColor,
                                               onPressed: () {
-                                                controller
-                                                    .paymentMathodActiveIndex
-                                                    .value = index;
-                                                TableDialogs.makePayment();
+                                                SplitDialogs.totalAmount(
+                                                  totalAmountController:
+                                                      c.splitPayAmountTEC,
+                                                  onTap: () {
+                                                    c.updateTipAndPayMethod(
+                                                        index, data);
+                                                  },
+                                                );
                                               },
                                               text: data,
                                               padding:
@@ -501,24 +507,37 @@ class SplitOrderView extends GetView<DineInController> {
                                 color: theme.dividerColor.withOpacity(0.4),
                                 height: 16,
                               ),
-                              Row(
-                                children: [
-                                  MyCustomText(
-                                      '${order.orderType.replaceAll('_', '-')}:  ',
-                                      fontSize: 18),
-                                  Expanded(
-                                    child: InkWell(
-                                      onTap: () {
-                                        SplitDialogs.guestName(
-                                          guestController: c.guestNameTEC,
-                                          onTap: () => c.updateGuestName(index),
-                                        );
-                                      },
-                                      child: MyCustomText(check.guestName,
+                              Align(
+                                alignment: Alignment.center,
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 4.0),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      MyCustomText(
+                                          '${order.orderType.replaceAll('_', '-')}:  ${check.guestName}',
                                           fontSize: 18),
-                                    ),
+                                      InkWell(
+                                        onTap: () {
+                                          SplitDialogs.guestName(
+                                            guestController: c.guestNameTEC,
+                                            onTap: () =>
+                                                c.updateGuestName(index),
+                                          );
+                                        },
+                                        child: const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 8.0),
+                                          child: Icon(
+                                            FontAwesomeIcons.penToSquare,
+                                            color: StaticColors.orangeColor,
+                                          ),
+                                        ),
+                                      )
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
                               Divider(
                                 color: theme.dividerColor.withOpacity(0.4),
@@ -540,10 +559,22 @@ class SplitOrderView extends GetView<DineInController> {
                                 color: theme.dividerColor.withOpacity(0.4),
                                 height: 16,
                               ),
+                              if (check.paymentMethod != null)
+                                _priceRow(theme,
+                                    title: "Tip Amount",
+                                    value:
+                                        "\$${check.tipAmount.toStringAsFixed(2)}"),
+                              if (check.paymentMethod != null)
+                                Divider(
+                                  color: theme.dividerColor.withOpacity(0.4),
+                                  height: 16,
+                                ),
                               _priceRow(theme,
-                                  title: "Total Due",
+                                  title: check.paymentMethod == ''
+                                      ? "Total Due"
+                                      : 'Total Paid',
                                   value:
-                                      "\$${check.splitAmount.toStringAsFixed(2)}"),
+                                      "\$${(check.splitAmount + check.tipAmount).toStringAsFixed(2)}"),
                               const SizedBox(height: 8),
                               PrimaryBtn(
                                 onPressed: () {},
@@ -558,7 +589,7 @@ class SplitOrderView extends GetView<DineInController> {
                                             .splitAmountChecks
                                             .splitAmounts[index]
                                             .paymentMethod !=
-                                        'Unpaid'
+                                        null
                                     ? () {
                                         //paid already
                                       }
@@ -575,11 +606,15 @@ class SplitOrderView extends GetView<DineInController> {
                                 width: double.infinity,
                                 text: c.splitAmountChecks.splitAmounts[index]
                                             .paymentMethod !=
-                                        'Unpaid'
+                                        null
                                     ? 'PAID (${c.splitAmountChecks.splitAmounts[index].paymentMethod})'
                                     : 'PAY',
                                 textColor: Colors.white,
-                                color: StaticColors.greenColor,
+                                color: c.splitAmountChecks.splitAmounts[index]
+                                            .paymentMethod !=
+                                        null
+                                    ? StaticColors.blueColor
+                                    : StaticColors.greenColor,
                               ),
                               const SizedBox(height: 8),
                               // payment method
@@ -603,9 +638,9 @@ class SplitOrderView extends GetView<DineInController> {
                                                 // controller
                                                 //     .paymentMathodActiveIndex
                                                 //     .value = index;
-                                                SplitDialogs.tipAmount(
-                                                  tipAmountController:
-                                                      c.tipAmountTEC,
+                                                SplitDialogs.totalAmount(
+                                                  totalAmountController:
+                                                      c.splitPayAmountTEC,
                                                   onTap: () {
                                                     c.updateTipAndPayMethod(
                                                         index, data);
@@ -650,28 +685,21 @@ class SplitOrderView extends GetView<DineInController> {
 
   // row
   Widget _priceRow(ThemeData theme,
-      {double? fontSize,
-      FontWeight? fontWeight,
-      required String title,
-      required String value}) {
+      {double? fontSize, required String title, required String value}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
-            child: Text(
+            child: MyCustomText(
               title,
-              style: theme.textTheme.titleSmall?.copyWith(
-                  fontSize: fontSize ?? 14,
-                  fontWeight: fontWeight ?? FontWeight.w600),
+              fontSize: 18,
             ),
           ),
-          Text(
+          MyCustomText(
             value,
-            style: theme.textTheme.titleSmall?.copyWith(
-                fontSize: fontSize ?? 14,
-                fontWeight: fontWeight ?? FontWeight.w800),
+            fontSize: 18,
           ),
         ],
       ),
