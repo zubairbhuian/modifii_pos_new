@@ -450,6 +450,8 @@ class SplitOrderView extends GetView<DineInController> {
                                                 SplitDialogs.totalAmount(
                                                   totalAmountController:
                                                       c.splitPayAmountTEC,
+                                                  formKey:
+                                                      c.splitPayAmountFormKey,
                                                   onTap: () {
                                                     c.updateTipAndPayMethod(
                                                         index, data);
@@ -635,15 +637,36 @@ class SplitOrderView extends GetView<DineInController> {
                                                   theme.scaffoldBackgroundColor,
                                               onPressed: () {
                                                 //TODO: split amount payment
-                                                // controller
-                                                //     .paymentMathodActiveIndex
-                                                //     .value = index;
+
                                                 SplitDialogs.totalAmount(
                                                   totalAmountController:
                                                       c.splitPayAmountTEC,
+                                                  formKey:
+                                                      c.splitPayAmountFormKey,
+                                                  validator: (value) {
+                                                    if (value == null ||
+                                                        value.isEmpty) {
+                                                      return 'Total amount required!';
+                                                    }
+                                                    if ((num.tryParse(c
+                                                                .splitPayAmountTEC
+                                                                .text) ??
+                                                            0) <
+                                                        c
+                                                            .splitAmountChecks
+                                                            .splitAmounts[index]
+                                                            .splitAmount) {
+                                                      return 'Minimum payment is \$${c.splitAmountChecks.splitAmounts[index].splitAmount}';
+                                                    }
+                                                    return null;
+                                                  },
                                                   onTap: () {
-                                                    c.updateTipAndPayMethod(
-                                                        index, data);
+                                                    if ((c.splitPayAmountFormKey
+                                                        .currentState!
+                                                        .validate())) {
+                                                      c.updateTipAndPayMethod(
+                                                          index, data);
+                                                    }
                                                   },
                                                 );
                                               },

@@ -116,10 +116,12 @@ class SplitDialogs {
 
   static totalAmount({
     required TextEditingController totalAmountController,
+    GlobalKey<FormState>? formKey,
+    String? Function(String?)? validator,
     required VoidCallback onTap,
   }) {
     PopupDialog.customDialog(
-        width: 450,
+        width: 500,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -130,25 +132,29 @@ class SplitDialogs {
             ),
             const SizedBox(height: 12),
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                    child: CustomTextField(
-                  controller: totalAmountController,
-                  // extraLabel: 'Tip Amount:',
-                  extraLabelFontSize: 32,
-                  prefixIcon: const MyCustomText('  \$  ', fontSize: 36),
-                  // hintText: '(Optional)',
-                  autofocus: true,
-                  style: const TextStyle(fontSize: 48),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 26, horizontal: 22),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.allow(
-                        RegExp(r'^\d*\.?\d{0,2}')),
-                  ],
+                    child: Form(
+                  key: formKey,
+                  child: CustomTextField(
+                    controller: totalAmountController,
+                    // extraLabel: 'Tip Amount:',
+                    extraLabelFontSize: 32,
+                    prefixIcon: const MyCustomText('  \$  ', fontSize: 36),
+                    // hintText: '(Optional)',
+                    autofocus: true,
+                    style: const TextStyle(fontSize: 48),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 26, horizontal: 22),
+                    keyboardType: TextInputType.number,
+                    validator: validator,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.allow(
+                          RegExp(r'^\d*\.?\d{0,2}')),
+                    ],
+                  ),
                 )),
                 const SizedBox(width: 16),
                 PrimaryBtnWithChild(

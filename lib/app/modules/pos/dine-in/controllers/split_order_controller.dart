@@ -33,6 +33,7 @@ class SplitOrderController extends GetxController {
     guestNameTEC.clear();
   }
 
+  final GlobalKey<FormState> splitPayAmountFormKey = GlobalKey<FormState>();
   TextEditingController splitPayAmountTEC = TextEditingController();
   void updateTipAndPayMethod(int index, String payment) {
     splitAmountChecks.splitAmounts[index].tipAmount =
